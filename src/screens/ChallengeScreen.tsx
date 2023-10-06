@@ -1,12 +1,12 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-const MainScreen = () => {
+const ChallengeScreen = () => {
   return (
     <View>
-      <Text>MainScreen</Text>
+      <Text>ChallengeScreen</Text>
     </View>
   );
 };
 
-export default MainScreen;
+export default ChallengeScreen;
