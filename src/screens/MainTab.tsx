@@ -13,19 +13,6 @@ export const MainTab = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarShowLabel: false,
-        // tabBarStyle: {position: 'absolute', borderColor: '#bdbdbd'},
-        // tabBarBadgeStyle: {backgroundColor: '#bdbdbd'},
-        // tabBarBadgeStyle: {
-        //   borderBlockColor: '#D56334',
-        //   borderBlockEndColor: '#D56334',
-        //   borderBlockStartColor: '#D56334',
-        //   borderBottomColor: '#D56334',
-        //   borderColor: '#D56334',
-        //   borderEndColor: '#D56334',
-        //   backgroundColor: '#D56334',
-        //   color: '#D56334',
-
-        // },
         tabBarActiveTintColor: '#4c4c4c',
         tabBarInactiveTintColor: '#b5b5b5',
       }}>
