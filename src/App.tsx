@@ -1,118 +1,88 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, {useState} from 'react';
+import {Button, Text, View} from 'react-native';
 
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  KakaoOAuthToken,
+  KakaoProfile,
+  KakaoProfileNoneAgreement,
+  getProfile,
+  logout,
+  login,
+  unlink,
+} from '@react-native-seoul/kakao-login';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+function App() {
+  const [result, setResult] = useState<string>('');
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const signInWithKakao = async (): Promise<void> => {
+    try {
+      const token: KakaoOAuthToken = await login();
+      console.log(token);
+
+      setResult(JSON.stringify(token));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const signOutWithKakao = async (): Promise<void> => {
+    try {
+      const message = await logout();
+      console.log(message);
+
+      setResult(message);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getKakaoProfile = async (): Promise<void> => {
+    try {
+      const profile: KakaoProfile | KakaoProfileNoneAgreement =
+        await getProfile();
+      console.log(profile);
+
+      setResult(JSON.stringify(profile));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const unlinkKakao = async (): Promise<void> => {
+    try {
+      const message = await unlink();
+      console.log(message);
+
+      setResult(message);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View>
+      <Text>result : {result}</Text>
+      <Button
+        testID="btn-login"
+        onPress={() => signInWithKakao()}
+        title={'카카오 로그인'}
+      />
+      <View style={{marginTop: 12}} />
+      <Button
+        testID="btn-login"
+        onPress={() => unlinkKakao()}
+        title={'링크 해제'}
+      />
+      <View style={{marginTop: 12}} />
+      <Button
+        testID="btn-login"
+        onPress={() => getKakaoProfile()}
+        title={'프로필 조회'}
+      />
+      <View style={{marginTop: 12}} />
+      <Button onPress={() => signOutWithKakao()} title={'카카오 로그아웃'} />
+      <View style={{marginTop: 40}} />
     </View>
   );
 }
-
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
