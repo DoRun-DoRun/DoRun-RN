@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Pressable,
   Image,
@@ -10,8 +10,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import Share from 'react-native-share';
 import {Text} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import ViewShot, {captureRef} from 'react-native-view-shot';
 
 const UploadModeModal = ({
   visible,
@@ -227,5 +229,59 @@ const ImageUploadSampleStyles = StyleSheet.create({
     height: 100,
     borderRadius: 50, // 원 모양을 만들기 위한 값
     backgroundColor: 'blue', // 배경 색상
+  },
+});
+
+export const ImageSave = () => {
+  const ref = useRef<ViewShot | null>(null);
+
+  useEffect(() => {
+    // on mount
+    if (ref.current) {
+      ref.current?.capture().then(uri => {
+        console.log('do something with ', uri);
+      });
+    }
+  }, []);
+
+  const onShare = async () => {
+    try {
+      console.log('click');
+
+      const uri = await captureRef(ref, {
+        format: 'jpg',
+        quality: 0.9,
+      });
+
+      let options = {
+        title: 'Share via',
+        message: 'Check out this image!',
+        url: Platform.OS === 'ios' ? `file://${uri}` : uri,
+      };
+      await Share.open(options);
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  return (
+    <ViewShot
+      ref={ref}
+      options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}
+      style={onShareStyles.block}>
+      <Pressable
+        // 클릭하면 viewRef를 이미지 파일로 변환해서 저장해 줌
+        onPress={onShare}
+        style={{padding: 10}}>
+        <Icon name="share" size={18} color={'#000'} />
+      </Pressable>
+      <Text>context</Text>
+    </ViewShot>
+  );
+};
+
+const onShareStyles = StyleSheet.create({
+  block: {
+    backgroundColor: '#f7d8b7',
   },
 });
