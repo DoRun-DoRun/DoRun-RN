@@ -1,11 +1,16 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {Button, InnerContainer} from '../Component';
 
 const MainScreen = () => {
   return (
-    <View>
-      <Text>MainScreen</Text>
-    </View>
+    <SafeAreaView>
+      <InnerContainer>
+        <Button>요소</Button>
+        <Button type="secondary">😀</Button>
+        <Button type="primary">요소</Button>
+      </InnerContainer>
+    </SafeAreaView>
   );
 };
 
