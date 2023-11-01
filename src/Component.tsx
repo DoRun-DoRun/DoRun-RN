@@ -15,13 +15,11 @@ const ButtonContainer = styled.TouchableOpacity<{color: string}>`
   border-radius: 10px;
 `;
 
-export const TextComponent = styled.Text`
-  font-family: 'NotoSansKr';
-`;
-
 const ButtonText = styled.Text<{color: string}>`
   color: ${props => props.theme[props.color]};
-  font-weight: 700;
+  font-family: 'NotoSansKR-Bold';
+  line-height: 23;
+  font-size: 16;
 `;
 
 export const InnerContainer = styled.View`
