@@ -4,35 +4,39 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 
-import ChallengeScreen from './ChallengeScreen';
-import RaceScreen from './RaceScreen';
-import MyPageScreen from './MyPageScreen';
+import ChallengeTab from './ChallengeTab';
+import RaceTab from './RaceTab';
+import MyPageTab from './MyPageTab';
+
+import {useTheme} from 'styled-components/native';
 
 const Tab = createBottomTabNavigator();
 
 export const MainTab = () => {
+  const theme = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
+        headerStyle: {
+          borderBottomWidth: 2,
+          borderColor: theme.gray6,
+        },
+        headerTitleStyle: {
+          fontFamily: 'NotoSansKR-Medium',
+          // fontWeight: '500',
+          fontSize: 20,
+          lineHeight: 28,
+          color: '#000',
+        },
+        headerTitleAlign: 'center',
         tabBarShowLabel: false,
-        // tabBarStyle: {position: 'absolute', borderColor: '#bdbdbd'},
-        // tabBarBadgeStyle: {backgroundColor: '#bdbdbd'},
-        // tabBarBadgeStyle: {
-        //   borderBlockColor: '#D56334',
-        //   borderBlockEndColor: '#D56334',
-        //   borderBlockStartColor: '#D56334',
-        //   borderBottomColor: '#D56334',
-        //   borderColor: '#D56334',
-        //   borderEndColor: '#D56334',
-        //   backgroundColor: '#D56334',
-        //   color: '#D56334',
-        // },
-        tabBarActiveTintColor: '#4c4c4c',
-        tabBarInactiveTintColor: '#b5b5b5',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.gray5,
       }}>
       <Tab.Screen
-        name="챌린지 A"
-        component={RaceScreen}
+        name="챌린지 이름"
+        component={RaceTab}
         options={{
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="home" color={color} size={size} />
@@ -40,8 +44,8 @@ export const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="챌린지 LIST"
-        component={ChallengeScreen}
+        name="챌린지 리스트"
+        component={ChallengeTab}
         options={{
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="list-alt" color={color} size={size} />
@@ -50,7 +54,7 @@ export const MainTab = () => {
       />
       <Tab.Screen
         name="마이페이지"
-        component={MyPageScreen}
+        component={MyPageTab}
         options={{
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="person" color={color} size={size} />

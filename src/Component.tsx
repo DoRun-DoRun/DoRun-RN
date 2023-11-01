@@ -27,6 +27,12 @@ export const InnerContainer = styled.View`
   text-align: left;
 `;
 
+export const Container = styled.SafeAreaView`
+  display: flex;
+  flex: 1;
+  background-color: #fff;
+`;
+
 export const Button = ({children, type, onPress}: ButtonType) => {
   let color = 'white';
   let backgroundColor = 'primary';
