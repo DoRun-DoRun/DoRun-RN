@@ -4,14 +4,17 @@ import {Provider as StoreProvider} from 'react-redux';
 import {name as appName} from './app.json';
 import App from './src/App';
 import {Store} from './store/Store';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, ThemeProvider} from '@react-navigation/native';
+import {light} from './src/style/theme';
 
 export default function Main() {
   return (
     <StoreProvider store={Store}>
-      <NavigationContainer>
-        <App />
-      </NavigationContainer>
+      <ThemeProvider theme={light}>
+        <NavigationContainer>
+          <App />
+        </NavigationContainer>
+      </ThemeProvider>
     </StoreProvider>
   );
 }

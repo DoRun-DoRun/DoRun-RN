@@ -1,11 +1,13 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/react-in-jsx-scope */
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import ChallengeScreen from './ChallengeScreen';
-import MainScreen from './MainScreen';
-import MyPageScreen from './MyPageScreen';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
+
+import ChallengeScreen from './ChallengeScreen';
+import RaceScreen from './RaceScreen';
+import MyPageScreen from './MyPageScreen';
+
 const Tab = createBottomTabNavigator();
 
 export const MainTab = () => {
@@ -24,14 +26,13 @@ export const MainTab = () => {
         //   borderEndColor: '#D56334',
         //   backgroundColor: '#D56334',
         //   color: '#D56334',
-
         // },
         tabBarActiveTintColor: '#4c4c4c',
         tabBarInactiveTintColor: '#b5b5b5',
       }}>
       <Tab.Screen
         name="챌린지 A"
-        component={MainScreen}
+        component={RaceScreen}
         options={{
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="home" color={color} size={size} />

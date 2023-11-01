@@ -1,12 +1,12 @@
 import React from 'react';
 import {SafeAreaView, Text} from 'react-native';
 
-const MyPageScreen = () => {
+const RaceScreen = () => {
   return (
     <SafeAreaView>
-      <Text>MyPageScreen</Text>
+      <Text>RaceScreen</Text>
     </SafeAreaView>
   );
 };
 
-export default MyPageScreen;
+export default RaceScreen;
