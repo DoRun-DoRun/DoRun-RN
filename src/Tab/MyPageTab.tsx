@@ -113,10 +113,6 @@ const ChallengeName = styled.View`
   justify-content: space-between;
 `;
 
-const ChallengeDescription = styled.View`
-  gap: 16px;
-`;
-
 const DailyPicContiner = styled.View`
   align-items: center;
 `;
@@ -158,10 +154,6 @@ const DailyTodoList = styled.View`
   padding: 4px 0;
 `;
 
-const WeeklyTeamTodo = styled.View`
-  gap: 16px;
-`;
-
 const WeeklyTeamGoal = styled.View`
   align-items: center;
   border: 2px solid ${props => props.theme.primary};
@@ -196,7 +188,7 @@ const History = () => {
         </DailyTextContiner>
       </DailyPicContiner>
 
-      <ChallengeDescription>
+      <View style={{gap: 16}}>
         <DailyDiary>
           <DailyDiaryTitle>
             <NotoSansKR color="white" size={16}>
@@ -224,9 +216,9 @@ const History = () => {
             </NotoSansKR>
           </DailyTodoList>
         </DailyTodo>
-      </ChallengeDescription>
+      </View>
 
-      <WeeklyTeamTodo>
+      <View style={{gap: 16}}>
         <NotoSansKR size={18}>팀 주간목표</NotoSansKR>
         <WeeklyTeamGoal>
           <NotoSansKR size={18} color="primary">
@@ -251,7 +243,7 @@ const History = () => {
             <Text>😀😀😀</Text>
           </View>
         </ScrollView>
-      </WeeklyTeamTodo>
+      </View>
     </>
   );
 };
