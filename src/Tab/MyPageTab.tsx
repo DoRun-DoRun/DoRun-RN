@@ -1,5 +1,10 @@
 import React, {useState} from 'react';
-import {HomeContainer, InnerContainer, NotoSansKR} from '../Component';
+import {
+  HomeContainer,
+  InnerContainer,
+  NotoSansKR,
+  ScrollContainer,
+} from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import {ScrollView, Text, View} from 'react-native';
 import {Calendar} from 'react-native-calendars';
@@ -7,7 +12,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 
 const ProfileContainer = styled.View`
-  display: flex;
   flex-direction: row;
   gap: 24px;
   border: 1px solid ${props => props.theme.primary};
@@ -23,13 +27,11 @@ const UserIcon = styled.View`
 `;
 
 const UserStatsContainer = styled.View`
-  display: flex;
   gap: 16px;
   flex-direction: row;
 `;
 
 const UserStatsCount = styled.View`
-  display: flex;
   justify-content: center;
   align-items: center;
   width: 40px;
@@ -39,7 +41,6 @@ const UserStatsCount = styled.View`
 `;
 
 const UserStatsBox = styled.View`
-  display: flex;
   gap: 3px;
   align-items: center;
 `;
@@ -66,7 +67,6 @@ const UserStats = ({
 };
 
 const Divider = styled.View`
-  width: 0px;
   height: 56px;
   border: 1px solid ${props => props.theme.gray6};
 `;
@@ -83,7 +83,6 @@ const HistoryContainer = styled.View`
 `;
 
 const CategoryContainer = styled.View`
-  display: flex;
   flex-direction: row;
   margin: 0 -16px;
   justify-content: flex-end;
@@ -91,11 +90,11 @@ const CategoryContainer = styled.View`
 `;
 
 const CategoryTab = styled.View`
-  display: flex;
   flex-direction: row;
   border-radius: 5px 5px 0 0;
   background-color: ${props => props.theme.gray7};
 `;
+
 const Tab = styled.Pressable<{selected?: boolean}>`
   padding: 4px 24px;
   border-radius: 5px 5px 0 0;
@@ -104,20 +103,17 @@ const Tab = styled.Pressable<{selected?: boolean}>`
 `;
 
 const HistoryDetailContainer = styled.View`
-  display: flex;
   gap: 32px;
   padding: 16px 0;
   width: auto;
 `;
 
 const ChallengeName = styled.View`
-  display: flex;
   flex-direction: row;
   justify-content: space-between;
 `;
 
 const ChallengeDescription = styled.View`
-  display: flex;
   gap: 16px;
 `;
 
@@ -138,7 +134,6 @@ const DailyTextContiner = styled.View`
 `;
 
 const DailyDiary = styled.View`
-  display: flex;
   gap: 8px;
   border-radius: 10px;
   padding: 16px;
@@ -146,13 +141,11 @@ const DailyDiary = styled.View`
 `;
 
 const DailyDiaryTitle = styled.View`
-  display: flex;
   flex-direction: row;
   justify-content: space-between;
 `;
 
 const DailyTodo = styled.View`
-  display: flex;
   gap: 8px;
   border-radius: 10px;
   padding: 8px 16px;
@@ -160,19 +153,16 @@ const DailyTodo = styled.View`
 `;
 
 const DailyTodoList = styled.View`
-  display: flex;
   flex-direction: row;
   gap: 8px;
   padding: 4px 0;
 `;
 
 const WeeklyTeamTodo = styled.View`
-  display: flex;
   gap: 16px;
 `;
 
 const WeeklyTeamGoal = styled.View`
-  display: flex;
   align-items: center;
   border: 2px solid ${props => props.theme.primary};
   padding: 8px;
@@ -315,7 +305,7 @@ const MyPageTab = () => {
   const [selected, setSelected] = useState('history');
   return (
     <HomeContainer>
-      <ScrollView>
+      <ScrollContainer>
         <InnerContainer gap={24}>
           <ProfileContainer>
             <UserIcon />
@@ -365,7 +355,7 @@ const MyPageTab = () => {
             </HistoryDetailContainer>
           </HistoryContainer>
         </InnerContainer>
-      </ScrollView>
+      </ScrollContainer>
     </HomeContainer>
   );
 };

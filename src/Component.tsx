@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 
 interface ButtonType {
   children: React.ReactNode;
-  type?: 'primary' | 'secondary' | 'disabled';
+  type?: 'primary' | 'secondary' | 'gray';
   onPress?: () => void;
 }
 
@@ -16,8 +16,8 @@ const ButtonContainer = styled.TouchableOpacity<{color: string}>`
 `;
 
 interface FontType {
-  weight?: 'Bold' | 'Medium' | 'Regular';
   size: number;
+  weight?: 'Bold' | 'Regular' | 'Medium';
   color?: string;
   lineHeight?: number;
 }
@@ -33,8 +33,9 @@ export const NotoSansKR = styled.Text<FontType>`
 export const InnerContainer = styled.View<{gap?: number}>`
   display: flex;
   flex: 1;
-  padding: 16px;
+  padding: 16px 16px 0;
   text-align: left;
+  gap: ${props => props.gap + 'px'};
 `;
 
 export const HomeContainer = styled.SafeAreaView`
@@ -53,7 +54,7 @@ export const Button = ({children, type, onPress}: ButtonType) => {
   if (type === 'secondary') {
     color = 'gray4';
     backgroundColor = 'null';
-  } else if (type === 'disabled') {
+  } else if (type === 'gray') {
     color = 'gray2';
     backgroundColor = 'gray5';
   }
