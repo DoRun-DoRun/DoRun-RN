@@ -1,12 +1,12 @@
 import React from 'react';
 import {Text} from 'react-native';
-import {Container} from '../Component';
+import {HomeContainer} from '../Component';
 
 const CreateChallengeScreen = () => {
   return (
-    <Container>
+    <HomeContainer>
       <Text>CreateChallengeScreen</Text>
-    </Container>
+    </HomeContainer>
   );
 };
 

@@ -22,15 +22,20 @@ const ButtonText = styled.Text<{color: string}>`
   font-size: 16;
 `;
 
-export const InnerContainer = styled.View`
+export const InnerContainer = styled.View<{gap?: number}>`
+  display: flex;
+  flex: 1;
   padding: 16px;
   text-align: left;
 `;
 
-export const Container = styled.SafeAreaView`
-  display: flex;
+export const HomeContainer = styled.SafeAreaView`
   flex: 1;
   background-color: #fff;
+`;
+
+export const ScrollContainer = styled.ScrollView`
+  flex: 1;
 `;
 
 export const Button = ({children, type, onPress}: ButtonType) => {

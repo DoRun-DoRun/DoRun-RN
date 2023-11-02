@@ -1,12 +1,12 @@
 import React from 'react';
 import {Text} from 'react-native';
-import {Container} from '../Component';
+import {HomeContainer} from '../Component';
 
 const PreferencesScreen = () => {
   return (
-    <Container>
+    <HomeContainer>
       <Text>PreferencesScreen</Text>
-    </Container>
+    </HomeContainer>
   );
 };
 
