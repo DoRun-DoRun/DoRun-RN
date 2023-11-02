@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {HomeContainer, InnerContainer} from '../Component';
+import {HomeContainer, InnerContainer, NotoSansKR} from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import {ScrollView, Text, View} from 'react-native';
 import {Calendar} from 'react-native-calendars';
@@ -54,9 +54,13 @@ const UserStats = ({
   return (
     <UserStatsBox>
       <UserStatsCount>
-        <Text>{count}</Text>
+        <NotoSansKR size={13} color="gray2">
+          {count}
+        </NotoSansKR>
       </UserStatsCount>
-      <Text>{status}</Text>
+      <NotoSansKR size={11} color="gray4" weight="Medium">
+        {status}
+      </NotoSansKR>
     </UserStatsBox>
   );
 };
@@ -67,7 +71,7 @@ const Divider = styled.View`
   border: 1px solid ${props => props.theme.gray6};
 `;
 
-const UserName = styled.Text`
+const UserName = styled(NotoSansKR)`
   padding: 0 8px 8px 8px;
 `;
 
@@ -191,7 +195,7 @@ const History = () => {
       <Calendar />
       <ChallengeName>
         <MaterialIcons name="chevron-left" size={24} />
-        <Text>챌린지 이름</Text>
+        <NotoSansKR size={18}>챌린지 이름</NotoSansKR>
         <MaterialIcons name="chevron-right" size={24} />
       </ChallengeName>
 
@@ -205,31 +209,39 @@ const History = () => {
       <ChallengeDescription>
         <DailyDiary>
           <DailyDiaryTitle>
-            <Text>11월 02일 한줄일기</Text>
+            <NotoSansKR color="white" size={16}>
+              11월 02일 한줄일기
+            </NotoSansKR>
             <Octicons name="pencil" size={20} color={'#fff'} />
           </DailyDiaryTitle>
-          <Text>
+          <NotoSansKR color="white" size={13} weight="Regular">
             오늘 달리기를 하고 물을 마시고 하루의 목표 달성에 힘썼다. 정말
             유익하고 좋은 시간이었다. 앞으로도 계속 이어나가고 싶다.
-          </Text>
+          </NotoSansKR>
         </DailyDiary>
 
         <DailyTodo>
           <DailyTodoList>
             <MaterialIcons name="list-alt" color={theme.primary} size={20} />
-            <Text>달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ</Text>
+            <NotoSansKR size={13} color="gray3">
+              달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
+            </NotoSansKR>
           </DailyTodoList>
           <DailyTodoList>
             <MaterialIcons name="list-alt" color={theme.primary} size={20} />
-            <Text>달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ</Text>
+            <NotoSansKR size={13} color="gray3">
+              달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
+            </NotoSansKR>
           </DailyTodoList>
         </DailyTodo>
       </ChallengeDescription>
 
       <WeeklyTeamTodo>
-        <Text>팀 주간목표</Text>
+        <NotoSansKR size={18}>팀 주간목표</NotoSansKR>
         <WeeklyTeamGoal>
-          <Text>“닭가슴살 1일 1회 먹기”</Text>
+          <NotoSansKR size={18} color="primary">
+            “닭가슴살 1일 1회 먹기”
+          </NotoSansKR>
         </WeeklyTeamGoal>
         <ScrollView horizontal>
           <View>
@@ -308,7 +320,7 @@ const MyPageTab = () => {
           <ProfileContainer>
             <UserIcon />
             <View>
-              <UserName>달려라 갓생팀</UserName>
+              <UserName size={16}>달려라 갓생팀</UserName>
               <UserStatsContainer>
                 <UserStats status="완료" count={8} />
                 <Divider />
@@ -328,14 +340,22 @@ const MyPageTab = () => {
                     setSelected('history');
                     console.log(selected);
                   }}>
-                  <Text>기록</Text>
+                  <NotoSansKR
+                    size={14}
+                    color={selected === 'history' ? 'primary' : 'gray4'}>
+                    기록
+                  </NotoSansKR>
                 </Tab>
                 <Tab
                   selected={selected === 'album'}
                   onPress={() => {
                     setSelected('album');
                   }}>
-                  <Text>앨범</Text>
+                  <NotoSansKR
+                    size={14}
+                    color={selected === 'album' ? 'primary' : 'gray4'}>
+                    앨범
+                  </NotoSansKR>
                 </Tab>
               </CategoryTab>
             </CategoryContainer>

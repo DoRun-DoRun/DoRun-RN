@@ -15,11 +15,19 @@ const ButtonContainer = styled.TouchableOpacity<{color: string}>`
   border-radius: 10px;
 `;
 
-const ButtonText = styled.Text<{color: string}>`
-  color: ${props => props.theme[props.color]};
-  font-family: 'NotoSansKR-Bold';
-  line-height: 23;
-  font-size: 16;
+interface FontType {
+  weight?: 'Bold' | 'Medium' | 'Regular';
+  size: number;
+  color?: string;
+  lineHeight?: number;
+}
+
+export const NotoSansKR = styled.Text<FontType>`
+  color: ${({color, theme}) => (color ? theme[color] : theme.black)};
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  line-height: ${({lineHeight, size}) =>
+    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
+  font-size: ${({size}) => size + 'px'};
 `;
 
 export const InnerContainer = styled.View<{gap?: number}>`
@@ -52,7 +60,9 @@ export const Button = ({children, type, onPress}: ButtonType) => {
 
   return (
     <ButtonContainer color={backgroundColor} onPress={onPress}>
-      <ButtonText color={color}>{children}</ButtonText>
+      <NotoSansKR color={color} size={16}>
+        {children}
+      </NotoSansKR>
     </ButtonContainer>
   );
 };
