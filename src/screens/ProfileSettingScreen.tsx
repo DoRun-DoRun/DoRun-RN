@@ -3,6 +3,7 @@ import {
   HomeContainer,
   InnerContainer,
   NotoSansKR,
+  RowScrollContainer,
   ScrollContainer,
 } from '../Component';
 import {View} from 'react-native';
@@ -28,12 +29,6 @@ const SelectedButton = styled.TouchableOpacity`
   color: ${props => props.theme.primary};
   background-color: #fff;
   border-radius: 10px;
-`;
-
-const SlotContainer = styled.View`
-  flex-direction: row;
-  gap: 8px;
-  padding: 0 16px;
 `;
 
 const CharecterSlot = styled.View`
@@ -66,18 +61,14 @@ const ProfileSettingScreen = () => {
                 </NotoSansKR>
               </SelectedButton>
               <View style={{height: 300}} />
-              <ScrollContainer
-                horizontal
-                style={{marginRight: -16, marginLeft: -16}}>
-                <SlotContainer>
-                  <CharecterSlot />
-                  <CharecterSlot />
-                  <CharecterSlot />
-                  <CharecterSlot />
-                  <CharecterSlot />
-                  <CharecterSlot />
-                </SlotContainer>
-              </ScrollContainer>
+              <RowScrollContainer gap={8}>
+                <CharecterSlot />
+                <CharecterSlot />
+                <CharecterSlot />
+                <CharecterSlot />
+                <CharecterSlot />
+                <CharecterSlot />
+              </RowScrollContainer>
             </SelectedContainer>
           </View>
         </InnerContainer>
