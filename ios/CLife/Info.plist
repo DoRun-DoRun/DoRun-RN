@@ -36,7 +36,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,10 +51,20 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	 <key>UIAppFonts</key>
-    <array>
-	  <string>Octicons.ttf</string>
-      <string>MaterialIcons.ttf</string>
-    </array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Octicons.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>TossFaceFontMac.ttf</string>
+		<string>NotoSansKR-Bold.ttf</string>
+		<string>NotoSansKR-ExtraBold.ttf</string>
+		<string>NotoSansKR-ExtraLight.ttf</string>
+		<string>NotoSansKR-Light.ttf</string>
+		<string>NotoSansKR-Medium.ttf</string>
+		<string>NotoSansKR-Regular.ttf</string>
+		<string>NotoSansKR-SemiBold.ttf</string>
+		<string>NotoSansKR-Thin.ttf</string>
+		<string>NotoSansKR-Black.ttf</string>
+	</array>
 </dict>
 </plist>
