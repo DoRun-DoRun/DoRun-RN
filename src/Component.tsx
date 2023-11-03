@@ -47,7 +47,7 @@ export const ScrollContainer = styled.ScrollView`
   flex: 1;
 `;
 
-export const Button = ({children, type, onPress}: ButtonType) => {
+export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
   let color = 'white';
   let backgroundColor = 'primary';
 
