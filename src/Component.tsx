@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 
 interface ButtonType {
   children: React.ReactNode;
-  type?: 'primary' | 'secondary' | 'disabled';
+  type?: 'primary' | 'secondary' | 'gray';
   onPress?: () => void;
 }
 
@@ -15,22 +15,36 @@ const ButtonContainer = styled.TouchableOpacity<{color: string}>`
   border-radius: 10px;
 `;
 
-const ButtonText = styled.Text<{color: string}>`
-  color: ${props => props.theme[props.color]};
-  font-family: 'NotoSansKR-Bold';
-  line-height: 23;
-  font-size: 16;
+interface FontType {
+  size: number;
+  weight?: 'Bold' | 'Regular' | 'Medium';
+  color?: string;
+  lineHeight?: number;
+}
+
+export const NotoSansKR = styled.Text<FontType>`
+  color: ${({color, theme}) => (color ? theme[color] : theme.black)};
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  line-height: ${({lineHeight, size}) =>
+    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
+  font-size: ${({size}) => size + 'px'};
 `;
 
-export const InnerContainer = styled.View`
-  padding: 16px;
-  text-align: left;
-`;
-
-export const Container = styled.SafeAreaView`
+export const InnerContainer = styled.View<{gap?: number}>`
   display: flex;
   flex: 1;
+  padding: 16px 16px 0;
+  text-align: left;
+  gap: ${props => props.gap + 'px'};
+`;
+
+export const HomeContainer = styled.SafeAreaView`
+  flex: 1;
   background-color: #fff;
+`;
+
+export const ScrollContainer = styled.ScrollView`
+  flex: 1;
 `;
 
 export const Button = ({children, type, onPress}: ButtonType) => {
@@ -40,14 +54,16 @@ export const Button = ({children, type, onPress}: ButtonType) => {
   if (type === 'secondary') {
     color = 'gray4';
     backgroundColor = 'null';
-  } else if (type === 'disabled') {
+  } else if (type === 'gray') {
     color = 'gray2';
     backgroundColor = 'gray5';
   }
 
   return (
     <ButtonContainer color={backgroundColor} onPress={onPress}>
-      <ButtonText color={color}>{children}</ButtonText>
+      <NotoSansKR color={color} size={16}>
+        {children}
+      </NotoSansKR>
     </ButtonContainer>
   );
 };

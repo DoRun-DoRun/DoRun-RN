@@ -9,11 +9,14 @@ import RaceTab from './RaceTab';
 import MyPageTab from './MyPageTab';
 
 import {useTheme} from 'styled-components/native';
+import {useNavigation} from '@react-navigation/native';
+import {TouchableOpacity} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
 export const MainTab = () => {
   const theme = useTheme();
+  const navigation = useNavigation();
 
   return (
     <Tab.Navigator
@@ -59,6 +62,17 @@ export const MainTab = () => {
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="person" color={color} size={size} />
           ),
+          headerRight: () => {
+            return (
+              <TouchableOpacity
+                style={{marginRight: 16}}
+                onPress={() => {
+                  navigation.navigate('ProfileSettingScreen' as never);
+                }}>
+                <OcticonIcons name="gear" size={24} />
+              </TouchableOpacity>
+            );
+          },
         }}
       />
     </Tab.Navigator>

@@ -12,6 +12,7 @@ export const light: DefaultTheme = {
   gray6: '#D5D5D5',
   gray7: '#EFEFEF',
   primary: '#00A473',
+  primary2: '#E5FAF4',
 };
 
 // export const dark = () => {

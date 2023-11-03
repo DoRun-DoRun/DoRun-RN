@@ -1,12 +1,12 @@
 import React from 'react';
 import {Text} from 'react-native';
-import {Container} from '../Component';
+import {HomeContainer} from '../Component';
 
 const ProfileSettingScreen = () => {
   return (
-    <Container>
+    <HomeContainer>
       <Text>ProfileSettingScreen</Text>
-    </Container>
+    </HomeContainer>
   );
 };
 
