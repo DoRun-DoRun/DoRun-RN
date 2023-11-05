@@ -3,6 +3,7 @@ import {
   HomeContainer,
   InnerContainer,
   NotoSansKR,
+  RowContainer,
   RowScrollContainer,
   ScrollContainer,
 } from '../Component';
@@ -12,9 +13,7 @@ import {Calendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 
-const ProfileContainer = styled.View`
-  flex-direction: row;
-  gap: 24px;
+const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary};
   padding: 16px;
   border-radius: 10px;
@@ -25,11 +24,6 @@ const UserIcon = styled.View`
   height: 80px;
   border: 3px solid ${props => props.theme.primary};
   border-radius: 80px;
-`;
-
-const UserStatsContainer = styled.View`
-  gap: 16px;
-  flex-direction: row;
 `;
 
 const UserStatsCount = styled.View`
@@ -80,18 +74,17 @@ const HistoryContainer = styled.View`
   flex: 1;
   margin: 0 -16px;
   padding: 0 16px;
+  margin-bottom: -16px;
   background-color: ${props => props.theme.primary2};
 `;
 
-const CategoryContainer = styled.View`
-  flex-direction: row;
+const CategoryContainer = styled(RowContainer)`
   margin: 0 -16px;
   justify-content: flex-end;
   background-color: ${props => props.theme.white};
 `;
 
-const CategoryTab = styled.View`
-  flex-direction: row;
+const CategoryTab = styled(RowContainer)`
   border-radius: 5px 5px 0 0;
   background-color: ${props => props.theme.gray7};
 `;
@@ -106,12 +99,6 @@ const Tab = styled.Pressable<{selected?: boolean}>`
 const HistoryDetailContainer = styled.View`
   gap: 32px;
   padding: 16px 0;
-  width: auto;
-`;
-
-const ChallengeName = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
 `;
 
 const DailyPicContiner = styled.View`
@@ -137,11 +124,6 @@ const DailyDiary = styled.View`
   background-color: ${props => props.theme.primary};
 `;
 
-const DailyDiaryTitle = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
 const DailyTodo = styled.View`
   gap: 8px;
   border-radius: 10px;
@@ -149,9 +131,7 @@ const DailyTodo = styled.View`
   background-color: ${props => props.theme.white};
 `;
 
-const DailyTodoList = styled.View`
-  flex-direction: row;
-  gap: 8px;
+const DailyTodoList = styled(RowContainer)`
   padding: 4px 0;
 `;
 
@@ -175,11 +155,11 @@ const History = () => {
   return (
     <>
       <Calendar />
-      <ChallengeName>
+      <RowContainer seperate>
         <MaterialIcons name="chevron-left" size={24} />
         <NotoSansKR size={18}>챌린지 이름</NotoSansKR>
         <MaterialIcons name="chevron-right" size={24} />
-      </ChallengeName>
+      </RowContainer>
 
       <DailyPicContiner>
         <DailyPic />
@@ -190,12 +170,12 @@ const History = () => {
 
       <View style={{gap: 16}}>
         <DailyDiary>
-          <DailyDiaryTitle>
+          <RowContainer seperate>
             <NotoSansKR color="white" size={16}>
               11월 02일 한줄일기
             </NotoSansKR>
             <Octicons name="pencil" size={20} color={'#fff'} />
-          </DailyDiaryTitle>
+          </RowContainer>
           <NotoSansKR color="white" size={13} weight="Regular">
             오늘 달리기를 하고 물을 마시고 하루의 목표 달성에 힘썼다. 정말
             유익하고 좋은 시간이었다. 앞으로도 계속 이어나가고 싶다.
@@ -203,13 +183,13 @@ const History = () => {
         </DailyDiary>
 
         <DailyTodo>
-          <DailyTodoList>
+          <DailyTodoList gap={8}>
             <MaterialIcons name="list-alt" color={theme.primary} size={20} />
             <NotoSansKR size={13} color="gray3">
               달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
             </NotoSansKR>
           </DailyTodoList>
-          <DailyTodoList>
+          <DailyTodoList gap={8}>
             <MaterialIcons name="list-alt" color={theme.primary} size={20} />
             <NotoSansKR size={13} color="gray3">
               달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
@@ -255,27 +235,18 @@ const AlbumItem = styled.View`
   background-color: ${props => props.theme.gray6};
 `;
 
-const AlbumGrid = styled.View`
+const AlbumGrid = styled(RowContainer)`
   width: 232px;
   height: 248px;
   column-gap: 8px;
   row-gap: 16px;
   justify-content: center;
-  align-items: center;
-  flex-direction: row;
   flex-wrap: wrap;
-`;
-
-const AlbumContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
 `;
 
 const Album = () => {
   return (
-    <AlbumContainer>
+    <RowContainer style={{justifyContent: 'space-between', padding: 16}}>
       <MaterialIcons name="chevron-left" size={20} />
       <AlbumGrid>
         <AlbumItem />
@@ -289,7 +260,7 @@ const Album = () => {
         <AlbumItem />
       </AlbumGrid>
       <MaterialIcons name="chevron-right" size={20} />
-    </AlbumContainer>
+    </RowContainer>
   );
 };
 
@@ -299,17 +270,17 @@ const MyPageTab = () => {
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
-          <ProfileContainer>
+          <ProfileContainer gap={24}>
             <UserIcon />
             <View>
               <UserName size={16}>달려라 갓생팀</UserName>
-              <UserStatsContainer>
+              <RowContainer gap={16}>
                 <UserStats status="완료" count={8} />
                 <Divider />
                 <UserStats status="진행중" count={1} />
                 <Divider />
                 <UserStats status="시작 전" count={3} />
-              </UserStatsContainer>
+              </RowContainer>
             </View>
           </ProfileContainer>
 
@@ -320,7 +291,6 @@ const MyPageTab = () => {
                   selected={selected === 'history'}
                   onPress={() => {
                     setSelected('history');
-                    console.log(selected);
                   }}>
                   <NotoSansKR
                     size={14}

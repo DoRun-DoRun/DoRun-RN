@@ -31,7 +31,6 @@ export const NotoSansKR = styled.Text<FontType>`
 `;
 
 export const InnerContainer = styled.View<{gap?: number}>`
-  display: flex;
   flex: 1;
   padding: 16px;
   text-align: left;
@@ -39,6 +38,7 @@ export const InnerContainer = styled.View<{gap?: number}>`
 `;
 
 export const HomeContainer = styled.SafeAreaView`
+  position: relative;
   flex: 1;
   background-color: #fff;
 `;
@@ -88,3 +88,11 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
     </ButtonContainer>
   );
 };
+
+export const RowContainer = styled.View<{gap?: number; seperate?: boolean}>`
+  flex-direction: row;
+  gap: ${props => props.gap + 'px'};
+  align-items: center;
+  justify-content: ${props =>
+    props.seperate ? 'space-between' : 'flex-start'};
+`;
