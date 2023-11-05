@@ -17,7 +17,7 @@ const ButtonContainer = styled.TouchableOpacity<{color: string}>`
 
 interface FontType {
   size: number;
-  weight?: 'Bold' | 'Regular' | 'Medium';
+  weight?: 'Bold' | 'Medium' | 'Regular';
   color?: string;
   lineHeight?: number;
 }
@@ -33,7 +33,7 @@ export const NotoSansKR = styled.Text<FontType>`
 export const InnerContainer = styled.View<{gap?: number}>`
   display: flex;
   flex: 1;
-  padding: 16px 16px 0;
+  padding: 16px;
   text-align: left;
   gap: ${props => props.gap + 'px'};
 `;

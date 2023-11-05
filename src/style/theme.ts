@@ -13,6 +13,9 @@ export const light: DefaultTheme = {
   gray7: '#EFEFEF',
   primary: '#00A473',
   primary2: '#E5FAF4',
+  secondary: '#D6BE00',
+  green: '#21A03D',
+  red: '#C52727',
 };
 
 // export const dark = () => {
