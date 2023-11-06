@@ -120,39 +120,9 @@ const ViewImageStyles = StyleSheet.create({
   image: {width: '100%'},
 });
 
-// 프로필 이미지 선택 + 보여주기
-export const CircleImage = () => {
-  const [response, setResponse] = useState<any>(null);
-
-  const onSelectCircleImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        includeBase64: Platform.OS === 'android',
-        selectionLimit: 1, // 선택할 이미지 수, 0 = 무제한
-      },
-      res => {
-        console.log(res);
-        if (res.didCancel) {
-          return;
-        }
-        setResponse(res);
-      },
-    );
-  };
-
-  return (
-    <Pressable onPress={onSelectCircleImage}>
-      <Image
-        style={ImageUploadSampleStyles.circle}
-        source={{uri: response?.assets[0]?.uri}}
-      />
-    </Pressable>
-  );
-};
-
 export const ImageUploadSample = () => {
   const [modalImage, setModalImage] = useState<any>(null);
+  const [response, setResponse] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageVisible, setImageVisible] = useState(false);
 
@@ -206,6 +176,24 @@ export const ImageUploadSample = () => {
     );
   };
 
+  // 프로필 이미지 선택 + 보여주기
+  const onSelectCircleImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: Platform.OS === 'android',
+        selectionLimit: 1, // 선택할 이미지 수, 0 = 무제한
+      },
+      res => {
+        console.log(res);
+        if (res.didCancel) {
+          return;
+        }
+        setResponse(res);
+      },
+    );
+  };
+
   return (
     <>
       <Pressable onPress={onPressToiOS}>
@@ -225,7 +213,12 @@ export const ImageUploadSample = () => {
           res={modalImage}
         />
       </Pressable>
-      <CircleImage />
+      <Pressable onPress={onSelectCircleImage}>
+        <Image
+          style={ImageUploadSampleStyles.circle}
+          source={{uri: response?.assets[0]?.uri}}
+        />
+      </Pressable>
     </>
   );
 };
@@ -272,20 +265,18 @@ export const ImageSave = () => {
   };
 
   return (
-    <>
+    <ViewShot
+      ref={ref}
+      options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}
+      style={onShareStyles.block}>
       <Pressable
         // 클릭하면 viewRef를 이미지 파일로 변환해서 저장해 줌
         onPress={onShare}
         style={{padding: 10}}>
         <Icon name="share" size={18} color={'#000'} />
       </Pressable>
-      <ViewShot
-        ref={ref}
-        options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}
-        style={onShareStyles.block}>
-        <Text>context</Text>
-      </ViewShot>
-    </>
+      <Text>context</Text>
+    </ViewShot>
   );
 };
 

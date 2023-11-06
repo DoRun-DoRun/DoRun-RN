@@ -1,12 +1,10 @@
 import React from 'react';
-import {View} from 'react-native';
-import {ImageSave} from '../components/ImageUpload';
+import {Text, View} from 'react-native';
 
 const MainScreen = () => {
   return (
     <View>
-      {/* <Text>MainScreen</Text> */}
-      <ImageSave />
+      <Text>MainScreen</Text>
     </View>
   );
 };
