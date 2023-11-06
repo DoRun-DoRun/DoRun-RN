@@ -125,7 +125,7 @@ const FriendScreen = () => {
   const theme = useTheme();
   return (
     <HomeContainer>
-      <InnerContainer style={{justifyContent: 'space-between'}}>
+      <InnerContainer seperate>
         <View style={{gap: 24}}>
           <NotoSansKR size={20} style={{marginBottom: 54}}>
             친구 목록

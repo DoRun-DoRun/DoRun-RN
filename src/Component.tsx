@@ -30,11 +30,13 @@ export const NotoSansKR = styled.Text<FontType>`
   font-size: ${({size}) => size + 'px'};
 `;
 
-export const InnerContainer = styled.View<{gap?: number}>`
+export const InnerContainer = styled.View<{gap?: number; seperate?: boolean}>`
   flex: 1;
   padding: 16px;
   text-align: left;
   gap: ${props => props.gap + 'px'};
+  justify-content: ${props =>
+    props.seperate ? 'space-between' : 'flex-start'};
 `;
 
 export const HomeContainer = styled.SafeAreaView`
@@ -74,7 +76,7 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
 
   if (type === 'secondary') {
     color = 'gray4';
-    backgroundColor = 'null';
+    backgroundColor = 'white';
   } else if (type === 'gray') {
     color = 'gray2';
     backgroundColor = 'gray5';
