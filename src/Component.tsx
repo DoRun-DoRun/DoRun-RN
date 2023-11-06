@@ -43,11 +43,32 @@ export const HomeContainer = styled.SafeAreaView`
   background-color: #fff;
 `;
 
-export const ScrollContainer = styled.ScrollView`
+export const ScrollContainer = styled.ScrollView.attrs({
+  showsHorizontalScrollIndicator: false,
+  showsVerticalScrollIndicator: false,
+})`
   flex: 1;
 `;
 
-export const Button = ({children, type, onPress}: ButtonType) => {
+const RowScrollView = styled.View`
+  flex-direction: row;
+  padding: 0 16px;
+`;
+
+interface ScrollContainerType {
+  children: React.ReactNode;
+  gap?: number;
+}
+
+export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
+  return (
+    <ScrollContainer horizontal style={{marginLeft: -16, marginRight: -16}}>
+      <RowScrollView style={{gap: gap}}>{children}</RowScrollView>
+    </ScrollContainer>
+  );
+};
+
+export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
   let color = 'white';
   let backgroundColor = 'primary';
 

@@ -3,10 +3,11 @@ import {
   HomeContainer,
   InnerContainer,
   NotoSansKR,
+  RowScrollContainer,
   ScrollContainer,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {ScrollView, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -166,7 +167,6 @@ const WeeklyTeamPic = styled.View`
   height: 96px;
   border-radius: 10px;
   margin-bottom: 8px;
-  margin-left: 8px;
   border: 2px solid ${props => props.theme.gray4};
 `;
 
@@ -225,7 +225,7 @@ const History = () => {
             “닭가슴살 1일 1회 먹기”
           </NotoSansKR>
         </WeeklyTeamGoal>
-        <ScrollView horizontal>
+        <RowScrollContainer gap={8}>
           <View>
             <WeeklyTeamPic />
             <Text>😀😀😀</Text>
@@ -242,7 +242,7 @@ const History = () => {
             <WeeklyTeamPic />
             <Text>😀😀😀</Text>
           </View>
-        </ScrollView>
+        </RowScrollContainer>
       </View>
     </>
   );
