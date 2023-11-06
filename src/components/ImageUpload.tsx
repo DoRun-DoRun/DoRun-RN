@@ -120,9 +120,39 @@ const ViewImageStyles = StyleSheet.create({
   image: {width: '100%'},
 });
 
+// 프로필 이미지 선택 + 보여주기
+export const CircleImage = () => {
+  const [response, setResponse] = useState<any>(null);
+
+  const onSelectCircleImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: Platform.OS === 'android',
+        selectionLimit: 1, // 선택할 이미지 수, 0 = 무제한
+      },
+      res => {
+        console.log(res);
+        if (res.didCancel) {
+          return;
+        }
+        setResponse(res);
+      },
+    );
+  };
+
+  return (
+    <Pressable onPress={onSelectCircleImage}>
+      <Image
+        style={ImageUploadSampleStyles.circle}
+        source={{uri: response?.assets[0]?.uri}}
+      />
+    </Pressable>
+  );
+};
+
 export const ImageUploadSample = () => {
   const [modalImage, setModalImage] = useState<any>(null);
-  const [response, setResponse] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageVisible, setImageVisible] = useState(false);
 
@@ -176,24 +206,6 @@ export const ImageUploadSample = () => {
     );
   };
 
-  // 프로필 이미지 선택 + 보여주기
-  const onSelectCircleImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        includeBase64: Platform.OS === 'android',
-        selectionLimit: 1, // 선택할 이미지 수, 0 = 무제한
-      },
-      res => {
-        console.log(res);
-        if (res.didCancel) {
-          return;
-        }
-        setResponse(res);
-      },
-    );
-  };
-
   return (
     <>
       <Pressable onPress={onPressToiOS}>
@@ -213,12 +225,7 @@ export const ImageUploadSample = () => {
           res={modalImage}
         />
       </Pressable>
-      <Pressable onPress={onSelectCircleImage}>
-        <Image
-          style={ImageUploadSampleStyles.circle}
-          source={{uri: response?.assets[0]?.uri}}
-        />
-      </Pressable>
+      <CircleImage />
     </>
   );
 };
