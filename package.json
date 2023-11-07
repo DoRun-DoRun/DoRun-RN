@@ -25,6 +25,7 @@
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
+    "rn-emoji-keyboard": "^1.5.1",
     "styled-components": "^6.1.0"
   },
   "devDependencies": {

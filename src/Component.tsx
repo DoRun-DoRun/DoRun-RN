@@ -30,6 +30,19 @@ export const NotoSansKR = styled.Text<FontType>`
   font-size: ${({size}) => size + 'px'};
 `;
 
+export const InputNotoSansKR = styled.TextInput<FontType>`
+  color: ${({color, theme}) => (color ? theme[color] : theme.black)};
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  line-height: ${({lineHeight, size}) =>
+    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
+  font-size: ${({size}) => size + 'px'};
+`;
+
+export const TossFace = styled.Text<{size?: number}>`
+  font-size: ${({size}) => size + 'px'};
+  font-family: 'TossFaceFontMac';
+`;
+
 export const InnerContainer = styled.View<{gap?: number; seperate?: boolean}>`
   flex: 1;
   padding: 16px;
