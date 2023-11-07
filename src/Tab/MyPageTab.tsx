@@ -4,17 +4,15 @@ import {
   InnerContainer,
   NotoSansKR,
   RowContainer,
-  RowScrollContainer,
   ScrollContainer,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import {Text, View} from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Octicons from 'react-native-vector-icons/Octicons';
 
 const ProfileContainer = styled(RowContainer)`
-  border: 1px solid ${props => props.theme.primary};
+  border: 1px solid ${props => props.theme.primary1};
   padding: 16px;
   border-radius: 10px;
 `;
@@ -22,7 +20,7 @@ const ProfileContainer = styled(RowContainer)`
 const UserIcon = styled.View`
   width: 80px;
   height: 80px;
-  border: 3px solid ${props => props.theme.primary};
+  border: 3px solid ${props => props.theme.primary1};
   border-radius: 80px;
 `;
 
@@ -50,11 +48,11 @@ const UserStats = ({
   return (
     <UserStatsBox>
       <UserStatsCount>
-        <NotoSansKR size={13} color="gray2">
+        <NotoSansKR size={16} color="primary1">
           {count}
         </NotoSansKR>
       </UserStatsCount>
-      <NotoSansKR size={11} color="gray4" weight="Medium">
+      <NotoSansKR size={12} color="gray4" weight="Medium">
         {status}
       </NotoSansKR>
     </UserStatsBox>
@@ -121,7 +119,7 @@ const DailyDiary = styled.View`
   gap: 8px;
   border-radius: 10px;
   padding: 16px;
-  background-color: ${props => props.theme.primary};
+  background-color: ${props => props.theme.primary1};
 `;
 
 const DailyTodo = styled.View`
@@ -135,20 +133,20 @@ const DailyTodoList = styled(RowContainer)`
   padding: 4px 0;
 `;
 
-const WeeklyTeamGoal = styled.View`
-  align-items: center;
-  border: 2px solid ${props => props.theme.primary};
-  padding: 8px;
-  border-radius: 10px;
-`;
+// const WeeklyTeamGoal = styled.View`
+//   align-items: center;
+//   border: 2px solid ${props => props.theme.primary1};
+//   padding: 8px;
+//   border-radius: 10px;
+// `;
 
-const WeeklyTeamPic = styled.View`
-  width: 96px;
-  height: 96px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  border: 2px solid ${props => props.theme.gray4};
-`;
+// const WeeklyTeamPic = styled.View`
+//   width: 96px;
+//   height: 96px;
+//   border-radius: 10px;
+//   margin-bottom: 8px;
+//   border: 2px solid ${props => props.theme.gray4};
+// `;
 
 const History = () => {
   const theme = useTheme();
@@ -170,13 +168,10 @@ const History = () => {
 
       <View style={{gap: 16}}>
         <DailyDiary>
-          <RowContainer seperate>
-            <NotoSansKR color="white" size={16}>
-              11월 02일 한줄일기
-            </NotoSansKR>
-            <Octicons name="pencil" size={20} color={'#fff'} />
-          </RowContainer>
-          <NotoSansKR color="white" size={13} weight="Regular">
+          <NotoSansKR color="white" size={16}>
+            11월 02일 한줄일기
+          </NotoSansKR>
+          <NotoSansKR color="white" size={14} weight="Regular">
             오늘 달리기를 하고 물을 마시고 하루의 목표 달성에 힘썼다. 정말
             유익하고 좋은 시간이었다. 앞으로도 계속 이어나가고 싶다.
           </NotoSansKR>
@@ -184,13 +179,13 @@ const History = () => {
 
         <DailyTodo>
           <DailyTodoList gap={8}>
-            <MaterialIcons name="list-alt" color={theme.primary} size={20} />
+            <MaterialIcons name="list-alt" color={theme.primary1} size={20} />
             <NotoSansKR size={13} color="gray3">
               달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
             </NotoSansKR>
           </DailyTodoList>
           <DailyTodoList gap={8}>
-            <MaterialIcons name="list-alt" color={theme.primary} size={20} />
+            <MaterialIcons name="list-alt" color={theme.primary1} size={20} />
             <NotoSansKR size={13} color="gray3">
               달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
             </NotoSansKR>
@@ -198,10 +193,10 @@ const History = () => {
         </DailyTodo>
       </View>
 
-      <View style={{gap: 16}}>
+      {/* <View style={{gap: 16}}>
         <NotoSansKR size={18}>팀 주간목표</NotoSansKR>
         <WeeklyTeamGoal>
-          <NotoSansKR size={18} color="primary">
+          <NotoSansKR size={18} color="primary1">
             “닭가슴살 1일 1회 먹기”
           </NotoSansKR>
         </WeeklyTeamGoal>
@@ -223,7 +218,7 @@ const History = () => {
             <Text>😀😀😀</Text>
           </View>
         </RowScrollContainer>
-      </View>
+      </View> */}
     </>
   );
 };
@@ -294,7 +289,7 @@ const MyPageTab = () => {
                   }}>
                   <NotoSansKR
                     size={14}
-                    color={selected === 'history' ? 'primary' : 'gray4'}>
+                    color={selected === 'history' ? 'primary1' : 'gray4'}>
                     기록
                   </NotoSansKR>
                 </Tab>
@@ -305,7 +300,7 @@ const MyPageTab = () => {
                   }}>
                   <NotoSansKR
                     size={14}
-                    color={selected === 'album' ? 'primary' : 'gray4'}>
+                    color={selected === 'album' ? 'primary1' : 'gray4'}>
                     앨범
                   </NotoSansKR>
                 </Tab>

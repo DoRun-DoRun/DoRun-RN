@@ -203,7 +203,7 @@ const CalendarRowContainer = styled(RowContainer)`
   justify-content: flex-end;
   border-top-width: 1px;
   padding: 12px;
-  border-color: ${props => props.theme.primary};
+  border-color: ${props => props.theme.primary1};
 `;
 
 const CalendarContainer = ({
@@ -238,7 +238,7 @@ const CalendarContainer = ({
         setMarkedDates({
           [dateString]: {
             startingDay: true,
-            color: theme.primary,
+            color: theme.primary1,
             textColor: 'white',
           },
         });
@@ -247,10 +247,10 @@ const CalendarContainer = ({
 
       // 시작, 종료 날짜 및 사이의 모든 날짜를 markedDates 객체에 추가
       const newMarkedDates: MarkedDataType = {
-        [start]: {startingDay: true, color: theme.primary, textColor: 'white'},
+        [start]: {startingDay: true, color: theme.primary1, textColor: 'white'},
         [dateString]: {
           endingDay: true,
-          color: theme.primary,
+          color: theme.primary1,
           textColor: 'white',
         },
       };
@@ -263,7 +263,7 @@ const CalendarContainer = ({
         newMarkedDates[dayStr] = {
           marked: true,
           dotColor: 'transparent',
-          color: theme.primary,
+          color: theme.primary1,
           textColor: 'white',
         };
         day.setDate(day.getDate() + 1);
@@ -273,7 +273,7 @@ const CalendarContainer = ({
       setMarkedDates({
         [dateString]: {
           startingDay: true,
-          color: theme.primary,
+          color: theme.primary1,
           textColor: 'white',
         },
       });
@@ -304,13 +304,13 @@ const CalendarContainer = ({
           <TouchableOpacity
             style={{padding: 10}}
             onPress={() => setCalendarOpen(false)}>
-            <NotoSansKR size={14} color="primary">
+            <NotoSansKR size={14} color="primary1">
               Cancel
             </NotoSansKR>
           </TouchableOpacity>
 
           <TouchableOpacity style={{padding: 10}} onPress={sendCalendarData}>
-            <NotoSansKR size={14} color="primary">
+            <NotoSansKR size={14} color="primary1">
               Ok
             </NotoSansKR>
           </TouchableOpacity>

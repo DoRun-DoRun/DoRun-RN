@@ -85,7 +85,7 @@ export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
 
 export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
   let color = 'white';
-  let backgroundColor = 'primary';
+  let backgroundColor = 'primary1';
 
   if (type === 'secondary') {
     color = 'gray4';
