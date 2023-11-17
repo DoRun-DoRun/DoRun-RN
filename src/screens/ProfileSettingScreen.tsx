@@ -17,7 +17,7 @@ const TextContainer = styled.TextInput`
 
 const SelectedContainer = styled.View`
   flex: 1;
-  background-color: ${props => props.theme.primary};
+  background-color: ${props => props.theme.primary1};
   margin: 0 -16px;
   padding: 24px 16px;
   align-items: center;
@@ -26,7 +26,7 @@ const SelectedContainer = styled.View`
 const SelectedButton = styled.TouchableOpacity`
   width: 72px;
   padding: 8px 10px;
-  color: ${props => props.theme.primary};
+  color: ${props => props.theme.primary1};
   background-color: #fff;
   border-radius: 10px;
 `;
@@ -56,7 +56,7 @@ const ProfileSettingScreen = () => {
             </NotoSansKR>
             <SelectedContainer>
               <SelectedButton>
-                <NotoSansKR size={14} color="primary" weight="Medium">
+                <NotoSansKR size={14} color="primary1" weight="Medium">
                   선택하기
                 </NotoSansKR>
               </SelectedButton>

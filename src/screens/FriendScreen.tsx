@@ -3,23 +3,14 @@ import {
   ButtonComponent,
   HomeContainer,
   InnerContainer,
+  InputNotoSansKR,
   NotoSansKR,
+  RowContainer,
 } from '../Component';
-import {TextInput, TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {styled, useTheme} from 'styled-components/native';
 
-const InvitedFriend = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const FrinedListContainer = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 8px;
-`;
 const FrinedCharacter = styled.View`
   width: 32px;
   height: 32px;
@@ -27,46 +18,36 @@ const FrinedCharacter = styled.View`
   border: 1px solid ${props => props.theme.secondary};
 `;
 
-const RowContainer = styled.View`
-  flex-direction: row;
-  gap: 8px;
-  align-items: center;
-`;
-
 const Friend = ({invited}: {invited?: boolean}) => {
   const theme = useTheme();
 
   return (
-    <FrinedListContainer>
-      <RowContainer>
-        <FrinedCharacter />
-        <NotoSansKR size={14} weight="Medium">
-          닉네임 A
-        </NotoSansKR>
-      </RowContainer>
+    <RowContainer gap={8}>
+      <FrinedCharacter />
+      <NotoSansKR size={14} weight="Medium" style={{flex: 1}}>
+        닉네임 A
+      </NotoSansKR>
 
       {invited ? (
-        <RowContainer>
+        <>
           <TouchableOpacity>
             <OcticonIcons name="check" size={24} color={theme.green} />
           </TouchableOpacity>
           <TouchableOpacity>
             <OcticonIcons name="x" size={24} color={theme.red} />
           </TouchableOpacity>
-        </RowContainer>
+        </>
       ) : (
         <TouchableOpacity>
           <OcticonIcons name="trash" size={24} color={theme.gray4} />
         </TouchableOpacity>
       )}
-    </FrinedListContainer>
+    </RowContainer>
   );
 };
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
-  position: absolute;
   width: 100%;
-  top: 52px;
   background-color: #fff;
   border: 1px solid ${props => props.theme.gray6};
   padding: 8px;
@@ -84,7 +65,7 @@ const ExpandedContainer = styled.View`
 
 const InviteFriend = () => {
   return (
-    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+    <RowContainer seperate>
       <NotoSansKR size={14} weight="Regular">
         닉네임 A
       </NotoSansKR>
@@ -95,7 +76,7 @@ const InviteFriend = () => {
         style={{textDecorationLine: 'underline'}}>
         친구요청
       </NotoSansKR>
-    </View>
+    </RowContainer>
   );
 };
 
@@ -105,9 +86,10 @@ const SearchBox = () => {
 
   return (
     <SearchContainer isClicked={isClicked}>
-      <RowContainer>
+      <RowContainer gap={8}>
         <OcticonIcons name="search" size={16} />
-        <TextInput
+        <InputNotoSansKR
+          size={14}
           value={textValue}
           onChangeText={text => setTextValue(text)}
           style={{flex: 1}}
@@ -140,18 +122,17 @@ const SearchBox = () => {
 
 const FriendScreen = () => {
   const [reqeusted, setReqeusted] = useState(true);
+  const theme = useTheme();
   return (
     <HomeContainer>
-      <InnerContainer style={{justifyContent: 'space-between'}}>
+      <InnerContainer seperate>
         <View style={{gap: 24}}>
-          <NotoSansKR size={20} style={{marginBottom: 54}}>
-            친구 목록
-          </NotoSansKR>
+          <NotoSansKR size={20}>친구 목록</NotoSansKR>
 
           <SearchBox />
 
           <View style={{gap: 8}}>
-            <InvitedFriend>
+            <RowContainer seperate>
               <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
                 요청된 친구 초대
               </NotoSansKR>
@@ -159,9 +140,10 @@ const FriendScreen = () => {
                 <OcticonIcons
                   name={reqeusted ? 'chevron-down' : 'chevron-up'}
                   size={28}
+                  color={theme.gray1}
                 />
               </TouchableOpacity>
-            </InvitedFriend>
+            </RowContainer>
             {reqeusted ? (
               <View style={{gap: 8}}>
                 <Friend invited />
