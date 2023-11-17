@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {TextInput, TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -79,7 +79,8 @@ const SearchBox = ({
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
         <OcticonIcons name="search" size={16} />
-        <TextInput
+        <InputNotoSansKR
+          size={14}
           value={textValue}
           onChangeText={text => setTextValue(text)}
           style={{flex: 1}}

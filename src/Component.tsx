@@ -32,10 +32,14 @@ export const NotoSansKR = styled.Text<FontType>`
 
 export const InputNotoSansKR = styled.TextInput<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  // 안드로이드에서 font 오류
+  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
   line-height: ${({lineHeight, size}) =>
     lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
   font-size: ${({size}) => size + 'px'};
+  padding: 0;
+  margin: 0;
+  align-items: center;
 `;
 
 export const TossFace = styled.Text<{size?: number}>`
@@ -47,7 +51,6 @@ export const InnerContainer = styled.View<{gap?: number; seperate?: boolean}>`
   flex: 1;
   padding: 16px;
   text-align: left;
-  gap: ${props => props.gap + 'px'};
   justify-content: ${props =>
     props.seperate ? 'space-between' : 'flex-start'};
 `;
@@ -106,7 +109,6 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
 
 export const RowContainer = styled.View<{gap?: number; seperate?: boolean}>`
   flex-direction: row;
-  gap: ${props => props.gap + 'px'};
   align-items: center;
   justify-content: ${props =>
     props.seperate ? 'space-between' : 'flex-start'};

@@ -3,10 +3,11 @@ import {
   ButtonComponent,
   HomeContainer,
   InnerContainer,
+  InputNotoSansKR,
   NotoSansKR,
   RowContainer,
 } from '../Component';
-import {TextInput, TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {styled, useTheme} from 'styled-components/native';
 
@@ -46,9 +47,7 @@ const Friend = ({invited}: {invited?: boolean}) => {
 };
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
-  position: absolute;
   width: 100%;
-  top: 52px;
   background-color: #fff;
   border: 1px solid ${props => props.theme.gray6};
   padding: 8px;
@@ -89,7 +88,8 @@ const SearchBox = () => {
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
         <OcticonIcons name="search" size={16} />
-        <TextInput
+        <InputNotoSansKR
+          size={14}
           value={textValue}
           onChangeText={text => setTextValue(text)}
           style={{flex: 1}}
@@ -127,9 +127,7 @@ const FriendScreen = () => {
     <HomeContainer>
       <InnerContainer seperate>
         <View style={{gap: 24}}>
-          <NotoSansKR size={20} style={{marginBottom: 54}}>
-            친구 목록
-          </NotoSansKR>
+          <NotoSansKR size={20}>친구 목록</NotoSansKR>
 
           <SearchBox />
 
