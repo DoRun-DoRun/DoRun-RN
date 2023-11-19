@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import ProfileSettingScreen from './screens/ProfileSettingScreen';
 import FriendScreen from './screens/FriendScreen';
+import SettingScreen from './screens/SettingScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,7 @@ function App(): JSX.Element {
         component={ProfileSettingScreen}
       />
       <Stack.Screen name="FriendScreen" component={FriendScreen} />
+      <Stack.Screen name="SettingScreen" component={SettingScreen} />
     </Stack.Navigator>
   );
 }
