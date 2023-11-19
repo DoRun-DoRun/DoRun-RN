@@ -113,3 +113,64 @@ export const RowContainer = styled.View<{gap?: number; seperate?: boolean}>`
   justify-content: ${props =>
     props.seperate ? 'space-between' : 'flex-start'};
 `;
+
+export async function createGuestUser() {
+  const response = await fetch('http://dorun.site/user/create/guest', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // 필요한 경우 body 데이터를 추가하세요.
+    // body: JSON.stringify({ key: 'value' }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  return response.json();
+}
+
+interface API {
+  endpoint: string;
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+  accessToken?: string;
+  body?: object;
+}
+
+interface Config {
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+  headers: {
+    'Content-Type': string;
+    Authorization?: string;
+  };
+  body?: string;
+}
+
+export async function CallApi({endpoint, method, accessToken, body}: API) {
+  const url = `http://dorun.site/${endpoint}`;
+
+  const config: Config = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  if (body && method !== 'GET') {
+    // GET 요청은 body를 포함하지 않음
+    config.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, config);
+
+  if (!response.ok) {
+    throw new Error(`API call failed: ${response.status}`);
+  }
+
+  return response.json();
+}
