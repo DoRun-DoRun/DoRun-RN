@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {HomeContainer, InnerContainer, NotoSansKR} from '../Component';
 import {Animated, Easing, Pressable, View} from 'react-native';
 import {styled, useTheme} from 'styled-components/native';
+import {Slider} from '@miblanchard/react-native-slider';
 
 const SettingScreen = () => {
   const [pushAlarm, setPushAlarm] = useState(true);
@@ -41,9 +42,8 @@ const SettingScreen = () => {
           </ObjectList>
 
           <ObjectList>
-            <ToggleComponent isOn={nightAlarm} onToggle={OnNightAlarmToggle}>
-              23시 ~ 09시 푸시 알람
-            </ToggleComponent>
+            <SliderComponent>효과음</SliderComponent>
+            <SliderComponent1 />
           </ObjectList>
         </View>
       </InnerContainer>
@@ -56,12 +56,11 @@ const ObjectList = styled(View)`
   gap: 8px;
 `;
 
-const ToggleContainer = styled(View)`
+const ObjectContainer = styled(View)`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
 `;
 
 const ToggleWheel = styled(Animated.View)`
@@ -109,7 +108,7 @@ const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
   }).start();
 
   return (
-    <ToggleContainer>
+    <ObjectContainer>
       <NotoSansKR size={16} weight="Medium">
         {children}
       </NotoSansKR>
@@ -122,7 +121,44 @@ const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
           </ToggleFrame>
         </Pressable>
       </Wrap>
-    </ToggleContainer>
+    </ObjectContainer>
+  );
+};
+
+const Container = styled(View)`
+  /* flex: 1; */
+  /* margin-left: 10; */
+  /* margin-right: 10; */
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+`;
+
+const SliderComponent = ({children}: {children: React.ReactNode}) => {
+  return (
+    <Container>
+      <NotoSansKR size={16} weight="Medium">
+        {children}
+      </NotoSansKR>
+      <Slider value={0.2} />
+    </Container>
+  );
+};
+
+const SliderComponent1 = () => {
+  const theme = useTheme();
+
+  return (
+    <Container>
+      <Slider
+        value={0.2}
+        minimumTrackTintColor={theme.primary1}
+        maximumTrackTintColor={theme.primary2}
+        thumbTintColor={theme.primary1}
+        // trackStyle={{width: '200px'}}
+      />
+      {/* <Text>Value: {this.state.value}</Text> */}
+    </Container>
   );
 };
 
