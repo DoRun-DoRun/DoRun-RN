@@ -1,5 +1,10 @@
 import React, {useState} from 'react';
-import {HomeContainer, InnerContainer, NotoSansKR} from '../Component';
+import {
+  ButtonComponent,
+  HomeContainer,
+  InnerContainer,
+  NotoSansKR,
+} from '../Component';
 import {Animated, Easing, Pressable, View} from 'react-native';
 import {styled, useTheme} from 'styled-components/native';
 import {Slider} from '@miblanchard/react-native-slider';
@@ -55,8 +60,30 @@ const SettingScreen = () => {
               배경음악
             </SliderComponent>
           </ObjectList>
+          <ObjectList>
+            <ObjectContainer>
+              <NotoSansKR size={16} weight="Medium">
+                소셜 로그인 정보
+              </NotoSansKR>
+              <NotoSansKR size={16} weight="Medium">
+                KaKao
+              </NotoSansKR>
+            </ObjectContainer>
+            <ObjectContainer>
+              <NotoSansKR size={16} weight="Medium">
+                User Id
+              </NotoSansKR>
+              <NotoSansKR size={16} weight="Medium">
+                000000
+              </NotoSansKR>
+            </ObjectContainer>
+          </ObjectList>
         </View>
       </InnerContainer>
+      <View style={{gap: 8, padding: 16}}>
+        <ButtonComponent>고객 센터</ButtonComponent>
+        <ButtonComponent type="secondary">로그아웃</ButtonComponent>
+      </View>
     </HomeContainer>
   );
 };
