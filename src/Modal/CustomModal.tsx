@@ -1,5 +1,12 @@
-import React, {FC, useEffect} from 'react';
-import {Modal, View, Text, TouchableOpacity} from 'react-native';
+import React, {FC, useEffect, useRef} from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  PanResponder,
+} from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
 
@@ -39,6 +46,30 @@ const CustomModal: FC = () => {
       // Handle modal visibility changes or perform other actions
     }
   }, [isVisible]);
+  const panY = useRef(new Animated.Value(0)).current;
+
+  const panResponders = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => false,
+      onPanResponderMove: (event, gestureState) => {
+        panY.setValue(gestureState.dy);
+      },
+      onPanResponderRelease: (event, gestureState) => {
+        if (gestureState.dy > 0 && gestureState.vy > 0.6) {
+          hideModal();
+        } else {
+          resetBottomSheet.start();
+        }
+      },
+    }),
+  ).current;
+
+  const resetBottomSheet = Animated.timing(panY, {
+    toValue: 0,
+    duration: 300,
+    useNativeDriver: true,
+  });
 
   return (
     <Modal
@@ -47,13 +78,17 @@ const CustomModal: FC = () => {
       visible={isVisible}
       onRequestClose={() => hideModal()}>
       <StyledModalContainer>
-        <StyledModalContent>
-          <StyledModalText>Custom Modal Content</StyledModalText>
-          {content}
-          <StyledButton onPress={() => hideModal()}>
-            <StyledButtonText>Close Modal</StyledButtonText>
-          </StyledButton>
-        </StyledModalContent>
+        <Animated.View
+          style={{transform: [{translateY: panY}]}}
+          {...panResponders.panHandlers}>
+          <StyledModalContent>
+            <StyledModalText>Custom Modal Content</StyledModalText>
+            {content}
+            <StyledButton onPress={() => hideModal()}>
+              <StyledButtonText>Close Modal</StyledButtonText>
+            </StyledButton>
+          </StyledModalContent>
+        </Animated.View>
       </StyledModalContainer>
     </Modal>
   );

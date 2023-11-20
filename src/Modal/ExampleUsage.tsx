@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import {useModal} from './ModalProvider';
 import CustomModal from './CustomModal';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const ExampleUsage = () => {
   const {showModal} = useModal();
@@ -20,12 +21,12 @@ const ExampleUsage = () => {
   };
 
   return (
-    <View>
+    <SafeAreaView>
       <TouchableOpacity onPress={openModal}>
         <Text>모달 보여주기</Text>
       </TouchableOpacity>
       <CustomModal />
-    </View>
+    </SafeAreaView>
   );
 };
 
