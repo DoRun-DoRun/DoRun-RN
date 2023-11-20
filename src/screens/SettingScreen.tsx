@@ -8,6 +8,8 @@ const SettingScreen = () => {
   const [pushAlarm, setPushAlarm] = useState(true);
   const [marketingAlarm, setMarketingAlarm] = useState(true);
   const [nightAlarm, setNightAlarm] = useState(true);
+  const [soundEffect, setSoundEffect] = useState(0);
+  const [backgroundMusic, setBackgroundMusic] = useState(0);
 
   const OnPushAlarmToggle = () => {
     setPushAlarm(!pushAlarm);
@@ -42,8 +44,16 @@ const SettingScreen = () => {
           </ObjectList>
 
           <ObjectList>
-            <SliderComponent>효과음</SliderComponent>
-            <SliderComponent1 />
+            <SliderComponent
+              sliderValue={soundEffect}
+              setSliderValue={setSoundEffect}>
+              효과음
+            </SliderComponent>
+            <SliderComponent
+              sliderValue={backgroundMusic}
+              setSliderValue={setBackgroundMusic}>
+              배경음악
+            </SliderComponent>
           </ObjectList>
         </View>
       </InnerContainer>
@@ -125,40 +135,36 @@ const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
   );
 };
 
-const Container = styled(View)`
-  /* flex: 1; */
-  /* margin-left: 10; */
-  /* margin-right: 10; */
-  flex-direction: row;
-  align-items: stretch;
-  justify-content: space-between;
-`;
+interface SliderComponentType {
+  children: React.ReactNode;
+  sliderValue: number;
+  setSliderValue: React.Dispatch<React.SetStateAction<number>>;
+}
 
-const SliderComponent = ({children}: {children: React.ReactNode}) => {
-  return (
-    <Container>
-      <NotoSansKR size={16} weight="Medium">
-        {children}
-      </NotoSansKR>
-      <Slider value={0.2} />
-    </Container>
-  );
-};
-
-const SliderComponent1 = () => {
+const SliderComponent = ({
+  children,
+  sliderValue,
+  setSliderValue,
+}: SliderComponentType) => {
   const theme = useTheme();
 
   return (
-    <Container>
-      <Slider
-        value={0.2}
-        minimumTrackTintColor={theme.primary1}
-        maximumTrackTintColor={theme.primary2}
-        thumbTintColor={theme.primary1}
-        // trackStyle={{width: '200px'}}
-      />
-      {/* <Text>Value: {this.state.value}</Text> */}
-    </Container>
+    <ObjectContainer>
+      <View style={{width: 240}}>
+        <NotoSansKR size={16} weight="Medium">
+          {children}
+        </NotoSansKR>
+      </View>
+      <View style={{flex: 1}}>
+        <Slider
+          value={sliderValue}
+          minimumTrackTintColor={theme.primary1}
+          maximumTrackTintColor={theme.primary2}
+          thumbTintColor={theme.primary1}
+          onValueChange={values => setSliderValue(values[0])}
+        />
+      </View>
+    </ObjectContainer>
   );
 };
 
