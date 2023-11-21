@@ -89,7 +89,6 @@ const SettingScreen = () => {
 };
 
 const ObjectList = styled(View)`
-  display: flex;
   gap: 8px;
 `;
 
