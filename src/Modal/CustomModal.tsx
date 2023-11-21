@@ -1,29 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {FC, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Modal, View, Animated, PanResponder} from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
-import OverlayContainer from './OverlayContainer';
+import {OverlayContainer} from './OverlayContainer';
 
 const StyledModalContainer = styled(View)`
   flex: 1;
   align-items: center;
   justify-content: flex-end;
-`;
-
-const StyledModalContent = styled(View)`
   padding: 16px;
-  padding-bottom: 0px;
-  border-radius: 8px;
-  align-items: center;
+  padding-bottom: 24px;
 `;
 
-const AnimatedBottomSheet = styled(Animated.View)`
+const StyledModalContent = styled(Animated.View)`
+  width: 100%;
+  background-color: white;
+  border-radius: 16px;
   padding: 16px;
-  padding-bottom: 0px;
 `;
 
-const CustomModal: FC = () => {
+const CustomModal = () => {
   const {isVisible, content, hideModal} = useModal();
   const panY = useRef(new Animated.Value(0)).current;
 
@@ -36,9 +32,12 @@ const CustomModal: FC = () => {
   const panResponders = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (event, gestureState) => {
-        panY.setValue(gestureState.dy);
+        // 오직 아래로 스와이프하는 경우에만 panY를 업데이트
+        if (gestureState.dy > 0) {
+          panY.setValue(gestureState.dy);
+        }
       },
       onPanResponderRelease: (event, gestureState) => {
         if (gestureState.dy > 0 && gestureState.vy > 0.6) {
@@ -66,13 +65,13 @@ const CustomModal: FC = () => {
       onRequestClose={() => hideModal()}>
       <OverlayContainer>
         <StyledModalContainer>
-          <AnimatedBottomSheet
+          <StyledModalContent
             style={{
               transform: [{translateY: panY}],
             }}
             {...panResponders.panHandlers}>
-            <StyledModalContent>{content}</StyledModalContent>
-          </AnimatedBottomSheet>
+            {content}
+          </StyledModalContent>
         </StyledModalContainer>
       </OverlayContainer>
     </Modal>
