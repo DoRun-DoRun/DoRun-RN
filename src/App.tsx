@@ -1,13 +1,48 @@
 import React from 'react';
-import ExampleUsage from './Modal/ExampleUsage';
-import {ModalProvider} from './Modal/ModalProvider';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import CreateChallengeScreen from './screens/CreateChallengeScreen';
+import {MainTab} from './Tab/MainTab';
 
-const App = () => {
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
+import ProfileSettingScreen from './screens/ProfileSettingScreen';
+import FriendScreen from './screens/FriendScreen';
+
+const Stack = createNativeStackNavigator();
+
+function App(): JSX.Element {
+  const navigation = useNavigation();
   return (
-    <ModalProvider>
-      <ExampleUsage />
-    </ModalProvider>
+    <Stack.Navigator
+      screenOptions={{
+        headerShadowVisible: false,
+        headerTitle: '',
+        // eslint-disable-next-line react/no-unstable-nested-components
+        headerLeft: () => (
+          <MaterialIcons
+            name="arrow-back"
+            size={24}
+            color={'#1C1B1F'}
+            onPress={() => navigation.goBack()}
+          />
+        ),
+      }}>
+      <Stack.Screen
+        name="MainTab"
+        component={MainTab}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CreateChallengeScreen"
+        component={CreateChallengeScreen}
+      />
+      <Stack.Screen
+        name="ProfileSettingScreen"
+        component={ProfileSettingScreen}
+      />
+      <Stack.Screen name="FriendScreen" component={FriendScreen} />
+    </Stack.Navigator>
   );
-};
+}
 
 export default App;
