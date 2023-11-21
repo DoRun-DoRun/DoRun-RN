@@ -1,80 +1,37 @@
-import React, {Component} from 'react';
-import {Animated, ViewStyle, StyleProp, BackHandler} from 'react-native';
+import React from 'react';
 import styled from 'styled-components/native';
+import {useModal} from './ModalProvider';
 
-const OverlayBackground = styled(Animated.View)<{
-  width?: number;
-  height?: number;
-}>`
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  width: ${({width}) => (width ? `${width}px` : '100%')};
-  height: ${({height}) => (height ? `${height}px` : '100%')};
+const OverlayBackground = styled.Pressable`
+  width: 100%;
+  height: 100%;
 `;
 
 interface OverlayContainerProps {
-  width?: number;
-  height?: number;
   hideBackground?: boolean;
   children: React.ReactNode;
-  style?: StyleProp<ViewStyle>;
-  onBackButtonPress?: () => void;
-  animationEnabled?: boolean;
-  opacity?: number;
 }
 
-interface FillOverlayOpacityProps {
-  opacity: number;
-}
-
-const FillOverlayOpacity = styled.View<FillOverlayOpacityProps>`
+const FillOverlayOpacity = styled.View`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background-color: black;
-  opacity: ${({opacity}) => opacity};
+  opacity: 0.3;
 `;
 
-class OverlayContainer extends Component<OverlayContainerProps> {
-  componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-  }
+export const OverlayContainer = ({
+  children,
+  hideBackground,
+}: OverlayContainerProps) => {
+  const {hideModal} = useModal();
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
-  }
-
-  handleBackPress = () => {
-    const {onBackButtonPress} = this.props;
-    if (onBackButtonPress) {
-      onBackButtonPress();
-      return true; // 이벤트 처리 완료
-    }
-    return false; // 이벤트 처리 중지
-  };
-
-  render() {
-    const {
-      width,
-      height,
-      hideBackground,
-      children,
-      style,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      animationEnabled = false,
-      opacity = 0.3,
-    } = this.props;
-
-    return (
-      <OverlayBackground width={width} height={height} style={style}>
-        {hideBackground ? null : <FillOverlayOpacity opacity={opacity} />}
-        {children}
-      </OverlayBackground>
-    );
-  }
-}
-
-export default OverlayContainer;
+  return (
+    <OverlayBackground onPress={() => hideModal()}>
+      {!hideBackground && <FillOverlayOpacity />}
+      {children}
+    </OverlayBackground>
+  );
+};
