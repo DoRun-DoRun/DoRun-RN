@@ -8,8 +8,7 @@ const StyledModalContainer = styled(View)`
   flex: 1;
   align-items: center;
   justify-content: flex-end;
-  padding: 16px;
-  padding-bottom: 24px;
+  padding: 16px 24px;
 `;
 
 const StyledModalContent = styled(Animated.View)`
@@ -62,7 +61,8 @@ const CustomModal = () => {
       animationType={'fade'}
       transparent={true}
       visible={isVisible}
-      onRequestClose={() => hideModal()}>
+      onRequestClose={() => hideModal()}
+      style={{zIndex: 10}}>
       <OverlayContainer>
         <StyledModalContainer>
           <StyledModalContent
