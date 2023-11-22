@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface userDataType {
-  UID: number;
-  accessToken: string;
-  refreshToken: string;
-  userName: string;
+  UID: number | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  userName: string | null;
 }
 
 export const persistUser = async (data: userDataType) => {

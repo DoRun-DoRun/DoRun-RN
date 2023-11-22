@@ -1,8 +1,10 @@
+import {userDataType} from './../async/asyncStore';
 import {createSlice} from '@reduxjs/toolkit';
 
 // User에서 관리해야하는 Slice
-const initialState = {
-  name: null,
+
+const initialState: userDataType = {
+  userName: null,
   accessToken: null,
   refreshToken: null,
   UID: null,
@@ -17,8 +19,8 @@ export const UserSlice = createSlice({
   reducers: {
     // 모든 사용자 정보를 상태에 저장합니다.
     setUser(state, action) {
-      const {name, UID, accessToken, refreshToken} = action.payload;
-      state.name = name;
+      const {userName, UID, accessToken, refreshToken} = action.payload;
+      state.userName = userName;
       state.UID = UID;
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;

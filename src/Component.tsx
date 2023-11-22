@@ -114,23 +114,6 @@ export const RowContainer = styled.View<{gap?: number; seperate?: boolean}>`
     props.seperate ? 'space-between' : 'flex-start'};
 `;
 
-export async function createGuestUser() {
-  const response = await fetch('http://dorun.site/user/create/guest', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    // 필요한 경우 body 데이터를 추가하세요.
-    // body: JSON.stringify({ key: 'value' }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-
-  return response.json();
-}
-
 interface API {
   endpoint: string;
   method: 'GET' | 'POST' | 'DELETE' | 'PUT';
@@ -162,7 +145,6 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
   }
 
   if (body && method !== 'GET') {
-    // GET 요청은 body를 포함하지 않음
     config.body = JSON.stringify(body);
   }
 
@@ -171,6 +153,9 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
   if (!response.ok) {
     throw new Error(`API call failed: ${response.status}`);
   }
+
+  // return response.text();
+  // 현재 API 호출 시 반환값이 json이 아니라 string 형태임. 추후 json으로 수정하겠음
 
   return response.json();
 }
