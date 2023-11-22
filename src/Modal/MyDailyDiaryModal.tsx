@@ -1,6 +1,6 @@
 import React from 'react';
-import {TextInput, View} from 'react-native';
-import {ButtonComponent, NotoSansKR} from '../Component';
+import {View} from 'react-native';
+import {ButtonComponent, InputNotoSansKR, NotoSansKR} from '../Component';
 import styled, {useTheme} from 'styled-components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -8,11 +8,10 @@ export const MyDailyDrayModal = () => {
   const theme = useTheme();
   return (
     <View style={{gap: 24, paddingBottom: 8}}>
-      <BorderBottomContainer>
-        <NotoSansKR size={20} weight="Bold">
-          [닉네임A]님 축하드려요! {'\n'} 오늘 목표를 전부 완료했어요!
-        </NotoSansKR>
-      </BorderBottomContainer>
+      <NotoSansKR size={20} weight="Bold">
+        [닉네임A]님 축하드려요! {'\n'}오늘 목표를 전부 완료했어요!
+      </NotoSansKR>
+      <BorderBottomContainer />
       <View style={{gap: 16}}>
         <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
         <NotoSansKR size={12} color="gray3">
@@ -26,13 +25,13 @@ export const MyDailyDrayModal = () => {
             size={40}
           />
         </PhotoUploadFrame>
-        <BorderBottomContainer>
-          <TextInput
-            style={{color: theme.gray3, fontSize: 14}}
-            placeholder="한줄 일기를 작성해봐요!"
-          />
-        </BorderBottomContainer>
-        <ButtonComponent type="secondary">오늘은 넘어갈래요</ButtonComponent>
+        <InputNotoSansKR
+          size={14}
+          weight="Medium"
+          color="gray3"
+          placeholder="한줄 일기를 작성해봐요!"
+        />
+        <ButtonComponent type="gray">오늘은 넘어갈래요</ButtonComponent>
       </View>
     </View>
   );
@@ -48,7 +47,8 @@ const PhotoUploadFrame = styled(View)`
 `;
 
 const BorderBottomContainer = styled(View)`
-  border-bottom: 1px solid ${props => props.theme.gray5};
+  border-bottom-width: 1px;
+  margin: -16px;
 `;
 
 // export const TryModal = () => {

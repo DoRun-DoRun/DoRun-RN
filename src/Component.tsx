@@ -38,7 +38,9 @@ export const InputNotoSansKR = styled.TextInput<FontType>`
     lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
   font-size: ${({size}) => size + 'px'};
   padding: 0;
+  padding-bottom: 4px;
   margin: 0;
+  border-bottom-width: 1px;
 `;
 
 export const TossFace = styled.Text<{size?: number}>`
@@ -93,8 +95,8 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
     color = 'gray4';
     backgroundColor = 'white';
   } else if (type === 'gray') {
-    color = 'gray2';
-    backgroundColor = 'gray5';
+    color = 'gray4';
+    backgroundColor = 'gray7';
   }
 
   return (
