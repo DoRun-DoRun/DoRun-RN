@@ -33,6 +33,7 @@ export const MyDailyDrayModal = () => {
           weight="Medium"
           color="gray3"
           placeholder="한줄 일기를 작성해봐요!"
+          border
         />
         <ButtonComponent type="gray">오늘은 넘어갈래요</ButtonComponent>
       </View>

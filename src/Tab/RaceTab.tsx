@@ -18,15 +18,11 @@ const NavigationButton = styled(View)`
   width: 40px;
   height: 40px;
   background-color: ${props => props.theme.white};
-  /* iOS: 버튼에 그림자가 잘 보이는지 체크 */
-  /* shadow-color: #000;
-  shadow-offset: {
-    width: 0;
-    height: 2;
-  }
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84; */
-  elevation: 5;
+  shadow-color: rgba(0, 0, 0, 0.3);
+  shadow-offset: 1px 2px;
+  shadow-opacity: 0.3;
+  shadow-radius: 3px;
+  elevation: 4;
   border-radius: 20px;
   align-items: center;
   justify-content: center;
