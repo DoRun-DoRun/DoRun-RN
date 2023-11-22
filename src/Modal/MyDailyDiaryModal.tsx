@@ -7,7 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 export const MyDailyDrayModal = () => {
   const theme = useTheme();
   return (
-    <View style={{gap: 24}}>
+    <View style={{gap: 24, paddingBottom: 8}}>
       <BorderBottomContainer>
         <NotoSansKR size={20} weight="Bold">
           [닉네임A]님 축하드려요! {'\n'} 오늘 목표를 전부 완료했어요!
