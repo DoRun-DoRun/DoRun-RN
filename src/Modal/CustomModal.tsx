@@ -8,14 +8,56 @@ const StyledModalContainer = styled(View)`
   flex: 1;
   align-items: center;
   justify-content: flex-end;
-  padding: 16px 24px;
+  padding: 16px;
 `;
 
 const StyledModalContent = styled(Animated.View)`
   width: 100%;
   background-color: white;
   border-radius: 16px;
-  padding: 16px;
+  padding: 0 16px;
+  padding-bottom: 24px;
+`;
+
+export const ModalHeadText = ({children}: {children: React.ReactNode}) => {
+  return (
+    <ModalHeaderText size={16}>
+      {children}
+      <ModalDivider />
+    </ModalHeaderText>
+  );
+};
+
+const ModalHeaderText = styled(View)<{size: number}>`
+  padding-top: 16px;
+  gap: 16px;
+`;
+
+const ModalDivider = styled(View)`
+  border-bottom-width: 2px;
+  border-color: ${props => props.theme.gray5};
+  margin: 0 -16px;
+`;
+
+export const ModalHeadBorder = () => {
+  return (
+    <ModalHeaderBorder size={12}>
+      <ModalShortDivider />
+    </ModalHeaderBorder>
+  );
+};
+
+const ModalHeaderBorder = styled(View)<{size: number}>`
+  padding-top: 12px;
+  gap: 12px;
+  align-items: center;
+`;
+
+const ModalShortDivider = styled(View)`
+  padding: 6px;
+  width: 35px;
+  border-bottom-width: 4px;
+  border-color: ${props => props.theme.gray6};
 `;
 
 const CustomModal = () => {
