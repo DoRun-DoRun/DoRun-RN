@@ -1,14 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
-import {
-  ButtonComponent,
-  HomeContainer,
-  InputNotoSansKR,
-  NotoSansKR,
-} from '../Component';
+import {ButtonComponent, InputNotoSansKR, NotoSansKR} from '../Component';
 import styled, {useTheme} from 'styled-components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useModal} from './ModalProvider';
 import {ModalHeadText} from './CustomModal';
 
 export const MyDailyDrayModal = () => {
@@ -20,8 +14,6 @@ export const MyDailyDrayModal = () => {
           [닉네임A]님 축하드려요! {'\n'}오늘 목표를 전부 완료했어요!
         </NotoSansKR>
       </ModalHeadText>
-
-      {/* <ModalHeadBorder /> */}
 
       <View style={{gap: 16}}>
         <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
@@ -57,17 +49,17 @@ const PhotoUploadFrame = styled(View)`
   border: 2px solid ${props => props.theme.primary1};
 `;
 
-export const TryModal = () => {
-  const {showModal} = useModal();
-  const openModal = () => {
-    showModal(<MyDailyDrayModal />);
-  };
+// export const TryModal = () => {
+//   const {showModal} = useModal();
+//   const openModal = () => {
+//     showModal(<MyDailyDrayModal />);
+//   };
 
-  return (
-    <HomeContainer>
-      <ButtonComponent onPress={openModal}>
-        클릭 시 일일 일기 모달 호출
-      </ButtonComponent>
-    </HomeContainer>
-  );
-};
+//   return (
+//     <HomeContainer>
+//       <ButtonComponent onPress={openModal}>
+//         클릭 시 일일 일기 모달 호출
+//       </ButtonComponent>
+//     </HomeContainer>
+//   );
+// };
