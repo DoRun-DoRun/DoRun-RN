@@ -3,6 +3,7 @@ import {Modal, View, Animated, PanResponder} from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
 import {OverlayContainer} from './OverlayContainer';
+import {NotoSansKR} from '../Component';
 
 const StyledModalContainer = styled(View)`
   flex: 1;
@@ -18,7 +19,20 @@ const StyledModalContent = styled(Animated.View)`
   padding: 0 16px;
   padding-bottom: 24px;
 `;
-
+export const BetweenModalContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+`;
+export const ChallengeTimeBox = styled.Text`
+  width: 100%;
+  border-radius: 25px;
+  border: 2px solid lightgray;
+  padding: 12px 40px;
+  align-items: center;
+  justify-content: center;
+`;
 export const ModalHeadText = ({children}: {children: React.ReactNode}) => {
   return (
     <ModalHeaderText size={16}>
@@ -59,7 +73,30 @@ const ModalShortDivider = styled(View)`
   border-bottom-width: 4px;
   border-color: ${props => props.theme.gray6};
 `;
-
+export const StatusComponent = ({
+  username,
+  status,
+}: {
+  username: String;
+  status: String;
+}) => {
+  return (
+    <BetweenModalContainer>
+      <NotoSansKR size={17} weight="Medium">
+        {username}
+      </NotoSansKR>
+      {status === 'true' ? (
+        <NotoSansKR size={16} weight="Medium" color="green">
+          참여중이에요
+        </NotoSansKR>
+      ) : (
+        <NotoSansKR size={16} weight="Medium" color="red">
+          참여를 기다리고 있어요
+        </NotoSansKR>
+      )}
+    </BetweenModalContainer>
+  );
+};
 const CustomModal = () => {
   const {isVisible, content, hideModal} = useModal();
   const panY = useRef(new Animated.Value(0)).current;
