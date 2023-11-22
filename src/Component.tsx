@@ -20,6 +20,7 @@ interface FontType {
   weight?: 'Bold' | 'Medium' | 'Regular';
   color?: string;
   lineHeight?: number;
+  textAlign?: 'center';
 }
 
 export const NotoSansKR = styled.Text<FontType>`
@@ -28,6 +29,7 @@ export const NotoSansKR = styled.Text<FontType>`
   line-height: ${({lineHeight, size}) =>
     lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
   font-size: ${({size}) => size + 'px'};
+  text-align: ${({textAlign}) => (textAlign ? textAlign : 'auto')};
 `;
 
 export const InputNotoSansKR = styled.TextInput<FontType>`

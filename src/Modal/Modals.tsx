@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextInput, View} from 'react-native';
+import {View} from 'react-native';
 import {ButtonComponent, HomeContainer, NotoSansKR} from '../Component';
 import styled, {useTheme} from 'styled-components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -8,48 +8,48 @@ import {useModal} from './ModalProvider';
 export const DailyModal = () => {
   const theme = useTheme();
   return (
-    <View style={{gap: 24}}>
-      <BorderBottomContainer>
-        <NotoSansKR size={20} weight="Bold">
-          [닉네임A]님 축하드려요! {'\n'} 오늘 목표를 전부 완료했어요!
+    <View>
+      <ModalHeader>
+        <MaterialIcons name="horizontal-rule" size={35} color={theme.gray6} />
+      </ModalHeader>
+      <View style={{gap: 24}}>
+        <NotoSansKR size={18} weight="Bold" textAlign="center">
+          우리가 해냈어요!{'\n'}
+          두런두런이 여러분의 앞길을 응원할게요!
         </NotoSansKR>
-      </BorderBottomContainer>
-      <View style={{gap: 16}}>
-        <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
-        <NotoSansKR size={12} color="gray3">
-          해당 내용은 친구들이 24시간동안 확인할 수 있어요! {'\n'}
-          24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
-        </NotoSansKR>
-        <PhotoUploadFrame>
-          <MaterialIcons
-            name="add-to-photos"
-            color={theme.primary1}
-            size={40}
-          />
-        </PhotoUploadFrame>
-        <BorderBottomContainer>
-          <TextInput
-            style={{color: theme.gray3, fontSize: 14}}
-            placeholder="한줄 일기를 작성해봐요!"
-          />
-        </BorderBottomContainer>
-        <ButtonComponent type="secondary">오늘은 넘어갈래요</ButtonComponent>
+        <ImageContainer>
+          <ImageDummy />
+        </ImageContainer>
+
+        <>
+          <ButtonComponent>친구한테 자랑하기</ButtonComponent>
+          <ButtonComponent type="secondary">이미지 저장하기</ButtonComponent>
+        </>
       </View>
     </View>
   );
 };
 
-const PhotoUploadFrame = styled(View)`
-  justify-content: center;
+const ModalHeader = styled(View)`
   align-items: center;
-  border-radius: 10px;
-  width: 88px;
-  height: 96px;
-  border: 2px solid ${props => props.theme.primary1};
+  padding: 20px 0;
 `;
 
-const BorderBottomContainer = styled(View)`
-  border-bottom: 1px solid ${props => props.theme.gray5};
+const ImageDummy = styled(View)`
+  width: 248px;
+  height: 264px;
+  background: ${props => props.theme.gray6};
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84;
+  elevation: 3;
+`;
+
+const ImageContainer = styled(View)`
+  justify-content: center;
+  align-items: center;
+  padding: 22px;
 `;
 
 export const TryModal = () => {
