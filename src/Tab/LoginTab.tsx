@@ -1,11 +1,19 @@
-import React from 'react';
-import {HomeContainer, NotoSansKR, RowContainer} from '../Component';
-// import {useMutation} from 'react-query';
+import React, {useEffect} from 'react';
+import {CallApi, HomeContainer, NotoSansKR, RowContainer} from '../Component';
 import {styled} from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
+import {useMutation} from 'react-query';
+import {setUser} from '../../store/slice/UserSlice';
+import {
+  loadUser,
+  persistUser,
+  userDataType,
+} from '../../store/async/asyncStore';
+import {useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 
-// const guestLogin = () =>
-//   CallApi({endpoint: 'user/create/guest', method: 'POST'});
+const guestLogin = () =>
+  CallApi({endpoint: 'user/create/guest', method: 'POST'});
 
 // const testCreate = () =>
 //   CallApi({
@@ -25,16 +33,45 @@ import {TouchableOpacity} from 'react-native';
 //   });
 
 const LoginTab = () => {
-  // const {mutate, data, isLoading, error} = useMutation(guestLogin, {
-  //   onSuccess: () => {
-  //     // 요청 성공 시 수행할 작업
-  //     console.log('Success:', data);
-  //   },
-  //   onError: () => {
-  //     // 요청 실패 시 수행할 작업
-  //     console.error('Error:', error);
-  //   },
-  // });
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      const userData = await loadUser();
+      if (userData) {
+        dispatch(setUser(userData));
+        navigation.navigate('MainTab' as never);
+      }
+    };
+
+    bootstrapAsync();
+  }, [dispatch, navigation]);
+
+  const {
+    mutate: login_guest,
+    isLoading,
+    error,
+  } = useMutation(guestLogin, {
+    onSuccess: response => {
+      // 요청 성공 시 수행할 작업
+      const userData: userDataType = {
+        UID: response.UID,
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+        userName: 'Guest',
+      };
+
+      dispatch(setUser(userData));
+      persistUser(userData);
+      console.log('Success:', userData);
+      navigation.navigate('MainTab' as never);
+    },
+    onError: () => {
+      // 요청 실패 시 수행할 작업
+      console.error('Error:', error);
+    },
+  });
 
   // const {mutate: test, data: dataTest} = useMutation(testCreate, {
   //   onSuccess: () => {
@@ -86,7 +123,15 @@ const LoginTab = () => {
           </RowContainer>
         </LoginButton>
 
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            if (isLoading) {
+              console.log('Guest login is already in progress.');
+              return;
+            } else {
+              login_guest();
+            }
+          }}>
           <NotoSansKR
             size={14}
             weight="Medium"

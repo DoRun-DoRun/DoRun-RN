@@ -32,11 +32,11 @@ export const NotoSansKR = styled.Text<FontType>`
 
 export const InputNotoSansKR = styled.TextInput<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  // 안드로이드에서 font 오류
-  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
+  /* 안드로이드에서 font 오류 */
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
-  font-size: ${({size}) => size + 'px'};
+    lineHeight ? `${lineHeight}px` : `${size * 1.45}px`};
+  font-size: ${({size}) => `${size}px`};
   padding: 0;
   margin: 0;
   align-items: center;
@@ -148,7 +148,7 @@ interface Config {
 }
 
 export async function CallApi({endpoint, method, accessToken, body}: API) {
-  const url = `http://dorun.site/${endpoint}`;
+  const url = `https://dorun.site/${endpoint}`;
 
   const config: Config = {
     method: method,
