@@ -1,17 +1,14 @@
 import React from 'react';
 import {View} from 'react-native';
 import {ButtonComponent, HomeContainer, NotoSansKR} from '../Component';
-import styled, {useTheme} from 'styled-components';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import styled from 'styled-components';
 import {useModal} from './ModalProvider';
+import {ModalHeadBorder} from './CustomModal';
 
 export const DailyModal = () => {
-  const theme = useTheme();
   return (
-    <View>
-      <ModalHeader>
-        <MaterialIcons name="horizontal-rule" size={35} color={theme.gray6} />
-      </ModalHeader>
+    <View style={{gap: 24}}>
+      <ModalHeadBorder />
       <View style={{gap: 24}}>
         <NotoSansKR size={18} weight="Bold" textAlign="center">
           우리가 해냈어요!{'\n'}
@@ -21,19 +18,14 @@ export const DailyModal = () => {
           <ImageDummy />
         </ImageContainer>
 
-        <>
+        <View style={{gap: 8}}>
           <ButtonComponent>친구한테 자랑하기</ButtonComponent>
           <ButtonComponent type="secondary">이미지 저장하기</ButtonComponent>
-        </>
+        </View>
       </View>
     </View>
   );
 };
-
-const ModalHeader = styled(View)`
-  align-items: center;
-  padding: 20px 0;
-`;
 
 const ImageDummy = styled(View)`
   width: 248px;
