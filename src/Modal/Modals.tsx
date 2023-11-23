@@ -41,13 +41,40 @@ const ImageDummy = styled(View)`
 const ImageContainer = styled(View)`
   justify-content: center;
   align-items: center;
-  padding: 22px;
 `;
+
+const ZoomImageDummy = styled(View)`
+  width: 264px;
+  height: 264px;
+  background: ${props => props.theme.gray6};
+`;
+
+export const ImageZoomModal = () => {
+  return (
+    <View style={{gap: 24, alignItems: 'center'}}>
+      <ModalHeadBorder />
+      <ZoomImageDummy />
+    </View>
+  );
+};
+
+export const UsedItemModal = () => {
+  return (
+    <View style={{gap: 24, alignItems: 'center'}}>
+      <ModalHeadBorder />
+      <ZoomImageDummy />
+      <NotoSansKR size={18} weight="Bold" textAlign="center">
+        이런! [닉네임A]님이{'\n'}
+        [아이템]을 사용했어요!
+      </NotoSansKR>
+    </View>
+  );
+};
 
 export const TryModal = () => {
   const {showModal} = useModal();
   const openModal = () => {
-    showModal(<DailyModal />);
+    showModal(<UsedItemModal />);
   };
 
   return (
