@@ -1,7 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {Pressable, Text} from 'react-native';
-import {HomeContainer, NotoSansKR} from '../Component';
+import {
+  HomeContainer,
+  NotoSansKR,
+  RowContainer,
+  RowScrollContainer,
+} from '../Component';
 import styled from 'styled-components/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {ScrollView} from 'react-native';
@@ -13,7 +18,12 @@ const TextContainer = styled.View`
   border-radius: 10px;
   padding: 12px 8px;
   background-color: white;
-  elevation: 1;
+  shadow-color: #000;
+  shadow-offset: 2px 2px;
+  shadow-opacity: 0.3;
+  shadow-radius: 4px;
+  elevation: 5;
+  margin: 8px 0;
   gap: 40px;
 `;
 const Profile = styled.View`
@@ -21,7 +31,6 @@ const Profile = styled.View`
   height: 40px;
   border-radius: 20px;
   background-color: #fbef84;
-  display: flex;
   justify-content: center;
   align-items: center;
 `;
@@ -31,14 +40,6 @@ const EmojiText = styled.Text`
 const TextBody = styled.View`
   gap: 8px;
 `;
-const MainText = styled.Text`
-  font-family: Noto Sans KR;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  color: black;
-`;
-
 const ChallengeInfo = ({
   mainText,
   subText,
@@ -52,7 +53,7 @@ const ChallengeInfo = ({
         <EmojiText>🥰</EmojiText>
       </Profile>
       <TextBody>
-        <MainText>{mainText}</MainText>
+        <NotoSansKR size={16}>{mainText}</NotoSansKR>
         <Text>{subText}</Text>
       </TextBody>
     </TextContainer>
@@ -85,7 +86,7 @@ const ChallengeSubInfo = ({
         <EmojiText>🥰</EmojiText>
       </Profile>
       <TextSubBody>
-        <MainText>{mainText}</MainText>
+        <NotoSansKR size={16}>{mainText}</NotoSansKR>
         <Text>{subText}</Text>
       </TextSubBody>
     </TextSubContainer>
@@ -174,7 +175,6 @@ const GoalBox: React.FC<GoalBoxProps> = ({theme, title, count}) => {
 const PlusContainer = styled.View`
   flex-direction: row-reverse;
   gap: 8px;
-  display: flex;
   align-items: center;
 `;
 const PlusText = styled.Text`
@@ -203,7 +203,6 @@ const SomeTargetContainer = styled.View`
 const ListContainer = styled.View`
   flex-direction: row;
   gap: 32px;
-  display: flex;
   align-items: center;
   flex: 1;
   margin-bottom: 10px;
@@ -284,19 +283,19 @@ const ChallengeTab = () => {
       <HomeContainer>
         <TopContainer>
           <NotoSansKR size={20}>진행중 챌린지</NotoSansKR>
-          <ChallengesContainer>
+          <RowScrollContainer gap={8}>
             <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
             <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
             <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
-          </ChallengesContainer>
+          </RowScrollContainer>
 
           <NotoSansKR size={20}>초대된 챌린지</NotoSansKR>
-          <ChallengesContainer>
+          <RowScrollContainer gap={8}>
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
-          </ChallengesContainer>
+          </RowScrollContainer>
 
           <Pressable
             onPress={() =>
@@ -339,12 +338,12 @@ const ChallengeTab = () => {
           <Pressable
             onPress={toggleAdditionalGoals}
             android_ripple={{color: 'transparent'}}>
-            <ChallengesContainer>
+            <RowContainer seperate="space-between">
               <NotoSansKR size={22} color="white">
                 추가 목표
               </NotoSansKR>
               <OcticonIcons name="diff-added" size={28} color={'white'} />
-            </ChallengesContainer>
+            </RowContainer>
           </Pressable>
           {showAdditionalGoals && (
             <View style={{flexDirection: 'column'}}>
