@@ -6,12 +6,14 @@ import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components';
 import {TryModal} from '../Modal/MyDailyDiaryModal';
 import {ChallengeModal} from '../Modal/ChallengeListModal';
+import {CharModal} from '../Modal/CharacterModal';
 const RaceTab = () => {
   return (
     <HomeContainer>
       <Text>RaceTab</Text>
       <TryModal />
       <ChallengeModal />
+      <CharModal />
       <Navigation />
     </HomeContainer>
   );

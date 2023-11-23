@@ -167,7 +167,7 @@ interface SliderComponentType {
   setSliderValue: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const SliderComponent = ({
+export const SliderComponent = ({
   children,
   sliderValue,
   setSliderValue,
