@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import {useModal} from './ModalProvider';
 import {ModalHeadBorder} from './CustomModal';
 
-export const DailyModal = () => {
+export const ShareModal = () => {
   return (
     <View style={{gap: 24}}>
       <ModalHeadBorder />
@@ -23,6 +23,41 @@ export const DailyModal = () => {
           <ButtonComponent type="secondary">이미지 저장하기</ButtonComponent>
         </View>
       </View>
+    </View>
+  );
+};
+
+export const ImageZoomModal = () => {
+  return (
+    <View style={{gap: 24, alignItems: 'center'}}>
+      <ModalHeadBorder />
+      <ZoomImageDummy />
+    </View>
+  );
+};
+
+export const UsedItemModal = () => {
+  return (
+    <View style={{gap: 24, alignItems: 'center'}}>
+      <ModalHeadBorder />
+      <ZoomImageDummy />
+      <NotoSansKR size={18} weight="Bold" textAlign="center">
+        이런! [닉네임A]님이{'\n'}
+        [아이템]을 사용했어요!
+      </NotoSansKR>
+    </View>
+  );
+};
+
+export const DailyModal = () => {
+  return (
+    <View style={{gap: 24, alignItems: 'center'}}>
+      <ModalHeadBorder />
+      <ZoomImageDummy />
+      <NotoSansKR size={18} weight="Bold" textAlign="center">
+        오늘도 수고했어요.{'\n'}
+        보상으로 [아이템]을 받았어요!
+      </NotoSansKR>
     </View>
   );
 };
@@ -49,32 +84,10 @@ const ZoomImageDummy = styled(View)`
   background: ${props => props.theme.gray6};
 `;
 
-export const ImageZoomModal = () => {
-  return (
-    <View style={{gap: 24, alignItems: 'center'}}>
-      <ModalHeadBorder />
-      <ZoomImageDummy />
-    </View>
-  );
-};
-
-export const UsedItemModal = () => {
-  return (
-    <View style={{gap: 24, alignItems: 'center'}}>
-      <ModalHeadBorder />
-      <ZoomImageDummy />
-      <NotoSansKR size={18} weight="Bold" textAlign="center">
-        이런! [닉네임A]님이{'\n'}
-        [아이템]을 사용했어요!
-      </NotoSansKR>
-    </View>
-  );
-};
-
 export const TryModal = () => {
   const {showModal} = useModal();
   const openModal = () => {
-    showModal(<UsedItemModal />);
+    showModal(<DailyModal />);
   };
 
   return (
