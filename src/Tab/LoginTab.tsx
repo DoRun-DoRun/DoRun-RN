@@ -11,6 +11,18 @@ import {
 } from '../../store/async/asyncStore';
 import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
+import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
+
+const signInWithKakao = async (): Promise<void> => {
+  try {
+    const token: KakaoOAuthToken = await login();
+    console.log(token);
+
+    // setResult(JSON.stringify(token));
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const guestLogin = () =>
   CallApi({endpoint: 'user/create/guest', method: 'POST'});
@@ -62,7 +74,7 @@ const LoginTab = () => {
       <LoginContainer>
         <Title source={require('../../assets/image/title.png')} />
 
-        <LoginButton kakao>
+        <LoginButton kakao onPress={() => signInWithKakao()}>
           <RowContainer gap={8}>
             <IconImage
               source={require('../../assets/image/kakao_icon.png')}
