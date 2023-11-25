@@ -46,7 +46,7 @@ export const InputNotoSansKR = styled.TextInput<FontType>`
 
 export const TossFace = styled.Text<{size: number}>`
   font-size: ${({size}) => size + 'px'};
-  line-height: ${({size}) => size * 2.2 + 'px'};
+  line-height: ${({size}) => size * 2 + 'px'};
   font-family: 'TossFaceFontMac';
 `;
 
