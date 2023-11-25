@@ -24,9 +24,10 @@ interface FontType {
 
 export const NotoSansKR = styled.Text<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  /* 안드로이드에서 font 오류 */
+  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
+    lineHeight ? lineHeight + 'px' : size * 1.75 + 'px'};
   font-size: ${({size}) => size + 'px'};
 `;
 
@@ -101,7 +102,7 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
 
   return (
     <ButtonContainer color={backgroundColor} onPress={onPress}>
-      <NotoSansKR color={color} size={16}>
+      <NotoSansKR color={color} size={16} lineHeight={23}>
         {children}
       </NotoSansKR>
     </ButtonContainer>
