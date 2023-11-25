@@ -4,11 +4,14 @@ import {HomeContainer} from '../Component';
 import {useNavigation} from '@react-navigation/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components';
-
+import {TryModal} from '../Modal/MyDailyDiaryModal';
+import {ChallengeModal} from '../Modal/ChallengeListModal';
 const RaceTab = () => {
   return (
     <HomeContainer>
       <Text>RaceTab</Text>
+      <TryModal />
+      <ChallengeModal />
       <Navigation />
     </HomeContainer>
   );
