@@ -1,42 +1,26 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
-import {Pressable, Text} from 'react-native';
-import {HomeContainer, NotoSansKR} from '../Component';
-import styled from 'styled-components/native';
+import React from 'react';
+import {TouchableOpacity} from 'react-native';
+import {
+  HomeContainer,
+  NotoSansKR,
+  RowContainer,
+  RowScrollContainer,
+  TossFace,
+} from '../Component';
+import styled, {useTheme} from 'styled-components/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ScrollView} from 'react-native';
 import {View} from 'react-native';
-const TextContainer = styled.View`
-  width: 122px;
-  height: 154px;
 
-  border-radius: 10px;
-  padding: 12px 8px;
-  background-color: white;
-  elevation: 1;
-  gap: 40px;
-`;
 const Profile = styled.View`
   width: 40px;
   height: 40px;
   border-radius: 20px;
   background-color: #fbef84;
-  display: flex;
   justify-content: center;
   align-items: center;
-`;
-const EmojiText = styled.Text`
-  font-size: 18px;
-`;
-const TextBody = styled.View`
-  gap: 8px;
-`;
-const MainText = styled.Text`
-  font-family: Noto Sans KR;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  color: black;
 `;
 
 const ChallengeInfo = ({
@@ -46,32 +30,37 @@ const ChallengeInfo = ({
   mainText: String;
   subText: String;
 }) => {
+  const TextContainer = styled.View`
+    width: 122px;
+    height: 154px;
+
+    border-radius: 10px;
+    padding: 12px 8px;
+    background-color: white;
+    shadow-color: #000;
+    shadow-offset: 2px 2px;
+    shadow-opacity: 0.3;
+    shadow-radius: 4px;
+    elevation: 5;
+    margin: 8px 0;
+    gap: 40px;
+  `;
+
   return (
     <TextContainer>
       <Profile>
-        <EmojiText>🥰</EmojiText>
+        <TossFace size={22}>🥰</TossFace>
       </Profile>
-      <TextBody>
-        <MainText>{mainText}</MainText>
-        <Text>{subText}</Text>
-      </TextBody>
+      <View style={{gap: 8}}>
+        <NotoSansKR size={14}>{mainText}</NotoSansKR>
+        <NotoSansKR size={10} color="gray5">
+          {subText}
+        </NotoSansKR>
+      </View>
     </TextContainer>
   );
 };
 
-const TextSubContainer = styled.View`
-  width: 108px;
-  height: 124px;
-
-  border-radius: 10px;
-  padding: 12px 8px;
-  background-color: white;
-  elevation: 1;
-  gap: 20px;
-`;
-const TextSubBody = styled.View`
-  gap: 4px;
-`;
 const ChallengeSubInfo = ({
   mainText,
   subText,
@@ -79,142 +68,118 @@ const ChallengeSubInfo = ({
   mainText: String;
   subText: String;
 }) => {
+  const TextSubContainer = styled.View`
+    width: 108px;
+    height: 124px;
+
+    border-radius: 10px;
+    padding: 12px 8px;
+    background-color: white;
+    gap: 20px;
+    margin: 8px 0;
+  `;
+
   return (
     <TextSubContainer>
       <Profile>
-        <EmojiText>🥰</EmojiText>
+        <TossFace size={20}>🥰</TossFace>
       </Profile>
-      <TextSubBody>
-        <MainText>{mainText}</MainText>
-        <Text>{subText}</Text>
-      </TextSubBody>
+      <View style={{gap: 4}}>
+        <NotoSansKR size={14}>{mainText}</NotoSansKR>
+        <NotoSansKR size={10} color="gray5">
+          {subText}
+        </NotoSansKR>
+      </View>
     </TextSubContainer>
   );
 };
 
 interface GoalBoxProps {
-  theme: 'white' | 'gray' | 'blue';
+  isTeam?: boolean;
+  isComplete?: boolean;
   title: string;
-  count: string;
+  count?: string;
 }
-const GoalBoxContainer = styled.View`
-  padding: 12px;
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-  border-radius: 30px;
-  overflow: hidden;
-`;
 
-const GoalBox: React.FC<GoalBoxProps> = ({theme, title, count}) => {
-  const getBackgroundColor = () => {
-    switch (theme) {
-      case 'white':
-        return 'white';
-      case 'gray':
-        return 'lightgray';
-      case 'blue':
-        return '#648cf3';
-      default:
-        return 'white';
-    }
-  };
-  const getBorderColor = () => {
-    switch (theme) {
-      case 'white':
-        return '#648cf3';
-      case 'gray':
-        return 'lightgray';
-      case 'blue':
-        return 'white';
-      default:
-        return 'white';
-    }
-  };
+const GoalBox: React.FC<GoalBoxProps> = ({
+  isTeam,
+  isComplete,
+  title,
+  count,
+}) => {
+  const theme = useTheme();
+
+  const backgroundColor = isComplete
+    ? theme.gray7
+    : isTeam
+    ? theme.primary1
+    : theme.white;
+
+  const textColor = isTeam ? 'white' : 'black';
+
+  const iconColor = isComplete
+    ? theme.gray4
+    : isTeam
+    ? theme.white
+    : theme.primary1;
+
+  const borderColor = !isComplete ? theme.primary1 : theme.gray7;
+
+  const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
+    text-decoration: line-through;
+    color: ${props => props.theme.gray4};
+    background-color: ${props => props.theme.gray7};
+  `;
+
+  const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
+    background-color: ${props => props.bc};
+    border-radius: 10px;
+    border-color: ${props => props.border};
+    border-width: 2px;
+    padding: 12px;
+  `;
+
   return (
-    <Pressable
-      android_ripple={{color: '#eeeeee'}}
-      style={{
-        flex: 1,
-        backgroundColor: getBackgroundColor(),
-        borderRadius: 13,
-        borderColor: getBorderColor(),
-        borderWidth: 2, // Border width to make the border visible
-        overflow: 'hidden',
-      }}>
-      <GoalBoxContainer>
-        <PlusContainer>
-          <NotoSansKR
-            size={20}
-            style={theme === 'gray' ? {textDecorationLine: 'line-through'} : {}}
-            color={
-              theme === 'blue' ? 'white' : theme === 'gray' ? 'gray3' : 'black'
-            }>
-            {title}
-          </NotoSansKR>
-          <OcticonIcons
-            name="check-circle-fill"
-            size={22}
-            color={
-              theme === 'blue' ? 'white' : theme === 'gray' ? 'gray' : '#648cf3'
-            }
-          />
-        </PlusContainer>
-        {theme === 'white' || theme === 'gray' ? (
-          <OcticonIcons name="kebab-horizontal" size={22} color={'gray'} />
+    <GoalContainer bc={backgroundColor} border={borderColor}>
+      <RowContainer seperate>
+        <RowContainer gap={8}>
+          <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
+          {isComplete ? (
+            <TodoTitle size={16}>{title}</TodoTitle>
+          ) : (
+            <NotoSansKR
+              size={16}
+              color={textColor}
+              weight={isTeam ? 'Bold' : 'Medium'}>
+              {title}
+            </NotoSansKR>
+          )}
+        </RowContainer>
+        {!isTeam ? (
+          <OcticonIcons name="kebab-horizontal" size={24} color={theme.gray5} />
         ) : (
-          <NotoSansKR size={20} color={theme === 'blue' ? 'white' : 'black'}>
+          <NotoSansKR size={16} color={textColor}>
             {count}
           </NotoSansKR>
         )}
-      </GoalBoxContainer>
-    </Pressable>
+      </RowContainer>
+    </GoalContainer>
   );
 };
-const PlusContainer = styled.View`
-  flex-direction: row-reverse;
-  gap: 8px;
-  display: flex;
-  align-items: center;
-`;
-const PlusText = styled.Text`
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  color: #648cf3;
-`;
 
 const PlusContainers = ({title}: {title: String}) => {
+  const theme = useTheme();
+
   return (
-    <PlusContainer>
-      <PlusText>{title}</PlusText>
-      <OcticonIcons name="plus-circle" size={20} color={'#648cf3'} />
-    </PlusContainer>
+    <RowContainer gap={4} style={{justifyContent: 'flex-end'}}>
+      <OcticonIcons name="plus-circle" size={16} color={theme.primary1} />
+      <NotoSansKR size={13} color="primary1">
+        {title}
+      </NotoSansKR>
+    </RowContainer>
   );
 };
-const SomeTargetContainer = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
 
-  border-bottom-color: white;
-  border-bottom-width: 3px;
-  margin-bottom: 10px;
-`;
-const ListContainer = styled.View`
-  flex-direction: row;
-  gap: 32px;
-  display: flex;
-  align-items: center;
-  flex: 1;
-  margin-bottom: 10px;
-`;
-const ListSecContainer = styled.View`
-  flex-direction: row-reverse;
-  gap: 8px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-`;
 const ListItem = ({
   title,
   body,
@@ -224,43 +189,41 @@ const ListItem = ({
   body: String;
   time: String;
 }) => {
+  const SomeTargetContainer = styled(RowContainer)`
+    border-bottom-color: white;
+    border-bottom-width: 1px;
+    padding: 6px 0;
+  `;
+
   return (
-    <SomeTargetContainer>
-      <ListContainer>
-        <NotoSansKR size={20} weight="Regular" color="white">
+    <SomeTargetContainer seperate>
+      <RowContainer gap={32}>
+        <NotoSansKR size={14} weight="Regular" color="white">
           {title}
         </NotoSansKR>
-        <NotoSansKR size={20} weight="Regular" color="white">
+        <NotoSansKR size={14} weight="Regular" color="white">
           {body}
         </NotoSansKR>
-      </ListContainer>
+      </RowContainer>
 
-      <ListSecContainer>
-        <OcticonIcons name="duplicate" size={28} color={'white'} />
-        <NotoSansKR size={20} weight="Regular" color="white">
+      <RowContainer gap={8}>
+        <NotoSansKR size={14} weight="Regular" color="yellow">
           {time}
         </NotoSansKR>
-      </ListSecContainer>
+        <MaterialIcons name="queue" size={28} color={'white'} />
+      </RowContainer>
     </SomeTargetContainer>
   );
 };
+
 const TopContainer = styled.View`
-  gap: 16px;
-  background-color: #dfeaff;
-  flex: 1;
+  gap: 8px;
+  background-color: ${props => props.theme.primary2};
   padding: 16px;
-  text-align: left;
-`;
-const ChallengesContainer = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
 `;
 
 const CenterContainer = styled.View`
-  background-color: white;
-  padding: 32px 16px 16px 16px;
+  padding: 0 16px;
   gap: 16px;
 `;
 
@@ -274,87 +237,65 @@ const FootContainer = styled.View`
 
 const ChallengeTab = () => {
   const navigation = useNavigation();
-  const [showAdditionalGoals, setShowAdditionalGoals] = useState(false);
 
-  const toggleAdditionalGoals = () => {
-    setShowAdditionalGoals(prev => !prev);
-  };
   return (
     <ScrollView>
-      <HomeContainer>
+      <HomeContainer style={{gap: 32}}>
         <TopContainer>
-          <NotoSansKR size={20}>진행중 챌린지</NotoSansKR>
-          <ChallengesContainer>
+          <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
+          <RowScrollContainer gap={8}>
             <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
             <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
             <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
-          </ChallengesContainer>
+          </RowScrollContainer>
 
-          <NotoSansKR size={20}>초대된 챌린지</NotoSansKR>
-          <ChallengesContainer>
+          <NotoSansKR size={16}>초대된 챌린지</NotoSansKR>
+          <RowScrollContainer gap={8}>
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
             <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
-          </ChallengesContainer>
+          </RowScrollContainer>
 
-          <Pressable
+          <TouchableOpacity
             onPress={() =>
               navigation.navigate('CreateChallengeScreen' as never)
-            }
-            android_ripple={{color: '#eeeeee'}}>
+            }>
             <PlusContainers title="챌린지 추가하기" />
-          </Pressable>
+          </TouchableOpacity>
         </TopContainer>
 
         <CenterContainer>
-          <NotoSansKR size={26}>팀 주간 목표</NotoSansKR>
-          <GoalBox theme="blue" title="개인이 맡은 UI 완료하기" count="1/4" />
+          <NotoSansKR size={18}>팀 주간 목표</NotoSansKR>
+          <GoalBox isTeam title="개인이 맡은 UI 완료하기" count="1/4" />
         </CenterContainer>
+
         <CenterContainer>
-          <NotoSansKR size={26}>개인별 목표</NotoSansKR>
+          <NotoSansKR size={18}>개인별 목표</NotoSansKR>
           <View style={{gap: 8}}>
-            <GoalBox
-              theme="white"
-              title="한줄이라도 코드 작성하기"
-              count="1/4"
-            />
-            <GoalBox
-              theme="white"
-              title="1시간씩 자리에 앉아 있기"
-              count="1/4"
-            />
-            <GoalBox theme="white" title="밥 잘 챙겨먹기" count="1/4" />
-            <GoalBox theme="gray" title="팀 회의 참여하기" count="1/4" />
+            <GoalBox title="한줄이라도 코드 작성하기" />
+            <GoalBox title="1시간씩 자리에 앉아 있기" />
+            <GoalBox title="밥 잘 챙겨먹기" />
+            <GoalBox title="팀 회의 참여하기" isComplete />
           </View>
-          <Pressable
-            onPress={() =>
-              navigation.navigate('CreateChallengeScreen' as never)
-            }
-            android_ripple={{color: '#eeeeee'}}>
+          <TouchableOpacity>
             <PlusContainers title="목표 추가하기" />
-          </Pressable>
+          </TouchableOpacity>
         </CenterContainer>
 
         <FootContainer>
-          <Pressable
-            onPress={toggleAdditionalGoals}
-            android_ripple={{color: 'transparent'}}>
-            <ChallengesContainer>
-              <NotoSansKR size={22} color="white">
-                추가 목표
-              </NotoSansKR>
-              <OcticonIcons name="diff-added" size={28} color={'white'} />
-            </ChallengesContainer>
-          </Pressable>
-          {showAdditionalGoals && (
-            <View style={{flexDirection: 'column'}}>
-              <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-              <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-              <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-              <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-            </View>
-          )}
+          <RowContainer seperate>
+            <NotoSansKR size={18} color="white">
+              추가 목표
+            </NotoSansKR>
+            <OcticonIcons name="hourglass" size={24} color={'white'} />
+          </RowContainer>
+          <View>
+            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
+            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
+            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
+            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
+          </View>
         </FootContainer>
       </HomeContainer>
     </ScrollView>

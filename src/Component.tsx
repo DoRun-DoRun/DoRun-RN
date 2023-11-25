@@ -20,6 +20,7 @@ interface FontType {
   weight?: 'Bold' | 'Medium' | 'Regular';
   color?: string;
   lineHeight?: number;
+  border?: boolean;
 }
 
 export const NotoSansKR = styled.Text<FontType>`
@@ -41,11 +42,12 @@ export const InputNotoSansKR = styled.TextInput<FontType>`
   padding: 0;
   padding-bottom: 4px;
   margin: 0;
-  border-bottom-width: 1px;
+  border-bottom-width: ${({border}) => (border ? '1px' : 0)};
 `;
 
-export const TossFace = styled.Text<{size?: number}>`
+export const TossFace = styled.Text<{size: number}>`
   font-size: ${({size}) => size + 'px'};
+  line-height: ${({size}) => size * 2 + 'px'};
   font-family: 'TossFaceFontMac';
 `;
 
