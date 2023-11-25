@@ -37,8 +37,8 @@ export const InputNotoSansKR = styled.TextInput<FontType>`
   /* 안드로이드에서 font 오류 */
   /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
-  font-size: ${({size}) => size + 'px'};
+    lineHeight ? `${lineHeight}px` : `${size * 1.45}px`};
+  font-size: ${({size}) => `${size}px`};
   padding: 0;
   padding-bottom: 4px;
   margin: 0;
@@ -117,3 +117,49 @@ export const RowContainer = styled.View<{gap?: number; seperate?: boolean}>`
   justify-content: ${props =>
     props.seperate ? 'space-between' : 'flex-start'};
 `;
+
+interface API {
+  endpoint: string;
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+  accessToken?: string;
+  body?: object;
+}
+
+interface Config {
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+  headers: {
+    'Content-Type': string;
+    Authorization?: string;
+  };
+  body?: string;
+}
+
+export async function CallApi({endpoint, method, accessToken, body}: API) {
+  const url = `https://dorun.site/${endpoint}`;
+
+  const config: Config = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  if (body && method !== 'GET') {
+    config.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, config);
+
+  if (!response.ok) {
+    throw new Error(`API call failed: ${response.status}`);
+  }
+
+  // return response.text();
+  // 현재 API 호출 시 반환값이 json이 아니라 string 형태임. 추후 json으로 수정하겠음
+
+  return response.json();
+}
