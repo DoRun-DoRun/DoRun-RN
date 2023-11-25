@@ -7,9 +7,10 @@ import {
   ScrollContainer,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Text, View} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useModal} from '../Modal/ModalProvider';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
@@ -240,11 +241,30 @@ const AlbumGrid = styled(RowContainer)`
 `;
 
 const Album = () => {
+  const {showModal, hideModal} = useModal();
+
+  const openModal = () => {
+    const modalContent = (
+      <View style={{alignItems: 'center', gap: 24}}>
+        <View style={{height: 200, width: 200, backgroundColor: '#ccc'}} />
+        <NotoSansKR size={14} onPress={() => hideModal()}>
+          닫기
+        </NotoSansKR>
+      </View>
+    );
+    showModal(modalContent);
+  };
+
   return (
     <RowContainer style={{justifyContent: 'space-between', padding: 16}}>
       <MaterialIcons name="chevron-left" size={20} />
       <AlbumGrid>
-        <AlbumItem />
+        <Pressable
+          onPress={() => {
+            openModal();
+          }}>
+          <AlbumItem />
+        </Pressable>
         <AlbumItem />
         <AlbumItem />
         <AlbumItem />

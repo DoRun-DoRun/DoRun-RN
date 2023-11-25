@@ -9,7 +9,6 @@ const RaceTab = () => {
   return (
     <HomeContainer>
       <Text>RaceTab</Text>
-
       <Navigation />
     </HomeContainer>
   );

@@ -1,12 +1,196 @@
-import React from 'react';
-import {Text} from 'react-native';
-import {HomeContainer} from '../Component';
+import React, {useState} from 'react';
+import {
+  ButtonComponent,
+  HomeContainer,
+  InnerContainer,
+  NotoSansKR,
+} from '../Component';
+import {Animated, Easing, Pressable, View} from 'react-native';
+import {styled, useTheme} from 'styled-components/native';
+import {Slider} from '@miblanchard/react-native-slider';
 
 const SettingScreen = () => {
+  const [pushAlarm, setPushAlarm] = useState(true);
+  const [marketingAlarm, setMarketingAlarm] = useState(true);
+  const [nightAlarm, setNightAlarm] = useState(true);
+  const [soundEffect, setSoundEffect] = useState(0);
+  const [backgroundMusic, setBackgroundMusic] = useState(0);
+
+  const OnPushAlarmToggle = () => {
+    setPushAlarm(!pushAlarm);
+  };
+
+  const OnMarketingAlarmToggle = () => {
+    setMarketingAlarm(!marketingAlarm);
+  };
+
+  const OnNightAlarmToggle = () => {
+    setNightAlarm(!nightAlarm);
+  };
+
   return (
     <HomeContainer>
-      <Text>SettingScreen</Text>
+      <InnerContainer>
+        <View style={{gap: 36}}>
+          <NotoSansKR size={20}>환경 설정</NotoSansKR>
+
+          <ObjectList>
+            <ToggleComponent isOn={pushAlarm} onToggle={OnPushAlarmToggle}>
+              푸시 알람
+            </ToggleComponent>
+            <ToggleComponent
+              isOn={marketingAlarm}
+              onToggle={OnMarketingAlarmToggle}>
+              마케팅 푸시 알람
+            </ToggleComponent>
+            <ToggleComponent isOn={nightAlarm} onToggle={OnNightAlarmToggle}>
+              23시 ~ 09시 푸시 알람
+            </ToggleComponent>
+          </ObjectList>
+
+          <ObjectList>
+            <SliderComponent
+              sliderValue={soundEffect}
+              setSliderValue={setSoundEffect}>
+              효과음
+            </SliderComponent>
+            <SliderComponent
+              sliderValue={backgroundMusic}
+              setSliderValue={setBackgroundMusic}>
+              배경음악
+            </SliderComponent>
+          </ObjectList>
+          <ObjectList>
+            <ObjectContainer>
+              <NotoSansKR size={16} weight="Medium">
+                소셜 로그인 정보
+              </NotoSansKR>
+              <NotoSansKR size={16} weight="Medium">
+                KaKao
+              </NotoSansKR>
+            </ObjectContainer>
+            <ObjectContainer>
+              <NotoSansKR size={16} weight="Medium">
+                User Id
+              </NotoSansKR>
+              <NotoSansKR size={16} weight="Medium">
+                000000
+              </NotoSansKR>
+            </ObjectContainer>
+          </ObjectList>
+        </View>
+      </InnerContainer>
+      <View style={{gap: 8, padding: 16}}>
+        <ButtonComponent>고객 센터</ButtonComponent>
+        <ButtonComponent type="secondary">로그아웃</ButtonComponent>
+      </View>
     </HomeContainer>
+  );
+};
+
+const ObjectList = styled(View)`
+  gap: 8px;
+`;
+
+const ObjectContainer = styled(View)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ToggleWheel = styled(Animated.View)`
+  width: 25px;
+  height: 25px;
+  background-color: ${props => props.theme.white};
+  border-radius: 12.5px;
+`;
+
+const Wrap = styled(View)`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const ToggleFrame = styled(View)`
+  width: 50px;
+  height: 30px;
+  padding-left: 2px;
+  border-radius: 15px;
+  justify-content: center;
+`;
+
+interface ToggleComponentType {
+  children: React.ReactNode;
+  isOn: Boolean;
+  onToggle: () => void;
+}
+
+const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
+  const theme = useTheme();
+
+  const aniValue = new Animated.Value(isOn ? 1 : 0);
+  const color = isOn ? theme.primary1 : theme.gray6;
+
+  const moveSwitchToggle = aniValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 20],
+  });
+
+  Animated.timing(aniValue, {
+    toValue: isOn ? 1 : 0,
+    duration: 200,
+    easing: Easing.linear,
+    useNativeDriver: true,
+  }).start();
+
+  return (
+    <ObjectContainer>
+      <NotoSansKR size={16} weight="Medium">
+        {children}
+      </NotoSansKR>
+      <Wrap>
+        <Pressable onPress={onToggle}>
+          <ToggleFrame style={{backgroundColor: color}}>
+            <ToggleWheel
+              style={[{transform: [{translateX: moveSwitchToggle}]}]}
+            />
+          </ToggleFrame>
+        </Pressable>
+      </Wrap>
+    </ObjectContainer>
+  );
+};
+
+interface SliderComponentType {
+  children: React.ReactNode;
+  sliderValue: number;
+  setSliderValue: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const SliderComponent = ({
+  children,
+  sliderValue,
+  setSliderValue,
+}: SliderComponentType) => {
+  const theme = useTheme();
+
+  return (
+    <ObjectContainer>
+      <View style={{width: 240}}>
+        <NotoSansKR size={16} weight="Medium">
+          {children}
+        </NotoSansKR>
+      </View>
+      <View style={{flex: 1}}>
+        <Slider
+          value={sliderValue}
+          minimumTrackTintColor={theme.primary1}
+          maximumTrackTintColor={theme.primary2}
+          thumbTintColor={theme.primary1}
+          onValueChange={values => setSliderValue(values[0])}
+        />
+      </View>
+    </ObjectContainer>
   );
 };
 
