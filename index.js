@@ -10,15 +10,20 @@ import {ThemeProvider} from 'styled-components/native'; // 사용하는 테마 �
 import {QueryClient, QueryClientProvider} from 'react-query';
 
 const queryClient = new QueryClient();
+import {ModalProvider} from './src/Modal/ModalProvider';
+import CustomModal from './src/Modal/CustomModal';
 
 export default function Main() {
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider store={Store}>
         <ThemeProvider theme={light}>
-          <NavigationContainer>
-            <App />
-          </NavigationContainer>
+          <ModalProvider>
+            <NavigationContainer>
+              <CustomModal />
+              <App />
+            </NavigationContainer>
+          </ModalProvider>
         </ThemeProvider>
       </StoreProvider>
     </QueryClientProvider>

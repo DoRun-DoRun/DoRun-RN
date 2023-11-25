@@ -20,30 +20,34 @@ interface FontType {
   weight?: 'Bold' | 'Medium' | 'Regular';
   color?: string;
   lineHeight?: number;
+  border?: boolean;
 }
 
 export const NotoSansKR = styled.Text<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  /* 안드로이드에서 font 오류 */
+  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
+    lineHeight ? lineHeight + 'px' : size * 1.75 + 'px'};
   font-size: ${({size}) => size + 'px'};
 `;
 
 export const InputNotoSansKR = styled.TextInput<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
   /* 안드로이드에서 font 오류 */
-  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
   line-height: ${({lineHeight, size}) =>
     lineHeight ? `${lineHeight}px` : `${size * 1.45}px`};
   font-size: ${({size}) => `${size}px`};
   padding: 0;
+  padding-bottom: 4px;
   margin: 0;
-  align-items: center;
+  border-bottom-width: ${({border}) => (border ? '1px' : 0)};
 `;
 
-export const TossFace = styled.Text<{size?: number}>`
+export const TossFace = styled.Text<{size: number}>`
   font-size: ${({size}) => size + 'px'};
+  line-height: ${({size}) => size * 2 + 'px'};
   font-family: 'TossFaceFontMac';
 `;
 
@@ -94,13 +98,13 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
     color = 'gray4';
     backgroundColor = 'white';
   } else if (type === 'gray') {
-    color = 'gray2';
-    backgroundColor = 'gray5';
+    color = 'gray4';
+    backgroundColor = 'gray7';
   }
 
   return (
     <ButtonContainer color={backgroundColor} onPress={onPress}>
-      <NotoSansKR color={color} size={16}>
+      <NotoSansKR color={color} size={16} lineHeight={23}>
         {children}
       </NotoSansKR>
     </ButtonContainer>
