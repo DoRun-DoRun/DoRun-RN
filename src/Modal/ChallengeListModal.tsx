@@ -4,88 +4,87 @@ import {
   ButtonComponent,
   HomeContainer,
   NotoSansKR,
+  RowContainer,
   TossFace,
 } from '../Component';
 import {ModalHeadText} from './CustomModal';
 import {useModal} from './ModalProvider';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
-export const BetweenModalContainer = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-`;
-export const ChallengeTimeBox = styled.Text`
-  width: 100%;
-  border-radius: 25px;
+
+const ChallengeTimeBox = styled.View`
+  border-radius: 100px;
   border: 2px solid lightgray;
-  padding: 12px 40px;
+  padding: 4px;
   align-items: center;
   justify-content: center;
 `;
-export const StatusComponent = ({
+const StatusComponent = ({
   username,
   status,
 }: {
   username: String;
-  status: String;
+  status?: Boolean;
 }) => {
   return (
-    <BetweenModalContainer>
-      <NotoSansKR size={17} weight="Medium">
+    <RowContainer seperate>
+      <NotoSansKR size={16} weight="Medium">
         {username}
       </NotoSansKR>
-      {status === 'true' ? (
-        <NotoSansKR size={16} weight="Medium" color="green">
+      {status ? (
+        <NotoSansKR size={14} weight="Medium" color="green">
           참여중이에요
         </NotoSansKR>
       ) : (
-        <NotoSansKR size={16} weight="Medium" color="red">
+        <NotoSansKR size={14} weight="Medium" color="red">
           참여를 기다리고 있어요
         </NotoSansKR>
       )}
-    </BetweenModalContainer>
+    </RowContainer>
   );
 };
 export const ChallengeListModal = () => {
-  const [isSecondSectionVisible, setSecondSectionVisible] = useState(false);
+  const [isSecondSectionVisible, setSecondSectionVisible] = useState(true);
   return (
     <View style={{gap: 24}}>
       <ModalHeadText>
-        <NotoSansKR size={20} weight="Bold">
-          [닉네임A]에게 초대가 왔어요
-        </NotoSansKR>
+        <NotoSansKR size={20}>[닉네임A]에게 초대가 왔어요</NotoSansKR>
       </ModalHeadText>
 
       <View style={{gap: 16}}>
-        <View style={{gap: 16, flexDirection: 'row', alignItems: 'center'}}>
+        <RowContainer gap={16}>
           <TossFace size={40}>🎲</TossFace>
           <NotoSansKR size={20}>챌린지 목표</NotoSansKR>
-        </View>
+        </RowContainer>
 
         <TouchableOpacity
           onPress={() => setSecondSectionVisible(!isSecondSectionVisible)}>
-          <BetweenModalContainer>
+          <RowContainer seperate>
             <NotoSansKR size={18}>챌린지 참여 인원</NotoSansKR>
-            <OcticonIcons name="chevron-down" size={26} color={'black'} />
-          </BetweenModalContainer>
+            <OcticonIcons name="chevron-down" size={28} />
+          </RowContainer>
         </TouchableOpacity>
 
         {isSecondSectionVisible && (
-          <View style={{gap: 16}}>
-            <StatusComponent username="닉네임 A" status="true" />
-            <StatusComponent username="닉네임 A" status="false" />
+          <View style={{gap: 8}}>
+            <StatusComponent username="닉네임 A" status />
+            <StatusComponent username="닉네임 A" />
           </View>
         )}
-        <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
-        <ChallengeTimeBox>
-          <NotoSansKR size={16} weight="Medium">
-            2023. 10. 20(금) ~ 2024. 01. 01(월)
-          </NotoSansKR>
-        </ChallengeTimeBox>
-        <ButtonComponent>참여하기</ButtonComponent>
-        <ButtonComponent type="secondary">거절하기</ButtonComponent>
+
+        <View style={{gap: 8}}>
+          <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
+          <ChallengeTimeBox>
+            <NotoSansKR size={14} weight="Medium" lineHeight={28}>
+              2023. 10. 20(금) ~ 2024. 01. 01(월)
+            </NotoSansKR>
+          </ChallengeTimeBox>
+        </View>
+
+        <View style={{gap: 8}}>
+          <ButtonComponent>참여하기</ButtonComponent>
+          <ButtonComponent type="secondary">거절하기</ButtonComponent>
+        </View>
       </View>
     </View>
   );
