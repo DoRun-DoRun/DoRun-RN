@@ -2,6 +2,7 @@ import React, {Dispatch, SetStateAction, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
+  CallApi,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -14,6 +15,9 @@ import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
+import {useSelector} from 'react-redux';
+import {useMutation} from 'react-query';
+import {RootState} from '../../store/Store';
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
   flex: 1;
@@ -337,6 +341,35 @@ const CreateChallengeScreen = () => {
 
   const theme = useTheme();
 
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const testCreate = () =>
+    CallApi({
+      endpoint: 'challenge/create',
+      method: 'POST',
+      accessToken: accessToken!,
+      body: {
+        CHALLENGE_MST_NM: 'string',
+        USERS_UID: [1000001, 1000002],
+        START_DT: '2023-11-18',
+        END_DT: '2023-11-18',
+        HEADER_EMOJI: 'string',
+        INSERT_DT: '2023-11-18T15:18:20.629Z',
+        CHALLENGE_STATUS: 'PENDING',
+      },
+    });
+
+  const {mutate: createChallenge} = useMutation(testCreate, {
+    onSuccess: response => {
+      // 요청 성공 시 수행할 작업
+      console.log('Success:', response);
+    },
+    onError: error => {
+      // 요청 실패 시 수행할 작업
+      console.error('Error:', error);
+    },
+  });
+
   return (
     <HomeContainer>
       <ScrollContainer>
@@ -410,8 +443,12 @@ const CreateChallengeScreen = () => {
       </ScrollContainer>
 
       <View style={{gap: 8, padding: 16}}>
-        <ButtonComponent>지금 시작하기</ButtonComponent>
-        <ButtonComponent type="secondary">참여 기다리기</ButtonComponent>
+        <ButtonComponent onPress={() => createChallenge()}>
+          지금 시작하기
+        </ButtonComponent>
+        <ButtonComponent type="secondary" onPress={() => createChallenge()}>
+          참여 기다리기
+        </ButtonComponent>
       </View>
 
       <EmojiPicker
