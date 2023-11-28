@@ -10,10 +10,7 @@ import {
   Platform,
   StyleSheet,
   Modal,
-  // View,
-  // ActionSheetIOS,
   useWindowDimensions,
-  Text,
 } from 'react-native';
 
 interface ButtonType {
@@ -266,10 +263,10 @@ export const PhotoView = () => {
   return (
     <>
       <Pressable onPress={onPressToiOS}>
-        <Text>사진 찍기</Text>
+        <NotoSansKR size={12}>사진 찍기</NotoSansKR>
       </Pressable>
       <Pressable onPress={onViewImage}>
-        <Text>찍은 이미지 보기</Text>
+        <NotoSansKR size={12}>찍은 이미지 보기</NotoSansKR>
         <ViewImage
           visible={imageVisible}
           onClose={() => setImageVisible(false)}
@@ -280,7 +277,7 @@ export const PhotoView = () => {
   );
 };
 
-export const ImageSave = () => {
+export const ContentSave = ({children}: {children: React.ReactNode}) => {
   const ref = useRef<ViewShot | null>(null);
 
   useEffect(() => {
@@ -325,16 +322,9 @@ export const ImageSave = () => {
       </Pressable>
       <ViewShot
         ref={ref}
-        options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}
-        style={onShareStyles.block}>
-        <Text>context</Text>
+        options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}>
+        {children}
       </ViewShot>
     </>
   );
 };
-
-const onShareStyles = StyleSheet.create({
-  block: {
-    backgroundColor: '#f7d8b7',
-  },
-});
