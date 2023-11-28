@@ -1,6 +1,6 @@
 import React from 'react';
 import {Pressable, Text, View} from 'react-native';
-import {HomeContainer, ImageUploadSample} from '../Component';
+import {HomeContainer} from '../Component';
 import {useNavigation} from '@react-navigation/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components';
@@ -12,7 +12,6 @@ const RaceTab = () => {
       <Text>RaceTab</Text>
       <TryModal />
       <ChallengeModal />
-      <ImageUploadSample />
       <Navigation />
     </HomeContainer>
   );
