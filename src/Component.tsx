@@ -4,14 +4,7 @@ import {launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
-import {
-  Pressable,
-  Image,
-  Platform,
-  StyleSheet,
-  Modal,
-  useWindowDimensions,
-} from 'react-native';
+import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -176,34 +169,15 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
   return response.json();
 }
 
-const UploadModeModalStyles = StyleSheet.create({
-  background: {
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  whiteBox: {
-    width: 300,
-    backgroundColor: 'white',
-    borderRadius: 4,
-    elevation: 2,
-  },
-  actionButton: {
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  icon: {
-    marginRight: 8,
-  },
-  actionText: {
-    fontSize: 16,
-  },
-});
+const ViewImageModalBackground = styled.TouchableOpacity`
+  background-color: 'rgba(0,0,0,0.6)';
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const ViewImage = ({visible, onClose, res}: any) => {
-  const {width} = useWindowDimensions();
+  const width = useWindowDimensions().width;
 
   return (
     <Modal
@@ -211,23 +185,20 @@ export const ViewImage = ({visible, onClose, res}: any) => {
       transparent={true}
       animationType="fade"
       onRequestClose={onClose}>
-      <Pressable style={UploadModeModalStyles.background} onPress={onClose}>
-        <Image
+      <ViewImageModalBackground onPress={onClose}>
+        <ViewImageStyles
           source={{uri: res?.assets[0]?.uri}}
-          style={[ViewImageStyles.image, {height: width}]}
+          height={width}
           resizeMode="cover"
         />
-      </Pressable>
+      </ViewImageModalBackground>
     </Modal>
   );
 };
 
-const ViewImageStyles = StyleSheet.create({
-  block: {
-    flex: 1,
-  },
-  image: {width: '100%'},
-});
+const ViewImageStyles = styled.Image<{height: any}>`
+  width: ${props => props.height};
+`;
 
 export const PhotoView = () => {
   const [modalImage, setModalImage] = useState<any>(null);
