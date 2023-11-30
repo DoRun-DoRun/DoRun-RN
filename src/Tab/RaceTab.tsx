@@ -7,16 +7,18 @@ import styled from 'styled-components/native';
 
 const RaceTab = () => {
   return (
-    <HomeContainer>
-      <ScrollContainer>
+    <HomeContainer color="background">
+      <RaceView>
+        {/* <ScrollContainer> */}
         <BGComponent BGN={0} />
         <BGComponent BGN={1} />
-        <BGComponent BGN={2} />
-        <BGComponent BGN={3} />
-        <BGComponent BGN={1} />
-        <BGComponent BGN={2} />
-        <Navigation />
-      </ScrollContainer>
+        {/* <BGComponent BGN={2} /> */}
+        {/* <BGComponent BGN={3} /> */}
+        {/* <BGComponent BGN={3} /> */}
+        {/* <BGComponent BGN={3} /> */}
+        {/* </ScrollContainer> */}
+      </RaceView>
+      <Navigation />
     </HomeContainer>
   );
 };
@@ -35,13 +37,20 @@ const BGComponent = ({BGN}: {BGN: number}) => {
     require('../../assets/images/peats00.png'),
   ];
   return (
-    <View style={{flex: 1}}>
-      <BGAStyle source={BGA[BGN].url} aspect-ratio={1} height={BGA[BGN].height}>
-        <DuduImage source={Dudus[BGN]} />
-      </BGAStyle>
-    </View>
+    <BGImage
+      source={BGA[BGN].url}
+      aspect-ratio={1}
+      resizeMode="stretch"
+      height={BGA[BGN].height}>
+      <DuduImage source={Dudus[BGN]} />
+    </BGImage>
   );
 };
+
+const RaceView = styled.View`
+  flex: 1;
+  justify-content: flex-end;
+`;
 
 const DuduImage = styled.Image`
   position: absolute;
@@ -49,8 +58,7 @@ const DuduImage = styled.Image`
   bottom: 16;
 `;
 
-const BGAStyle = styled.ImageBackground<{height: number}>`
-  flex: 1;
+const BGImage = styled.ImageBackground<{height: number}>`
   height: ${props => props.height}px;
   width: 100%;
 `;

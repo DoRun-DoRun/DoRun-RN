@@ -59,10 +59,10 @@ export const InnerContainer = styled.View<{gap?: number; seperate?: boolean}>`
     props.seperate ? 'space-between' : 'flex-start'};
 `;
 
-export const HomeContainer = styled.SafeAreaView`
+export const HomeContainer = styled.SafeAreaView<{color?: string}>`
   position: relative;
   flex: 1;
-  background-color: #fff;
+  background-color: ${({color, theme}) => (color ? theme[color] : theme.white)};
 `;
 
 export const ScrollContainer = styled.ScrollView.attrs({
