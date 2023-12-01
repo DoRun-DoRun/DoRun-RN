@@ -1,5 +1,10 @@
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/native';
+import {launchCamera} from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Share from 'react-native-share';
+import ViewShot, {captureRef} from 'react-native-view-shot';
+import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -163,3 +168,134 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
 
   return response.json();
 }
+
+const ViewImageModalBackground = styled.TouchableOpacity`
+  background-color: 'rgba(0,0,0,0.6)';
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const ViewImage = ({visible, onClose, res}: any) => {
+  const width = useWindowDimensions().width;
+
+  return (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}>
+      <ViewImageModalBackground onPress={onClose}>
+        <ViewImageStyles
+          source={{uri: res?.assets[0]?.uri}}
+          height={width}
+          resizeMode="cover"
+        />
+      </ViewImageModalBackground>
+    </Modal>
+  );
+};
+
+const ViewImageStyles = styled.Image<{height: any}>`
+  width: ${props => props.height};
+`;
+
+export const PhotoView = () => {
+  const [modalImage, setModalImage] = useState<any>(null);
+  const [imageVisible, setImageVisible] = useState(false);
+
+  const imagePickerOption: any = {
+    mediaType: 'photo',
+    selectionLimit: 0,
+    includeBase64: Platform.OS === 'android',
+  };
+
+  const onPickImage = (res: any) => {
+    if (res.didCancel || !res) {
+      return;
+    }
+    setModalImage(res);
+  };
+
+  // 찍은 사진 확대모달로 보여주기
+  const onViewImage = () => {
+    setImageVisible(true);
+  };
+
+  // 카메라로 사진찍기
+  const onLaunchCamera = () => {
+    launchCamera(imagePickerOption, onPickImage);
+  };
+
+  const onPressToiOS = () => {
+    onLaunchCamera();
+  };
+
+  return (
+    <>
+      <Pressable onPress={onPressToiOS}>
+        <NotoSansKR size={12}>사진 찍기</NotoSansKR>
+      </Pressable>
+      <Pressable onPress={onViewImage}>
+        <NotoSansKR size={12}>찍은 이미지 보기</NotoSansKR>
+        <ViewImage
+          visible={imageVisible}
+          onClose={() => setImageVisible(false)}
+          res={modalImage}
+        />
+      </Pressable>
+    </>
+  );
+};
+
+export const ContentSave = ({children}: {children: React.ReactNode}) => {
+  const ref = useRef<ViewShot | null>(null);
+
+  useEffect(() => {
+    // on mount
+    if (ref.current) {
+      captureRef(ref, {
+        format: 'jpg',
+        quality: 0.9,
+      }).then((uri: string) => {
+        console.log('do something with ', uri);
+      });
+    }
+  }, []);
+
+  const onShare = async () => {
+    try {
+      console.log('click');
+
+      const uri = await captureRef(ref, {
+        format: 'jpg',
+        quality: 0.9,
+      });
+
+      let options = {
+        title: 'Share via',
+        message: 'Check out this image!',
+        url: Platform.OS === 'ios' ? `file://${uri}` : uri,
+      };
+      await Share.open(options);
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  return (
+    <>
+      <Pressable
+        // 클릭하면 viewRef를 이미지 파일로 변환해서 저장해 줌
+        onPress={onShare}
+        style={{padding: 10}}>
+        <Icon name="share" size={18} color={'#000'} />
+      </Pressable>
+      <ViewShot
+        ref={ref}
+        options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}>
+        {children}
+      </ViewShot>
+    </>
+  );
+};

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Pressable, View} from 'react-native';
-import {HomeContainer, ScrollContainer} from '../Component';
+import {HomeContainer} from '../Component';
 import {useNavigation} from '@react-navigation/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
