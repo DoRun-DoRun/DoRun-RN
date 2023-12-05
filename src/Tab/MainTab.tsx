@@ -44,6 +44,9 @@ export const MainTab = () => {
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="home" color={color} size={size} />
           ),
+          headerStyle: {
+            backgroundColor: theme.background,
+          },
         }}
       />
       <Tab.Screen

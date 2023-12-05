@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import ProfileSettingScreen from './screens/ProfileSettingScreen';
 import FriendScreen from './screens/FriendScreen';
+import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 
 const Stack = createNativeStackNavigator();
@@ -28,6 +29,11 @@ function App(): JSX.Element {
           />
         ),
       }}>
+      <Stack.Screen
+        name="LoginTab"
+        component={LoginTab}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="MainTab"
         component={MainTab}
