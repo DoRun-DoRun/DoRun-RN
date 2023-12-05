@@ -54,8 +54,8 @@ const RaceView = styled.View`
 
 const DuduImage = styled.Image`
   position: absolute;
-  left: 10;
-  bottom: 16;
+  left: 10px;
+  bottom: 16px;
 `;
 
 const BGImage = styled.ImageBackground<{height: number}>`

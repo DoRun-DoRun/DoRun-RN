@@ -6,7 +6,7 @@ import App from './src/App';
 import {Store} from './store/Store';
 import {NavigationContainer} from '@react-navigation/native';
 import {light} from './src/style/theme';
-import {ThemeProvider} from 'styled-components/native'; // 사용하는 테마 라이브러리에 따라 다를 수 있습니다.
+import {ThemeProvider} from 'styled-components/native';
 import {QueryClient, QueryClientProvider} from 'react-query';
 
 const queryClient = new QueryClient();

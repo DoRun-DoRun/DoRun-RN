@@ -23,6 +23,7 @@ import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 // import 'react-native-get-random-values';
 import {v4 as uuid} from 'uuid';
+import {SignType} from '../../store/data';
 
 const signInWithApple = async () => {
   // performs login request
@@ -118,7 +119,11 @@ const getKakaoProfile = async (): Promise<void> => {
 };
 
 const guestLogin = () =>
-  CallApi({endpoint: 'user/create/guest', method: 'POST'});
+  CallApi({
+    endpoint: 'user',
+    method: 'POST',
+    body: {SIGN_TYPE: SignType.GUEST},
+  });
 
 const LoginTab = () => {
   const navigation = useNavigation();
