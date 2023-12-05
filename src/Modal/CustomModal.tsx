@@ -48,7 +48,7 @@ export const ModalHeadBorder = () => {
 };
 
 const ModalHeaderBorder = styled(View)<{size: number}>`
-  padding-top: 12px;
+  padding: 12px 0;
   gap: 12px;
   align-items: center;
 `;
