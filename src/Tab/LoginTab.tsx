@@ -4,11 +4,7 @@ import {styled} from 'styled-components/native';
 import {Alert, Platform, TouchableOpacity} from 'react-native';
 import {useMutation} from 'react-query';
 import {setUser} from '../../store/slice/UserSlice';
-import {
-  loadUser,
-  persistUser,
-  userDataType,
-} from '../../store/async/asyncStore';
+import {loadUser, userDataType} from '../../store/async/asyncStore';
 import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -156,7 +152,6 @@ const LoginTab = () => {
       };
 
       dispatch(setUser(userData));
-      persistUser(userData);
       console.log('Success:', userData);
       navigation.navigate('MainTab' as never);
     },

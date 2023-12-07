@@ -142,8 +142,7 @@ interface Config {
 }
 
 export async function CallApi({endpoint, method, accessToken, body}: API) {
-  const url = `https://dorun.site/${endpoint}`;
-
+  const url = `http://127.0.0.1:8000/${endpoint}`;
   const config: Config = {
     method: method,
     headers: {
@@ -159,16 +158,26 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
     config.body = JSON.stringify(body);
   }
 
-  const response = await fetch(url, config);
+  try {
+    const response = await fetch(url, config);
 
-  if (!response.ok) {
-    throw new Error(`API call failed: ${response.status}`);
+    if (!response.ok) {
+      const errorBody = await response.json();
+
+      throw new Error(
+        `API call failed: ${response.status}, Details: ${errorBody.detail}`,
+      );
+    }
+    console.log(url);
+    return response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Error during API call to ${url}: ${error.message}`);
+    } else {
+      console.error('An unknown error occurred');
+    }
+    throw error;
   }
-
-  // return response.text();
-  // 현재 API 호출 시 반환값이 json이 아니라 string 형태임. 추후 json으로 수정하겠음
-
-  return response.json();
 }
 
 const ViewImageModalBackground = styled.TouchableOpacity`
@@ -301,3 +310,24 @@ export const ContentSave = ({children}: {children: React.ReactNode}) => {
     </>
   );
 };
+
+export const GetImage = (fileName: string) => {
+  return `https://do-run.s3.amazonaws.com/${fileName}`;
+};
+
+export function convertKoKRToUTC(dateString: string) {
+  // 한국 시간대의 'YYYY-MM-DD' 문자열을 Date 객체로 변환
+  const localDate = new Date(dateString + 'T00:00:00+09:00'); // 한국 시간대 GMT+9
+
+  // UTC Date 객체 생성
+  const utcDate = new Date(
+    localDate.getUTCFullYear(),
+    localDate.getUTCMonth(),
+    localDate.getUTCDate(),
+    localDate.getUTCHours(),
+    localDate.getUTCMinutes(),
+    localDate.getUTCSeconds(),
+  );
+
+  return utcDate;
+}

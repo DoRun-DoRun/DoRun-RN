@@ -1,4 +1,4 @@
-import {userDataType} from './../async/asyncStore';
+import {persistUser, userDataType} from './../async/asyncStore';
 import {createSlice} from '@reduxjs/toolkit';
 
 // User에서 관리해야하는 Slice
@@ -24,11 +24,20 @@ export const UserSlice = createSlice({
       state.UID = UID;
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
+
+      persistUser(state);
+    },
+
+    setAccessToken(state, actoin) {
+      const {accessToken} = actoin.payload;
+      state.accessToken = accessToken;
+
+      persistUser(state);
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {setUser} = UserSlice.actions;
+export const {setUser, setAccessToken} = UserSlice.actions;
 
 export default UserSlice.reducer;
