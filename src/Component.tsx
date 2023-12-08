@@ -1,10 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {Dispatch, useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/native';
 import {launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
+import {setAccessToken} from '../store/slice/UserSlice';
+import {AnyAction} from 'redux';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -147,19 +149,13 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
     method: method,
     headers: {
       'Content-Type': 'application/json',
+      Authorization: accessToken ? `Bearer ${accessToken}` : '',
     },
+    body: body && method !== 'GET' ? JSON.stringify(body) : undefined,
   };
 
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-
-  if (body && method !== 'GET') {
-    config.body = JSON.stringify(body);
-  }
-
   try {
-    const response = await fetch(url, config);
+    let response = await fetch(url, config);
 
     if (!response.ok) {
       const errorBody = await response.json();
@@ -168,17 +164,40 @@ export async function CallApi({endpoint, method, accessToken, body}: API) {
         `API call failed: ${response.status}, Details: ${errorBody.detail}`,
       );
     }
-    console.log(url);
-    return response.json();
+    return await response.json();
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error during API call to ${url}: ${error.message}`);
-    } else {
-      console.error('An unknown error occurred');
-    }
+    console.error(`Error during API call to ${url}: ${error}`);
+    console.error(accessToken);
     throw error;
   }
 }
+
+export const RefreshToken = async (
+  dispatch: Dispatch<AnyAction>,
+  accessToken?: string | null,
+) => {
+  const url = 'http://127.0.0.1:8000/user/callback';
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Token refresh failed: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log(data);
+
+    dispatch(setAccessToken(data.access_token));
+    return data.access_token;
+  } catch (error) {
+    console.error('Error during token refresh:', error);
+    throw error;
+  }
+};
 
 const ViewImageModalBackground = styled.TouchableOpacity`
   background-color: 'rgba(0,0,0,0.6)';
@@ -310,11 +329,9 @@ export const ContentSave = ({children}: {children: React.ReactNode}) => {
     </>
   );
 };
-
 export const GetImage = (fileName: string) => {
   return `https://do-run.s3.amazonaws.com/${fileName}`;
 };
-
 export function convertKoKRToUTC(dateString: string) {
   // 한국 시간대의 'YYYY-MM-DD' 문자열을 Date 객체로 변환
   const localDate = new Date(dateString + 'T00:00:00+09:00'); // 한국 시간대 GMT+9

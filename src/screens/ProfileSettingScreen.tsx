@@ -1,13 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
+  CallApi,
   HomeContainer,
   InnerContainer,
   NotoSansKR,
+  RowContainer,
   RowScrollContainer,
   ScrollContainer,
 } from '../Component';
 import {View} from 'react-native';
 import {styled} from 'styled-components/native';
+import {useSelector} from 'react-redux';
+import {useQuery} from 'react-query';
+import {RootState} from '../../store/RootReducer';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
 
 const TextContainer = styled.TextInput`
   flex: 1;
@@ -38,19 +44,55 @@ const CharecterSlot = styled.View`
   background: ${props => props.theme.white};
 `;
 
+const PencilIcon = styled.TouchableOpacity`
+  position: absolute;
+  right: 8px;
+`;
+
 const ProfileSettingScreen = () => {
+  const {accessToken} = useSelector((state: RootState) => state.user);
+  const [userName, setUserName] = useState('');
+
+  const SettingProfile = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: 'user/avatar',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      setUserName(response.USER_NM);
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+  const {data, isLoading} = useQuery('challenge_history', SettingProfile);
+
+  if (isLoading) {
+    return <NotoSansKR size={18}>로딩중</NotoSansKR>;
+  }
+
   return (
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
           <NotoSansKR size={20}>프로필 수정</NotoSansKR>
-          <View>
+          <View style={{gap: 8}}>
             <NotoSansKR size={18} weight="Medium">
               닉네임 변경
             </NotoSansKR>
-            <TextContainer />
+            <RowContainer>
+              <TextContainer
+                placeholder={data.USER_NM}
+                value={userName}
+                onChangeText={setUserName}
+              />
+              <PencilIcon>
+                <OcticonIcons name="pencil" size={20} />
+              </PencilIcon>
+            </RowContainer>
           </View>
-          <View style={{gap: 16}}>
+          <View style={{gap: 16, flex: 1}}>
             <NotoSansKR size={18} weight="Medium">
               캐릭터/펫 변경
             </NotoSansKR>

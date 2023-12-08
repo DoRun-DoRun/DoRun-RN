@@ -114,11 +114,18 @@ const getKakaoProfile = async (): Promise<void> => {
   }
 };
 
-const guestLogin = () =>
+const createGuest = () =>
   CallApi({
     endpoint: 'user',
     method: 'POST',
     body: {SIGN_TYPE: SignType.GUEST},
+  });
+
+const loginAPI = (refreshToken: string) =>
+  CallApi({
+    endpoint: 'user/login',
+    method: 'GET',
+    accessToken: refreshToken,
   });
 
 const LoginTab = () => {
@@ -128,9 +135,23 @@ const LoginTab = () => {
   useEffect(() => {
     const bootstrapAsync = async () => {
       const userData = await loadUser();
-      if (userData) {
+      if (userData?.accessToken) {
         dispatch(setUser(userData));
         navigation.navigate('MainTab' as never);
+      } else if (userData?.refreshToken) {
+        try {
+          const newUserData = await loginAPI(userData.refreshToken);
+          if (newUserData) {
+            console.log('new user data' + newUserData);
+            const updatedUserData = {...userData, accessToken: newUserData};
+            console.log('updated user data' + updatedUserData);
+            dispatch(setUser(updatedUserData));
+            navigation.navigate('MainTab' as never);
+          }
+        } catch (err) {
+          console.error('Login error:', err);
+          // 여기에서 로그인 실패 처리 (예: 로그인 화면으로 이동)
+        }
       }
     };
 
@@ -141,7 +162,7 @@ const LoginTab = () => {
     mutate: login_guest,
     isLoading,
     error,
-  } = useMutation(guestLogin, {
+  } = useMutation(createGuest, {
     onSuccess: response => {
       // 요청 성공 시 수행할 작업
       const userData: userDataType = {

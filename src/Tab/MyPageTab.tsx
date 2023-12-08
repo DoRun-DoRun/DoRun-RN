@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {
   CallApi,
+  GetImage,
   HomeContainer,
   InnerContainer,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
-  GetImage,
   convertKoKRToUTC,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
@@ -239,6 +239,7 @@ const History = () => {
                 </NotoSansKR>
               </DailyDiary>
             )}
+
             {data[index].personGoal.length > 0 ? (
               <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.3)']}>
                 {data[index].personGoal.map((goal: PersonGoal, idx: number) => (
@@ -266,30 +267,35 @@ const History = () => {
             ) : (
               <Text>해당 날짜에 진행사항이 없어요</Text>
             )}
+
+            {data[index].teamGoal && (
+              <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.4)']}>
+                <DailyTodoList gap={8}>
+                  {data[index].teamGoal.IS_DONE ? (
+                    <MaterialIcons
+                      name="check-box"
+                      color={theme.primary1}
+                      size={20}
+                    />
+                  ) : (
+                    <MaterialIcons
+                      name="check-box-outline-blank"
+                      color={theme.primary1}
+                      size={20}
+                    />
+                  )}
+
+                  <NotoSansKR size={13} color="gray3">
+                    {data[index].teamGoal.TEAM_NM}
+                  </NotoSansKR>
+                </DailyTodoList>
+              </DailyTodo>
+            )}
           </View>
         </>
       ) : (
         <NotoSansKR size={16}>챌린지 기록이 존재하지 않아요</NotoSansKR>
       )}
-      {/* {data[index].teamGoal.length > 0 ? (
-        <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.4)']}>
-          {data[index].teamGoal[0].length.IS_DONE ? (
-            <MaterialIcons name="check-box" color={theme.primary1} size={20} />
-          ) : (
-            <MaterialIcons
-              name="check-box-outline-blank"
-              color={theme.primary1}
-              size={20}
-            />
-          )}
-
-          <NotoSansKR size={13} color="gray3">
-            {data[index].teamGoal[0].length.TEAM_NM}
-          </NotoSansKR>
-        </DailyTodo>
-      ) : (
-        <View />
-      )} */}
     </>
   );
 };
