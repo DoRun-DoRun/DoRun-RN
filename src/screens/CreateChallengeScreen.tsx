@@ -17,7 +17,7 @@ import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
-import {useMutation, useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
 
@@ -392,7 +392,7 @@ const CreateChallengeScreen = () => {
   const {accessToken, userName, UID} = useSelector(
     (state: RootState) => state.user,
   );
-
+  const queryClient = useQueryClient();
   const navigation = useNavigation();
 
   // const validAccessToken = accessToken || '기본값 또는 대체값';
@@ -435,7 +435,7 @@ const CreateChallengeScreen = () => {
   const {mutate: ChallengeCreateMutate} = useMutation(createChallenge, {
     onSuccess: response => {
       console.log('Success:', response);
-
+      queryClient.invalidateQueries('getChallenge');
       navigation.navigate('MainTab' as never);
     },
     onError: error => {
@@ -446,6 +446,7 @@ const CreateChallengeScreen = () => {
   const {mutate: ChallengeCreateNowMutate} = useMutation(createChallenge, {
     onSuccess: response => {
       console.log('Success:', response);
+      queryClient.invalidateQueries('getChallenge');
       Alert.alert(
         '챌린지 시작하기',
         '시작 날짜까지 참가지를 기다리지 않고 바로 시작하시겠습니까?',

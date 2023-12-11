@@ -405,7 +405,7 @@ const ChallengeTab = () => {
                   subText={
                     challenge.CHALLENGE_STATUS === ChallengeStatusType.PENDING
                       ? '시작전'
-                      : `${challenge.PROGRESS}% 진행됨`
+                      : `${Number(challenge.PROGRESS.toFixed(2))}% 진행됨`
                   }
                 />
               </TouchableOpacity>
