@@ -357,3 +357,35 @@ export function convertKoKRToUTC(dateString: string) {
 
   return utcDate;
 }
+
+export const calculateDaysUntil = (startDateString: string) => {
+  const startDate = new Date(startDateString);
+  const currentDate = new Date(Date.now());
+
+  const timeDifference = startDate.getTime() - currentDate.getTime();
+  const daysUntil = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+  return daysUntil;
+};
+
+export const calculateTimeDifference = (endDtString: string) => {
+  const currentDateTimeUtc = new Date(Date.now()); // 현재 시간 (UTC)
+  const endDateTimeUtc = new Date(endDtString); // 종료 시간 (UTC)
+
+  let timeDifference = endDateTimeUtc.getTime() - currentDateTimeUtc.getTime();
+
+  // 차이가 음수인 경우, 0으로 설정
+  if (timeDifference < 0) {
+    timeDifference = 0;
+  }
+
+  // 밀리초를 시간과 분으로 변환
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+  // 시간과 분을 문자열로 포매팅
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.toString().padStart(2, '0');
+
+  return `${formattedHours}:${formattedMinutes}`;
+};
