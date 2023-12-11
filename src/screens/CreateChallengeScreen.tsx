@@ -2,7 +2,6 @@ import React, {Dispatch, SetStateAction, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
-  CallApi,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -10,6 +9,7 @@ import {
   RowContainer,
   ScrollContainer,
   TossFace,
+  useApi,
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {styled, useTheme} from 'styled-components/native';
@@ -329,6 +329,7 @@ const CreateChallengeScreen = () => {
   const [listOpen, setListOpen] = useState(true);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<EmojiType>();
+  const [challengeName, setChallengeName] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
@@ -340,22 +341,25 @@ const CreateChallengeScreen = () => {
   ]);
 
   const theme = useTheme();
+  const CallApi = useApi();
 
   const {accessToken} = useSelector((state: RootState) => state.user);
-
   const testCreate = () =>
     CallApi({
-      endpoint: 'challenge/create',
+      endpoint: 'challenge',
       method: 'POST',
       accessToken: accessToken!,
       body: {
         CHALLENGE_MST_NM: 'string',
-        USERS_UID: [1000001, 1000002],
-        START_DT: '2023-11-18',
-        END_DT: '2023-11-18',
+        USERS_UID: [
+          {
+            USER_UID: 0,
+            INVITE_STATS: 'PENDING',
+          },
+        ],
+        START_DT: '2023-12-09',
+        END_DT: '2023-12-09',
         HEADER_EMOJI: 'string',
-        INSERT_DT: '2023-11-18T15:18:20.629Z',
-        CHALLENGE_STATUS: 'PENDING',
       },
     });
 
@@ -386,7 +390,12 @@ const CreateChallengeScreen = () => {
                 <OcticonIcons name="plus-circle" size={40} />
               )}
             </TouchableOpacity>
-            <InputNotoSansKR size={20} placeholder="챌린지 목표" />
+            <InputNotoSansKR
+              size={20}
+              placeholder="챌린지 목표"
+              onChangeText={setChallengeName}
+              value={challengeName}
+            />
           </RowContainer>
 
           <RowContainer gap={8}>
@@ -444,10 +453,10 @@ const CreateChallengeScreen = () => {
 
       <View style={{gap: 8, padding: 16}}>
         <ButtonComponent onPress={() => createChallenge()}>
-          지금 시작하기
+          바로 시작하기
         </ButtonComponent>
         <ButtonComponent type="secondary" onPress={() => createChallenge()}>
-          참여 기다리기
+          시작 날짜까지 기다리기
         </ButtonComponent>
       </View>
 

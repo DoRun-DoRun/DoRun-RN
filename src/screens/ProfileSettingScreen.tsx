@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {
-  CallApi,
   HomeContainer,
   InnerContainer,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
   ScrollContainer,
+  useApi,
 } from '../Component';
 import {Image, TouchableOpacity, View} from 'react-native';
 import {styled} from 'styled-components/native';
@@ -62,6 +62,7 @@ const avatarImages = [
 ];
 
 const ProfileSettingScreen = () => {
+  const CallApi = useApi();
   const queryClient = useQueryClient();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const [userName, setUserName] = useState('');

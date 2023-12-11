@@ -7,6 +7,7 @@ import ViewShot, {captureRef} from 'react-native-view-shot';
 import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
 import {setAccessToken} from '../store/slice/UserSlice';
 import {AnyAction} from 'redux';
+import {useNavigation} from '@react-navigation/native';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -142,35 +143,43 @@ interface Config {
   };
   body?: string;
 }
+export const useApi = () => {
+  const navigation = useNavigation();
 
-export async function CallApi({endpoint, method, accessToken, body}: API) {
-  const url = `http://127.0.0.1:8000/${endpoint}`;
-  const config: Config = {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: accessToken ? `Bearer ${accessToken}` : '',
-    },
-    body: body && method !== 'GET' ? JSON.stringify(body) : undefined,
-  };
+  async function CallApi({endpoint, method, accessToken, body}: API) {
+    const url = `http://127.0.0.1:8000/${endpoint}`;
+    const config: Config = {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: accessToken ? `Bearer ${accessToken}` : '',
+      },
+      body: body && method !== 'GET' ? JSON.stringify(body) : undefined,
+    };
 
-  try {
-    let response = await fetch(url, config);
+    try {
+      let response = await fetch(url, config);
 
-    if (!response.ok) {
-      const errorBody = await response.json();
+      if (!response.ok) {
+        const errorBody = await response.json();
 
-      throw new Error(
-        `API call failed: ${response.status}, Details: ${errorBody.detail}`,
-      );
+        if (errorBody.detail === '토큰이 만료되었습니다.') {
+          navigation.navigate('LoginTab' as never);
+        }
+
+        throw new Error(
+          `API call failed: ${response.status}, Details: ${errorBody.detail}`,
+        );
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(`Error during API call to ${url}: ${error}`);
+      console.error(accessToken);
+      throw error;
     }
-    return await response.json();
-  } catch (error) {
-    console.error(`Error during API call to ${url}: ${error}`);
-    console.error(accessToken);
-    throw error;
   }
-}
+  return CallApi;
+};
 
 export const RefreshToken = async (
   dispatch: Dispatch<AnyAction>,

@@ -1,18 +1,22 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
 import {
   HomeContainer,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
   TossFace,
+  useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ScrollView} from 'react-native';
 import {View} from 'react-native';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import {useQuery} from 'react-query';
 
 const Profile = styled.View`
   width: 40px;
@@ -37,11 +41,11 @@ const ChallengeInfo = ({
     border-radius: 10px;
     padding: 12px 8px;
     background-color: white;
-    shadow-color: #000;
+    /* shadow-color: #000;
     shadow-offset: 2px 2px;
     shadow-opacity: 0.3;
     shadow-radius: 4px;
-    elevation: 5;
+    elevation: 5; */
     margin: 8px 0;
     gap: 40px;
   `;
@@ -236,7 +240,76 @@ const FootContainer = styled.View`
 `;
 
 const ChallengeTab = () => {
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
   const navigation = useNavigation();
+
+  const getChallenge = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: 'challenge/list',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+  const {data, isLoading} = useQuery('getChallenge', getChallenge);
+
+  if (isLoading) {
+    return <NotoSansKR size={15}>로딩중</NotoSansKR>;
+  }
+
+  if (data?.pending_challenges.length === 0) {
+    return (
+      <HomeContainer>
+        <TopContainer style={{flex: 1}}>
+          <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1,
+              gap: 24,
+            }}>
+            <Image
+              style={{height: 136}}
+              source={require('../../assets/images/nuts05.png')}
+              resizeMode="contain"
+            />
+            <NotoSansKR size={16} color="gray5">
+              진행중인 챌린지가 없어요!
+            </NotoSansKR>
+          </View>
+
+          <NotoSansKR size={16}>초대된 챌린지</NotoSansKR>
+          {data.progress_challenges.length === 0 ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 16,
+              }}>
+              <NotoSansKR size={16} color="gray5">
+                초대된 챌린지가 없어요!
+              </NotoSansKR>
+            </View>
+          ) : (
+            <View />
+          )}
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CreateChallengeScreen' as never)
+            }>
+            <PlusContainers title="챌린지 추가하기" />
+          </TouchableOpacity>
+        </TopContainer>
+      </HomeContainer>
+    );
+  }
 
   return (
     <ScrollView>
@@ -264,12 +337,10 @@ const ChallengeTab = () => {
             <PlusContainers title="챌린지 추가하기" />
           </TouchableOpacity>
         </TopContainer>
-
         <CenterContainer>
           <NotoSansKR size={18}>팀 주간 목표</NotoSansKR>
           <GoalBox isTeam title="개인이 맡은 UI 완료하기" count="1/4" />
         </CenterContainer>
-
         <CenterContainer>
           <NotoSansKR size={18}>개인별 목표</NotoSansKR>
           <View style={{gap: 8}}>
@@ -282,7 +353,6 @@ const ChallengeTab = () => {
             <PlusContainers title="목표 추가하기" />
           </TouchableOpacity>
         </CenterContainer>
-
         <FootContainer>
           <RowContainer seperate>
             <NotoSansKR size={18} color="white">

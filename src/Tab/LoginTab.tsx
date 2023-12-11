@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
-import {CallApi, HomeContainer, NotoSansKR, RowContainer} from '../Component';
+import {HomeContainer, NotoSansKR, RowContainer, useApi} from '../Component';
 import {styled} from 'styled-components/native';
 import {Alert, Platform, TouchableOpacity} from 'react-native';
 import {useMutation} from 'react-query';
-import {setUser} from '../../store/slice/UserSlice';
+import {setAccessToken, setUser} from '../../store/slice/UserSlice';
 import {loadUser, userDataType} from '../../store/async/asyncStore';
 import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
@@ -114,52 +114,40 @@ const getKakaoProfile = async (): Promise<void> => {
   }
 };
 
-const createGuest = () =>
-  CallApi({
-    endpoint: 'user',
-    method: 'POST',
-    body: {SIGN_TYPE: SignType.GUEST},
-  });
-
-const loginAPI = (refreshToken: string) =>
-  CallApi({
-    endpoint: 'user/login',
-    method: 'GET',
-    accessToken: refreshToken,
-  });
-
 const LoginTab = () => {
+  const CallApi = useApi();
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      const userData = await loadUser();
-      if (userData?.accessToken) {
-        dispatch(setUser(userData));
-        navigation.navigate('MainTab' as never);
-      } else if (userData?.refreshToken) {
-        try {
-          const newUserData = await loginAPI(userData.refreshToken);
-          if (newUserData) {
-            console.log('new user data' + newUserData);
-            const updatedUserData = {...userData, accessToken: newUserData};
-            console.log('updated user data' + updatedUserData);
-            dispatch(setUser(updatedUserData));
-            navigation.navigate('MainTab' as never);
-          }
-        } catch (err) {
-          console.error('Login error:', err);
-          // 여기에서 로그인 실패 처리 (예: 로그인 화면으로 이동)
-        }
-      }
-    };
+  const loginGuest = (refreshToken: string) =>
+    CallApi({
+      endpoint: 'user/login',
+      method: 'GET',
+      accessToken: refreshToken,
+    });
 
-    bootstrapAsync();
-  }, [dispatch, navigation]);
+  const loginMutation = useMutation(loginGuest, {
+    onSuccess: async data => {
+      const {access_token} = data;
+
+      if (access_token) {
+        dispatch(setAccessToken({accessToken: access_token}));
+        navigation.navigate('MainTab' as never);
+      } else {
+        console.error('Access token is missing in the response');
+      }
+    },
+  });
+
+  const createGuest = () =>
+    CallApi({
+      endpoint: 'user',
+      method: 'POST',
+      body: {SIGN_TYPE: SignType.GUEST},
+    });
 
   const {
-    mutate: login_guest,
+    mutate: create_guest,
     isLoading,
     error,
   } = useMutation(createGuest, {
@@ -177,10 +165,22 @@ const LoginTab = () => {
       navigation.navigate('MainTab' as never);
     },
     onError: () => {
-      // 요청 실패 시 수행할 작업
       console.error('Error:', error);
     },
   });
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      const userData = await loadUser();
+      if (userData.refreshToken) {
+        dispatch(setUser(userData));
+        loginMutation.mutate(userData.refreshToken);
+      }
+    };
+
+    bootstrapAsync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, navigation]);
 
   return (
     <HomeContainer>
@@ -220,7 +220,7 @@ const LoginTab = () => {
               console.log('Guest login is already in progress.');
               return;
             } else {
-              login_guest();
+              create_guest();
             }
           }}>
           <NotoSansKR

@@ -30,7 +30,6 @@ export const UserSlice = createSlice({
 
     setAccessToken(state, actoin) {
       const {accessToken} = actoin.payload;
-      console.log(accessToken);
       state.accessToken = accessToken;
 
       persistUser(state);

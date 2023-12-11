@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  CallApi,
   GetImage,
   HomeContainer,
   InnerContainer,
@@ -8,6 +7,7 @@ import {
   RowContainer,
   ScrollContainer,
   convertKoKRToUTC,
+  useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import {Pressable, Text, TouchableOpacity, View} from 'react-native';
@@ -157,7 +157,7 @@ interface PersonGoal {
 
 const History = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
-
+  const CallApi = useApi();
   const currentDate = new Date();
   const formattedDate = currentDate
     .toLocaleDateString('ko-KR', {
@@ -354,6 +354,7 @@ const Album = () => {
 };
 
 const MyPageTab = () => {
+  const CallApi = useApi();
   const [selected, setSelected] = useState('history');
   const {accessToken} = useSelector((state: RootState) => state.user);
 
