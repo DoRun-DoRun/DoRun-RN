@@ -157,7 +157,7 @@ const LoginTab = () => {
         UID: response.UID,
         accessToken: response.access_token,
         refreshToken: response.refresh_token,
-        userName: 'Guest',
+        userName: response.USER_NM,
       };
 
       dispatch(setUser(userData));

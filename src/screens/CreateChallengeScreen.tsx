@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Alert, TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -9,6 +9,7 @@ import {
   RowContainer,
   ScrollContainer,
   TossFace,
+  convertKoKRToUTC,
   useApi,
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
@@ -16,8 +17,9 @@ import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
-import {useMutation} from 'react-query';
+import {useMutation, useQuery} from 'react-query';
 import {RootState} from '../../store/Store';
+import {useNavigation} from '@react-navigation/native';
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
   flex: 1;
@@ -32,16 +34,17 @@ const SearchContainer = styled.View<{isClicked: boolean}>`
 const ExpandedContainer = styled.View`
   background-color: #fff;
   padding: 0 8px;
-  gap: 8px;
-  padding-bottom: 16px;
+  gap: 16px;
+  padding-bottom: 8px;
 `;
 
 interface InviteFriendType {
   name: string;
+  UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
 }
 
-const InviteFriend = ({name, setInviteListData}: InviteFriendType) => {
+const InviteFriend = ({name, UID, setInviteListData}: InviteFriendType) => {
   return (
     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
       <NotoSansKR size={14} weight="Regular">
@@ -50,7 +53,13 @@ const InviteFriend = ({name, setInviteListData}: InviteFriendType) => {
 
       <TouchableOpacity
         onPress={() => {
-          setInviteListData(prev => [...prev, {name: name, accept: false}]);
+          setInviteListData(prev => {
+            if (!prev.find(item => item.UID === UID)) {
+              return [...prev, {UserName: name, UID, accept: false}];
+            }
+            // 중복된 항목이 있으면 리스트 변경 없이 반환
+            return prev;
+          });
         }}>
         <NotoSansKR
           size={14}
@@ -70,23 +79,71 @@ interface SearchBoxType {
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
 }
 
+interface FriendType {
+  UID: number;
+  USER_NM: string;
+}
+
 const SearchBox = ({
   isClicked,
   setIsClicked,
   setInviteListData,
 }: SearchBoxType) => {
-  const [textValue, setTextValue] = useState('');
-  const FriendListData = [{name: '닉네임 C'}];
-  const SearchListData = [{name: '닉네임 D'}];
+  const [uidInput, setUidInput] = useState('');
 
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const FriendList = async () => {
+    try {
+      const response = CallApi({
+        endpoint: 'friend/list',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+  const {data: friendData, isLoading: friendLoading} = useQuery(
+    'FriendList',
+    FriendList,
+  );
+
+  const SearchList = async () => {
+    try {
+      const response = CallApi({
+        endpoint: `user/search/${uidInput}`,
+        method: 'GET',
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+  const isUidValid = uidInput.length === 7 && /^\d{7}$/.test(uidInput);
+
+  const {data: searchData, isLoading: searchLoading} = useQuery(
+    ['SearchList', uidInput], // 쿼리 키에 uidInput 포함
+    SearchList,
+    {enabled: isUidValid}, // 쿼리 실행 조건
+  );
+  if (searchLoading || friendLoading) {
+    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+  }
   return (
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
         <OcticonIcons name="search" size={16} />
         <InputNotoSansKR
+          keyboardType="number-pad"
+          maxLength={7}
           size={14}
-          value={textValue}
-          onChangeText={text => setTextValue(text)}
+          value={uidInput}
+          onChangeText={text => setUidInput(text)}
           style={{flex: 1}}
           placeholder="Friend UID"
           onBlur={() => setIsClicked(false)}
@@ -94,29 +151,34 @@ const SearchBox = ({
         />
       </RowContainer>
 
-      {isClicked && !textValue ? (
+      {isClicked && !uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>친구 목록</NotoSansKR>
-          {FriendListData.map((data, key) => (
+          {friendData?.accepted.map((data: FriendType, key: number) => (
             <InviteFriend
               key={key}
-              name={data.name}
+              name={data.USER_NM}
+              UID={data.UID}
               setInviteListData={setInviteListData}
             />
           ))}
         </ExpandedContainer>
       ) : null}
 
-      {isClicked && textValue ? (
+      {isClicked && uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {SearchListData.map((data, key) => (
+          {searchData?.USER_NM ? (
             <InviteFriend
-              key={key}
-              name={data.name}
+              name={searchData.USER_NM}
+              UID={searchData.UID}
               setInviteListData={setInviteListData}
             />
-          ))}
+          ) : (
+            <NotoSansKR size={14} color="gray5">
+              검색결과가 없습니다.
+            </NotoSansKR>
+          )}
         </ExpandedContainer>
       ) : null}
     </SearchContainer>
@@ -132,15 +194,16 @@ const DatePicker = styled.TouchableOpacity`
 `;
 
 interface InviteList {
-  name: string;
+  UserName: string;
+  UID: number;
   accept?: boolean;
 }
 
-const InviteList = ({name, accept}: InviteList) => {
+const InviteList = ({UserName, accept}: InviteList) => {
   return (
     <RowContainer seperate>
       <NotoSansKR size={16} weight="Medium">
-        {name}
+        {UserName}
       </NotoSansKR>
       <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
         {accept ? '참여중이에요' : '참여를 기다리고 있어요'}
@@ -326,6 +389,16 @@ const CalendarContainer = ({
 };
 
 const CreateChallengeScreen = () => {
+  const {accessToken, userName, UID} = useSelector(
+    (state: RootState) => state.user,
+  );
+
+  const navigation = useNavigation();
+
+  // const validAccessToken = accessToken || '기본값 또는 대체값';
+  const validUserName = userName || '기본 사용자 이름';
+  const validUID = UID || 1000000;
+
   const [listOpen, setListOpen] = useState(true);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<EmojiType>();
@@ -336,41 +409,79 @@ const CreateChallengeScreen = () => {
   const [calendarData, setCalendarData] = useState({start: '', end: ''});
 
   const [inviteListData, setInviteListData] = useState<InviteList[]>([
-    {name: '닉네임 A', accept: true},
-    {name: '닉네임 B', accept: false},
+    {UserName: validUserName, UID: validUID, accept: true},
   ]);
 
   const theme = useTheme();
   const CallApi = useApi();
 
-  const {accessToken} = useSelector((state: RootState) => state.user);
-  const testCreate = () =>
+  const createChallenge = () =>
     CallApi({
       endpoint: 'challenge',
       method: 'POST',
       accessToken: accessToken!,
       body: {
-        CHALLENGE_MST_NM: 'string',
-        USERS_UID: [
-          {
-            USER_UID: 0,
-            INVITE_STATS: 'PENDING',
-          },
-        ],
-        START_DT: '2023-12-09',
-        END_DT: '2023-12-09',
-        HEADER_EMOJI: 'string',
+        CHALLENGE_MST_NM: challengeName,
+        USERS_UID: inviteListData.map(item => ({
+          USER_UID: item.UID,
+          INVITE_STATS: item.accept ? 'ACCEPTED' : 'PENDING',
+        })),
+        START_DT: convertKoKRToUTC(calendarData.start).toISOString(),
+        END_DT: convertKoKRToUTC(calendarData.end).toISOString(),
+        HEADER_EMOJI: selectedEmoji?.emoji,
       },
     });
 
-  const {mutate: createChallenge} = useMutation(testCreate, {
+  const {mutate: ChallengeCreateMutate} = useMutation(createChallenge, {
     onSuccess: response => {
-      // 요청 성공 시 수행할 작업
       console.log('Success:', response);
+
+      navigation.navigate('MainTab' as never);
     },
     onError: error => {
-      // 요청 실패 시 수행할 작업
       console.error('Error:', error);
+    },
+  });
+
+  const {mutate: ChallengeCreateNowMutate} = useMutation(createChallenge, {
+    onSuccess: response => {
+      console.log('Success:', response);
+      Alert.alert(
+        '챌린지 시작하기',
+        '시작 날짜까지 참가지를 기다리지 않고 바로 시작하시겠습니까?',
+        [
+          {
+            text: '바로시작',
+            onPress: () => ChallengeStartMutate(response.CHALLENGE_MST_NO),
+            style: 'default',
+          },
+          {
+            text: '기다리기',
+            onPress: () => navigation.navigate('MainTab' as never),
+          },
+        ],
+      );
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
+  const challengeStart = (challenge_mst_no: number) =>
+    CallApi({
+      endpoint: `challenge/start?challenge_mst_no=${challenge_mst_no}`,
+      method: 'POST',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: ChallengeStartMutate} = useMutation(challengeStart, {
+    onSuccess: response => {
+      console.log('Success:', response);
+
+      navigation.navigate('MainTab' as never);
+    },
+    onError: error => {
+      console.error('Challenge Start Error:', error);
     },
   });
 
@@ -424,7 +535,12 @@ const CreateChallengeScreen = () => {
             {listOpen ? (
               <View style={{gap: 12}}>
                 {inviteListData.map((data, key) => (
-                  <InviteList key={key} name={data.name} accept={data.accept} />
+                  <InviteList
+                    key={key}
+                    UserName={data.UserName}
+                    UID={data.UID}
+                    accept={data.accept}
+                  />
                 ))}
               </View>
             ) : null}
@@ -452,10 +568,35 @@ const CreateChallengeScreen = () => {
       </ScrollContainer>
 
       <View style={{gap: 8, padding: 16}}>
-        <ButtonComponent onPress={() => createChallenge()}>
+        <ButtonComponent
+          onPress={() => {
+            if (
+              !challengeName ||
+              !calendarData.start ||
+              !calendarData.end ||
+              !selectedEmoji
+            ) {
+              console.error('모든 필수 필드를 채워주세요.');
+              return;
+            }
+            ChallengeCreateNowMutate();
+          }}>
           바로 시작하기
         </ButtonComponent>
-        <ButtonComponent type="secondary" onPress={() => createChallenge()}>
+        <ButtonComponent
+          type="secondary"
+          onPress={() => {
+            if (
+              !challengeName ||
+              !calendarData.start ||
+              !calendarData.end ||
+              !selectedEmoji
+            ) {
+              console.error('모든 필수 필드를 채워주세요.');
+              return;
+            }
+            ChallengeCreateMutate();
+          }}>
           시작 날짜까지 기다리기
         </ButtonComponent>
       </View>
