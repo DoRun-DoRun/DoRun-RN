@@ -20,6 +20,8 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
 import {ChallengeStatusType} from '../../store/data';
+import {useModal} from '../Modal/ModalProvider';
+import {ChallengeListModal} from '../Modal/ChallengeListModal';
 
 const Profile = styled.View`
   width: 40px;
@@ -285,6 +287,7 @@ const ChallengeTab = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
   const navigation = useNavigation();
   const [selectedChallenge, setSelectedChallenge] = useState<number>();
+  const {showModal} = useModal();
 
   const getChallenge = async () => {
     try {
@@ -385,6 +388,9 @@ const ChallengeTab = () => {
       </HomeContainer>
     );
   }
+  const openModal = (challenge_mst_no: number) => {
+    showModal(<ChallengeListModal challenge_mst_no={challenge_mst_no} />);
+  };
 
   return (
     <ScrollView>
@@ -417,7 +423,9 @@ const ChallengeTab = () => {
             {listData?.invited_challenges.map((challenge: ChallengeInfo) => {
               const leftDay = calculateDaysUntil(challenge.START_DT);
               return (
-                <TouchableOpacity key={challenge.CHALLENGE_MST_NO}>
+                <TouchableOpacity
+                  key={challenge.CHALLENGE_MST_NO}
+                  onPress={() => openModal(challenge.CHALLENGE_MST_NO)}>
                   <ChallengeSubInfo
                     headerEmoji={challenge.HEADER_EMOJI}
                     mainText={challenge.CHALLENGE_MST_NM}

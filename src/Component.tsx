@@ -1,12 +1,10 @@
-import React, {Dispatch, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/native';
 import {launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
-import {setAccessToken} from '../store/slice/UserSlice';
-import {AnyAction} from 'redux';
 import {useNavigation} from '@react-navigation/native';
 
 interface ButtonType {
@@ -147,9 +145,13 @@ export const useApi = () => {
   const navigation = useNavigation();
 
   async function CallApi({endpoint, method, accessToken, body}: API) {
-    // const url = `http://127.0.0.1:8000/${endpoint}`; //ios
-    const url = `http://10.0.2.2:8000/${endpoint}`; //andriod
-    // const url = `https://dorun.site/${endpoint}`; //실제서버
+    let url = `https://dorun.site/${endpoint}`; //production
+
+    if (Platform.OS === 'android') {
+      url = `http://10.0.2.2:8000/${endpoint}`; //andriod
+    } else {
+      url = `http://127.0.0.1:8000/${endpoint}`; //ios
+    }
 
     const config: Config = {
       method: method,
@@ -182,33 +184,6 @@ export const useApi = () => {
     }
   }
   return CallApi;
-};
-
-export const RefreshToken = async (
-  dispatch: Dispatch<AnyAction>,
-  accessToken?: string | null,
-) => {
-  const url = 'http://127.0.0.1:8000/user/callback';
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`Token refresh failed: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log(data);
-
-    dispatch(setAccessToken(data.access_token));
-    return data.access_token;
-  } catch (error) {
-    console.error('Error during token refresh:', error);
-    throw error;
-  }
 };
 
 const ViewImageModalBackground = styled.TouchableOpacity`
@@ -359,6 +334,26 @@ export function convertKoKRToUTC(dateString: string) {
   );
 
   return utcDate;
+}
+
+export function convertUTCToKoKR(dateString: string) {
+  // 요일명 배열
+  const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // UTC 시간대의 Date 객체 생성
+  const utcDate = new Date(dateString);
+
+  // 한국 시간대로 변환 (UTC+9)
+  const koreaTimeOffset = 9 * 60; // 9시간을 분 단위로 변환
+  const localTime = new Date(utcDate.getTime() + koreaTimeOffset * 60000); // 밀리초 단위로 변환하여 더함
+
+  // YYYY-MM-DD 형식으로 변환
+  const year = localTime.getFullYear();
+  const month = (localTime.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 1을 더함
+  const day = localTime.getDate().toString().padStart(2, '0');
+  const weekDay = weekDays[localTime.getDay()]; // 요일명 추출
+
+  return `${year}-${month}-${day} (${weekDay})`;
 }
 
 export const calculateDaysUntil = (startDateString: string) => {

@@ -6,6 +6,7 @@ import {
   InputNotoSansKR,
   NotoSansKR,
   RowContainer,
+  ScrollContainer,
 } from '../Component';
 import {TouchableOpacity, View} from 'react-native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
@@ -126,43 +127,44 @@ const FriendScreen = () => {
   return (
     <HomeContainer>
       <InnerContainer seperate>
-        <View style={{gap: 24}}>
-          <NotoSansKR size={20}>친구 목록</NotoSansKR>
+        <ScrollContainer style={{flex: 1}}>
+          <View style={{gap: 24}}>
+            <NotoSansKR size={20}>친구 목록</NotoSansKR>
+            <SearchBox />
 
-          <SearchBox />
+            <View style={{gap: 8}}>
+              <RowContainer seperate>
+                <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
+                  요청된 친구 초대
+                </NotoSansKR>
+                <TouchableOpacity onPress={() => setReqeusted(!reqeusted)}>
+                  <OcticonIcons
+                    name={reqeusted ? 'chevron-down' : 'chevron-up'}
+                    size={28}
+                    color={theme.gray1}
+                  />
+                </TouchableOpacity>
+              </RowContainer>
+              {reqeusted ? (
+                <View style={{gap: 8}}>
+                  <Friend invited />
+                  <Friend invited />
+                  <Friend invited />
+                </View>
+              ) : null}
+            </View>
 
-          <View style={{gap: 8}}>
-            <RowContainer seperate>
+            <View style={{gap: 8}}>
               <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-                요청된 친구 초대
+                친구 목록
               </NotoSansKR>
-              <TouchableOpacity onPress={() => setReqeusted(!reqeusted)}>
-                <OcticonIcons
-                  name={reqeusted ? 'chevron-down' : 'chevron-up'}
-                  size={28}
-                  color={theme.gray1}
-                />
-              </TouchableOpacity>
-            </RowContainer>
-            {reqeusted ? (
-              <View style={{gap: 8}}>
-                <Friend invited />
-                <Friend invited />
-                <Friend invited />
-              </View>
-            ) : null}
-          </View>
 
-          <View style={{gap: 8}}>
-            <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-              친구 목록
-            </NotoSansKR>
-
-            <Friend />
-            <Friend />
-            <Friend />
+              <Friend />
+              <Friend />
+              <Friend />
+            </View>
           </View>
-        </View>
+        </ScrollContainer>
         <ButtonComponent>카카오톡으로 초대하기</ButtonComponent>
       </InnerContainer>
     </HomeContainer>

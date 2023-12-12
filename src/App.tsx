@@ -9,6 +9,7 @@ import ProfileSettingScreen from './screens/ProfileSettingScreen';
 import FriendScreen from './screens/FriendScreen';
 import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
+import EditChallengeScreen from './screens/EditChallengeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,10 @@ function App(): JSX.Element {
       <Stack.Screen
         name="CreateChallengeScreen"
         component={CreateChallengeScreen}
+      />
+      <Stack.Screen
+        name="EditChallengeScreen"
+        component={EditChallengeScreen}
       />
       <Stack.Screen
         name="ProfileSettingScreen"
