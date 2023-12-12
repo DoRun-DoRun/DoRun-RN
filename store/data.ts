@@ -16,6 +16,7 @@ export enum InviteAcceptType {
   ACCEPTED = 'ACCEPTED',
   DECLINED = 'DECLINED',
   DELETED = 'DELETED',
+  BLOCKED = 'BLOCKED',
 }
 export enum ItemType {
   BOOM = 'BOOM',

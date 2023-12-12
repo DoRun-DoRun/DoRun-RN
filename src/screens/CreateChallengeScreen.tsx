@@ -44,7 +44,11 @@ interface InviteFriendType {
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
 }
 
-const InviteFriend = ({name, UID, setInviteListData}: InviteFriendType) => {
+export const InviteFriend = ({
+  name,
+  UID,
+  setInviteListData,
+}: InviteFriendType) => {
   return (
     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
       <NotoSansKR size={14} weight="Regular">
