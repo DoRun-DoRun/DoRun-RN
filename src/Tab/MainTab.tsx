@@ -38,7 +38,7 @@ export const MainTab = () => {
         tabBarInactiveTintColor: theme.gray5,
       }}>
       <Tab.Screen
-        name="챌린지 이름"
+        name="두런두런"
         component={RaceTab}
         options={{
           tabBarIcon: ({color, size}) => (
