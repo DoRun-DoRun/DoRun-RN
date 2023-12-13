@@ -67,9 +67,13 @@ const RaceTab = () => {
   );
 
   useEffect(() => {
-    if (challengeListData?.length !== 0) {
+    if (
+      challengeListData &&
+      challengeListData.length > 0 &&
+      index < challengeListData.length
+    ) {
       navigation.setOptions({
-        title: challengeListData[index!]?.CHALLENGE_MST_NM,
+        title: challengeListData[index]?.CHALLENGE_MST_NM,
         headerRight:
           index! < challengeListData?.length - 1
             ? () => (
@@ -112,6 +116,7 @@ const RaceTab = () => {
               return (
                 <BGComponent
                   key={data.CHALLENGE_USER_NO}
+                  progress={data.PROGRESS}
                   BGN={key}
                   setScrollEnabled={setScrollEnabled}
                 />
@@ -151,13 +156,13 @@ const DefaultImage = () => {
   );
 };
 
-const BGComponent = ({
-  BGN,
-  setScrollEnabled,
-}: {
+interface BGComponentType {
   BGN: number;
   setScrollEnabled: any;
-}) => {
+  progress: number;
+}
+
+const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
   const BGA = [
     {url: require('../../assets/images/BGAHeader1.png'), height: 176},
     {url: require('../../assets/images/BGABody1.png'), height: 137},
@@ -198,7 +203,8 @@ const BGComponent = ({
     yPosition += BGA[i].height;
   }
 
-  const duduInitialX = 10;
+  // const duduInitialX = `${progress * (80 / 100)}%`;
+  const duduInitialX = progress;
   const duduInitialY = yPosition + 10;
 
   return (
