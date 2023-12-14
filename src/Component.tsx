@@ -141,17 +141,16 @@ interface Config {
   };
   body?: string;
 }
+// if (Platform.OS === 'android') {
+//   url = `http://10.0.2.2:8000/${endpoint}`; //andriod
+// } else {
+//   url = `http://127.0.0.1:8000/${endpoint}`; //ios
+// }
 export const useApi = () => {
   const navigation = useNavigation();
 
   async function CallApi({endpoint, method, accessToken, body}: API) {
-    let url = `https://dorun.site/${endpoint}`; //production
-
-    if (Platform.OS === 'android') {
-      url = `http://10.0.2.2:8000/${endpoint}`; //andriod
-    } else {
-      url = `http://127.0.0.1:8000/${endpoint}`; //ios
-    }
+    let url = `https://dorun.site/${endpoint}`;
 
     const config: Config = {
       method: method,
@@ -164,22 +163,33 @@ export const useApi = () => {
 
     try {
       let response = await fetch(url, config);
+      let contentType = response.headers.get('Content-Type');
 
       if (!response.ok) {
-        const errorBody = await response.json();
+        let errorBodyText = await response.text(); // 응답을 텍스트로 받기
+        console.log(errorBodyText);
+        // Content-Type이 application/json인지 확인
+        if (contentType && contentType.includes('application/json')) {
+          let errorBody = JSON.parse(errorBodyText); // JSON으로 파싱
 
-        if (errorBody.detail === '토큰이 만료되었습니다.') {
-          navigation.navigate('LoginTab' as never);
+          if (errorBody.detail === '토큰이 만료되었습니다.') {
+            navigation.navigate('LoginTab' as never);
+          }
+
+          throw new Error(
+            `API call failed: ${response.status}, Details: ${errorBody.detail}`,
+          );
+        } else {
+          console.error('Invalid Content-Type:', contentType);
+          throw new Error(`Invalid Content-Type: ${contentType}`);
         }
-
-        throw new Error(
-          `API call failed: ${response.status}, Details: ${errorBody.detail}`,
-        );
       }
+
       return await response.json();
     } catch (error) {
+      console.error('Error Object:', error); // 전체 에러 객체 출력
       console.error(`Error during API call to ${url}: ${error}`);
-      console.error(accessToken);
+      console.error('Access Token:', accessToken); // 토큰 출력 (운영 환경에서는 제거 필요)
       throw error;
     }
   }

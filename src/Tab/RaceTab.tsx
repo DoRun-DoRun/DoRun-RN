@@ -107,7 +107,7 @@ const RaceTab = () => {
   }
   return (
     <HomeContainer color="background">
-      {challengeListData.length !== 0 ? (
+      {challengeListData && challengeListData?.length !== 0 ? (
         <ScrollContainer
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
