@@ -10,6 +10,7 @@ import FriendScreen from './screens/FriendScreen';
 import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
+import TestTab2 from './Tab/TestTab2';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,11 @@ function App(): JSX.Element {
           />
         ),
       }}>
+      <Stack.Screen
+        name="TestTab2"
+        component={TestTab2}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="LoginTab"
         component={LoginTab}

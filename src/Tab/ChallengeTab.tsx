@@ -16,12 +16,14 @@ import OcticonIcons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ScrollView} from 'react-native';
 import {View} from 'react-native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
 import {ChallengeStatusType} from '../../store/data';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
+import {goalType, toggleGoal} from '../../store/slice/GoalSlice';
+import {PersonGoalChoiceModal} from '../Modal/PersonGoalModal';
 
 const Profile = styled.View`
   width: 40px;
@@ -112,73 +114,95 @@ const ChallengeSubInfo = ({
 };
 
 interface GoalBoxProps {
-  isTeam?: boolean;
+  goal: goalType;
+}
+interface TeamGoalProps {
   isComplete?: boolean;
+  count: string;
   title: string;
-  count?: string;
 }
 
-const GoalBox: React.FC<GoalBoxProps> = ({
-  isTeam,
-  isComplete,
-  title,
-  count,
-}) => {
+const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
+  text-decoration: line-through;
+  color: ${props => props.theme.gray4};
+  background-color: ${props => props.theme.gray7};
+`;
+
+const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
+  background-color: ${props => props.bc};
+  border-radius: 10px;
+  border-color: ${props => props.border};
+  border-width: 2px;
+  padding: 12px;
+`;
+
+const GoalBox: React.FC<GoalBoxProps> = ({goal}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const {showModal} = useModal();
 
-  const backgroundColor = isComplete
-    ? theme.gray7
-    : isTeam
-    ? theme.primary1
-    : theme.white;
+  if (goal === undefined) {
+    return (
+      <HomeContainer>
+        <NotoSansKR size={16}>오류</NotoSansKR>
+      </HomeContainer>
+    );
+  }
+  const backgroundColor = goal.isComplete ? theme.gray7 : theme.white;
+  const textColor = 'black';
+  const iconColor = goal.isComplete ? theme.gray4 : theme.primary1;
+  const borderColor = goal.isComplete ? theme.gray7 : theme.primary1;
 
-  const textColor = isTeam ? 'white' : 'black';
-
-  const iconColor = isComplete
-    ? theme.gray4
-    : isTeam
-    ? theme.white
-    : theme.primary1;
-
-  const borderColor = !isComplete ? theme.primary1 : theme.gray7;
-
-  const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
-    text-decoration: line-through;
-    color: ${props => props.theme.gray4};
-    background-color: ${props => props.theme.gray7};
-  `;
-
-  const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
-    background-color: ${props => props.bc};
-    border-radius: 10px;
-    border-color: ${props => props.border};
-    border-width: 2px;
-    padding: 12px;
-  `;
+  const openEditeModal = (id: number) => {
+    showModal(<PersonGoalChoiceModal id={id} />);
+  };
 
   return (
-    <GoalContainer bc={backgroundColor} border={borderColor}>
+    <GoalContainer
+      onPress={() => dispatch(toggleGoal(goal.id))}
+      bc={backgroundColor}
+      border={borderColor}>
       <RowContainer seperate>
         <RowContainer gap={8}>
           <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
-          {isComplete ? (
-            <TodoTitle size={16}>{title}</TodoTitle>
+          {goal.isComplete ? (
+            <TodoTitle size={16}>{goal.title}</TodoTitle>
           ) : (
-            <NotoSansKR
-              size={16}
-              color={textColor}
-              weight={isTeam ? 'Bold' : 'Medium'}>
-              {title}
+            <NotoSansKR size={16} color={textColor} weight="Medium">
+              {goal.title}
             </NotoSansKR>
           )}
         </RowContainer>
-        {!isTeam ? (
+        <TouchableOpacity
+          onPress={() => {
+            openEditeModal(goal.id);
+          }}>
           <OcticonIcons name="kebab-horizontal" size={24} color={theme.gray5} />
-        ) : (
-          <NotoSansKR size={16} color={textColor}>
-            {count}
+        </TouchableOpacity>
+      </RowContainer>
+    </GoalContainer>
+  );
+};
+
+const TeamGoalBox: React.FC<TeamGoalProps> = ({title, count, isComplete}) => {
+  const theme = useTheme();
+
+  const backgroundColor = isComplete ? theme.gray7 : theme.primary1;
+  const textColor = 'white';
+  const iconColor = isComplete ? theme.gray4 : theme.white;
+
+  return (
+    <GoalContainer bc={backgroundColor} border={theme.primary1}>
+      <RowContainer seperate>
+        <RowContainer gap={8}>
+          <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
+          <NotoSansKR size={16} color={textColor} weight="Bold">
+            {title}
           </NotoSansKR>
-        )}
+        </RowContainer>
+        <NotoSansKR size={16} color={textColor}>
+          {count}
+        </NotoSansKR>
       </RowContainer>
     </GoalContainer>
   );
@@ -289,6 +313,8 @@ const ChallengeTab = () => {
   const [selectedChallenge, setSelectedChallenge] = useState<number>();
   const {showModal} = useModal();
 
+  const goals = useSelector((state: RootState) => state.goal.goals);
+
   const getChallenge = async () => {
     try {
       const response = await CallApi({
@@ -388,7 +414,7 @@ const ChallengeTab = () => {
       </HomeContainer>
     );
   }
-  const openModal = (challenge_mst_no: number) => {
+  const openInviteModal = (challenge_mst_no: number) => {
     showModal(<ChallengeListModal challenge_mst_no={challenge_mst_no} />);
   };
 
@@ -425,7 +451,7 @@ const ChallengeTab = () => {
               return (
                 <TouchableOpacity
                   key={challenge.CHALLENGE_MST_NO}
-                  onPress={() => openModal(challenge.CHALLENGE_MST_NO)}>
+                  onPress={() => openInviteModal(challenge.CHALLENGE_MST_NO)}>
                   <ChallengeSubInfo
                     headerEmoji={challenge.HEADER_EMOJI}
                     mainText={challenge.CHALLENGE_MST_NM}
@@ -446,8 +472,7 @@ const ChallengeTab = () => {
         <CenterContainer>
           <NotoSansKR size={18}>팀 주간 목표</NotoSansKR>
           {detailData?.teamGoal.length !== 0 ? (
-            <GoalBox
-              isTeam
+            <TeamGoalBox
               title={detailData?.teamGoal[0].TEAM_NM}
               count={
                 detailData?.teamGoal.filter(
@@ -458,8 +483,7 @@ const ChallengeTab = () => {
               }
             />
           ) : (
-            <GoalBox
-              isTeam
+            <TeamGoalBox
               title="팀 목표 생성을 기다리고 있습니다."
               count="0/0"
             />
@@ -468,10 +492,9 @@ const ChallengeTab = () => {
         <CenterContainer>
           <NotoSansKR size={18}>개인별 목표</NotoSansKR>
           <View style={{gap: 8}}>
-            <GoalBox title="한줄이라도 코드 작성하기" />
-            <GoalBox title="1시간씩 자리에 앉아 있기" />
-            <GoalBox title="밥 잘 챙겨먹기" />
-            <GoalBox title="팀 회의 참여하기" isComplete />
+            {goals.map(goal => (
+              <GoalBox key={goal.id} goal={goal} />
+            ))}
           </View>
           <TouchableOpacity>
             <PlusContainers title="목표 추가하기" />
