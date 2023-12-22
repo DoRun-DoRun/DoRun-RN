@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import {
@@ -6,6 +5,7 @@ import {
   ButtonContainer,
   HomeContainer,
   NotoSansKR,
+  RowContainer,
 } from '../Component';
 import {useModal} from './ModalProvider';
 import styled, {useTheme} from 'styled-components/native';
@@ -32,30 +32,25 @@ export const CharacterModal = () => {
   const theme = useTheme();
   const [myValue, setMyValue] = useState(0);
   return (
-    <View style={{paddingVertical: 16, paddingHorizontal: 12}}>
-      <View style={{gap: 16, flexDirection: 'column'}}>
-        <View style={{gap: 8, flexDirection: 'row'}}>
+    <View style={{paddingTop: 16}}>
+      <View style={{gap: 9}}>
+        <RowContainer gap={9}>
           <UserProfile />
-          <View style={{gap: 8, flexDirection: 'column', alignItems: 'center'}}>
-            <View
-              style={{
-                gap: 8,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+          <View style={{gap: 8, flex: 1}}>
+            <RowContainer gap={8}>
               <UserStatues>
                 <MaterialIcons
                   name="directions-run"
                   color={theme.primary1}
-                  size={18}
+                  size={16}
                 />
-                <NotoSansKR size={14} color="primary1">
+                <NotoSansKR size={10} color="primary1">
                   뛰고 있음
                 </NotoSansKR>
               </UserStatues>
 
-              <NotoSansKR size={20}>달려라 갓생팀</NotoSansKR>
-            </View>
+              <NotoSansKR size={16}>달려라 갓생팀</NotoSansKR>
+            </RowContainer>
             <View style={{flex: 1}}>
               <Slider
                 value={myValue}
@@ -66,27 +61,22 @@ export const CharacterModal = () => {
               />
             </View>
           </View>
-        </View>
+        </RowContainer>
         <ButtonContainer color="primary2">
-          <NotoSansKR size={14} color="primary1">
+          <NotoSansKR size={13} color="primary1">
             "오늘도 열심히 해야지!"
           </NotoSansKR>
         </ButtonContainer>
-        <View
-          style={{
-            gap: 8,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
+        <RowContainer gap={8}>
           <MaterialIcons
             name="speaker-notes"
             color={theme.primary1}
-            size={32}
+            size={20}
           />
-          <NotoSansKR size={18} color={'gray3'}>
+          <NotoSansKR size={13} color={'gray3'}>
             달리기 1km 오늘도 화이ㅣ이이팅
           </NotoSansKR>
-        </View>
+        </RowContainer>
       </View>
     </View>
   );
