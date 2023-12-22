@@ -12,8 +12,20 @@ import {QueryClient, QueryClientProvider} from 'react-query';
 const queryClient = new QueryClient();
 import {ModalProvider} from './src/Modal/ModalProvider';
 import CustomModal from './src/Modal/CustomModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Main() {
+  React.useEffect(() => {
+    const loadGoals = async () => {
+      const storedGoals = await AsyncStorage.getItem('goals');
+      if (storedGoals) {
+        const parsedGoals = JSON.parse(storedGoals);
+        Store.dispatch({type: 'goals/restore', payload: parsedGoals});
+      }
+    };
+
+    loadGoals();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider store={Store}>

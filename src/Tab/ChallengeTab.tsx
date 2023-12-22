@@ -23,7 +23,11 @@ import {ChallengeStatusType} from '../../store/data';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
 import {goalType, toggleGoal} from '../../store/slice/GoalSlice';
-import {PersonGoalChoiceModal} from '../Modal/PersonGoalModal';
+import {
+  PersonGoalAddModal,
+  PersonGoalChoiceModal,
+} from '../Modal/PersonGoalModal';
+import {challengeDataType} from '../../store/async/asyncStore';
 
 const Profile = styled.View`
   width: 40px;
@@ -115,6 +119,7 @@ const ChallengeSubInfo = ({
 
 interface GoalBoxProps {
   goal: goalType;
+  challenge_no: number;
 }
 interface TeamGoalProps {
   isComplete?: boolean;
@@ -136,7 +141,7 @@ const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
   padding: 12px;
 `;
 
-const GoalBox: React.FC<GoalBoxProps> = ({goal}) => {
+const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const {showModal} = useModal();
@@ -153,13 +158,11 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal}) => {
   const iconColor = goal.isComplete ? theme.gray4 : theme.primary1;
   const borderColor = goal.isComplete ? theme.gray7 : theme.primary1;
 
-  const openEditeModal = (id: number) => {
-    showModal(<PersonGoalChoiceModal id={id} />);
-  };
-
   return (
     <GoalContainer
-      onPress={() => dispatch(toggleGoal(goal.id))}
+      onPress={() =>
+        dispatch(toggleGoal({goalId: goal.id, challenge_no: challenge_no}))
+      }
       bc={backgroundColor}
       border={borderColor}>
       <RowContainer seperate>
@@ -175,7 +178,13 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal}) => {
         </RowContainer>
         <TouchableOpacity
           onPress={() => {
-            openEditeModal(goal.id);
+            showModal(
+              <PersonGoalChoiceModal
+                id={goal.id}
+                challenge_no={challenge_no}
+                title={goal.title}
+              />,
+            );
           }}>
           <OcticonIcons name="kebab-horizontal" size={24} color={theme.gray5} />
         </TouchableOpacity>
@@ -306,6 +315,17 @@ interface AdditionalInfo {
   CHALLENGE_USER_NN: string;
 }
 
+const getPersonalGoalsByChallengeNo = ({
+  challenges,
+  challengeNo,
+}: {
+  challenges: challengeDataType[];
+  challengeNo: number;
+}) => {
+  const challenge = challenges.find(ch => ch.challenge_no === challengeNo);
+  return challenge ? challenge.personalGoals : [];
+};
+
 const ChallengeTab = () => {
   const CallApi = useApi();
   const {accessToken} = useSelector((state: RootState) => state.user);
@@ -313,7 +333,7 @@ const ChallengeTab = () => {
   const [selectedChallenge, setSelectedChallenge] = useState<number>();
   const {showModal} = useModal();
 
-  const goals = useSelector((state: RootState) => state.goal.goals);
+  const challenges = useSelector((state: RootState) => state.goal);
 
   const getChallenge = async () => {
     try {
@@ -418,6 +438,11 @@ const ChallengeTab = () => {
     showModal(<ChallengeListModal challenge_mst_no={challenge_mst_no} />);
   };
 
+  const personGoal = getPersonalGoalsByChallengeNo({
+    challenges: challenges ? challenges : [],
+    challengeNo: selectedChallenge!,
+  });
+
   return (
     <ScrollView>
       <HomeContainer style={{gap: 32}}>
@@ -492,11 +517,20 @@ const ChallengeTab = () => {
         <CenterContainer>
           <NotoSansKR size={18}>개인별 목표</NotoSansKR>
           <View style={{gap: 8}}>
-            {goals.map(goal => (
-              <GoalBox key={goal.id} goal={goal} />
+            {personGoal.map(goal => (
+              <GoalBox
+                key={goal.id}
+                goal={goal}
+                challenge_no={selectedChallenge!}
+              />
             ))}
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              showModal(
+                <PersonGoalAddModal challenge_no={selectedChallenge!} />,
+              );
+            }}>
             <PlusContainers title="목표 추가하기" />
           </TouchableOpacity>
         </CenterContainer>

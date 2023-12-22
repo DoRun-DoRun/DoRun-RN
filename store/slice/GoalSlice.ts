@@ -6,37 +6,71 @@ export interface goalType {
   isComplete: boolean;
 }
 
-const initialState = {
-  goals: [
-    {id: 1, title: '한줄이라도 코드 작성하기', isComplete: false},
-    {id: 2, title: '1시간씩 자리에 앉아 있기', isComplete: false},
-    {id: 3, title: '밥 잘 챙겨먹기', isComplete: false},
-    {id: 4, title: '팀 회의 참여하기', isComplete: true},
-  ],
-};
+const initialState = [
+  {
+    challenge_no: 29,
+    personalGoals: [{id: 1, title: '개인 목표 1', isComplete: false}],
+  },
+];
 
 const goalsSlice = createSlice({
   name: 'goals',
   initialState,
   reducers: {
+    addPersonalGoal: (state, action) => {
+      const {challenge_no, newGoal} = action.payload;
+      let challenge = state.find(ch => ch.challenge_no === challenge_no);
+
+      if (!challenge) {
+        challenge = {
+          challenge_no,
+          personalGoals: [],
+        };
+        state.push(challenge);
+      }
+
+      challenge.personalGoals.push({...newGoal, id: Date.now()}); // ID 생성을 위해 Date.now() 사용
+    },
+
     toggleGoal: (state, action) => {
-      const targetGoal = state.goals.find(goal => goal.id === action.payload);
-      if (targetGoal) {
-        targetGoal.isComplete = !targetGoal.isComplete;
+      const {challenge_no, goalId} = action.payload;
+      const challenge = state.find(ch => ch.challenge_no === challenge_no);
+      if (challenge) {
+        const targetGoal = challenge.personalGoals.find(
+          goal => goal.id === goalId,
+        );
+        if (targetGoal) {
+          targetGoal.isComplete = !targetGoal.isComplete;
+        }
       }
     },
     removeGoal: (state, action) => {
-      state.goals = state.goals.filter(goal => goal.id !== action.payload);
+      const {challenge_no, goalId} = action.payload;
+      const challenge = state.find(ch => ch.challenge_no === challenge_no);
+      if (challenge) {
+        challenge.personalGoals = challenge.personalGoals.filter(
+          goal => goal.id !== goalId,
+        );
+      }
     },
     updateGoalTitle: (state, action) => {
-      const {id, newTitle} = action.payload;
-      const newGoal = state.goals.find(goal => goal.id === id);
-      if (newGoal) {
-        newGoal.title = newTitle;
+      const {challenge_no, goalId, newTitle} = action.payload;
+      const challenge = state.find(ch => ch.challenge_no === challenge_no);
+      if (challenge) {
+        const targetGoal = challenge.personalGoals.find(
+          goal => goal.id === goalId,
+        );
+        if (targetGoal) {
+          targetGoal.title = newTitle;
+        }
       }
+    },
+    restore: (state, action) => {
+      return action.payload;
     },
   },
 });
 
-export const {toggleGoal, removeGoal, updateGoalTitle} = goalsSlice.actions;
+export const {addPersonalGoal, toggleGoal, removeGoal, updateGoalTitle} =
+  goalsSlice.actions;
 export default goalsSlice.reducer;
