@@ -4,18 +4,42 @@ import {
   HomeContainer,
   InnerContainer,
   NotoSansKR,
+  useApi,
 } from '../Component';
 import {Animated, Easing, Pressable, View} from 'react-native';
 import {styled, useTheme} from 'styled-components/native';
 import {Slider} from '@miblanchard/react-native-slider';
+import {useQuery} from 'react-query';
+import {RootState} from '../../store/RootReducer';
+import {useSelector} from 'react-redux';
 
 const SettingScreen = () => {
   const [pushAlarm, setPushAlarm] = useState(true);
   const [marketingAlarm, setMarketingAlarm] = useState(true);
   const [nightAlarm, setNightAlarm] = useState(true);
-  const [soundEffect, setSoundEffect] = useState(0);
-  const [backgroundMusic, setBackgroundMusic] = useState(0);
+  const [soundEffect, setSoundEffect] = useState(100);
+  const [backgroundMusic, setBackgroundMusic] = useState(100);
 
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const UserDataSetting = async () => {
+    try {
+      const response = CallApi({
+        endpoint: 'user/setting',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+  const {data, isLoading} = useQuery('UserDataSetting', UserDataSetting);
+  if (isLoading) {
+    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+  }
   const OnPushAlarmToggle = () => {
     setPushAlarm(!pushAlarm);
   };
@@ -66,15 +90,15 @@ const SettingScreen = () => {
                 소셜 로그인 정보
               </NotoSansKR>
               <NotoSansKR size={16} weight="Medium">
-                KaKao
+                {data.SIGN_TYPE}
               </NotoSansKR>
             </ObjectContainer>
             <ObjectContainer>
               <NotoSansKR size={16} weight="Medium">
-                User Id
+                UID
               </NotoSansKR>
               <NotoSansKR size={16} weight="Medium">
-                000000
+                {data.UID}
               </NotoSansKR>
             </ObjectContainer>
           </ObjectList>

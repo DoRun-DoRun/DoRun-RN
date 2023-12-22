@@ -1,13 +1,20 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   HomeContainer,
   InnerContainer,
   NotoSansKR,
+  RowContainer,
   RowScrollContainer,
   ScrollContainer,
+  useApi,
 } from '../Component';
-import {View} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
 import {styled} from 'styled-components/native';
+import {useSelector} from 'react-redux';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {RootState} from '../../store/RootReducer';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {Avatar} from '../../store/data';
 
 const TextContainer = styled.TextInput`
   flex: 1;
@@ -31,43 +38,133 @@ const SelectedButton = styled.TouchableOpacity`
   border-radius: 10px;
 `;
 
-const CharecterSlot = styled.View`
+const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
   width: 88px;
   height: 104px;
   border-radius: 10px;
+  border-width: ${props => (props.isEquip ? '2px' : null)};
+  opacity: ${props => (props.isOwned ? 1 : 0.5)};
   background: ${props => props.theme.white};
+  justify-content: center;
+  align-items: center;
 `;
 
+const PencilIcon = styled.TouchableOpacity`
+  position: absolute;
+  right: 8px;
+`;
+
+const avatarImages = [
+  require('../../assets/images/dudu00.png'),
+  require('../../assets/images/nuts00.png'),
+  require('../../assets/images/pachi00.png'),
+  require('../../assets/images/peats00.png'),
+];
+
 const ProfileSettingScreen = () => {
+  const CallApi = useApi();
+  const queryClient = useQueryClient();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+  const [userName, setUserName] = useState('');
+  const [selectedCharacter, setSelectedCharacter] = useState(1);
+
+  const SettingProfile = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: 'user/avatar',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      setUserName(response.USER_NM);
+      for (const avatar of response.avatars) {
+        if (avatar.IS_EQUIP) {
+          setSelectedCharacter(avatar.AVATAR_NO);
+          break; // 착용 중인 아바타를 찾았으므로 루프 종료
+        }
+      }
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const SetAvatar = async (avatar_no: number) => {
+    try {
+      const response = await CallApi({
+        endpoint: `user/avatar?avatar_no=${avatar_no}`,
+        method: 'PUT',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const {mutate: setCharacter} = useMutation(SetAvatar, {
+    onSuccess: () => {
+      // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
+      queryClient.invalidateQueries('SettingProfile');
+    },
+  });
+  const {data, isLoading} = useQuery('SettingProfile', SettingProfile);
+
+  if (isLoading) {
+    return <NotoSansKR size={18}>로딩중</NotoSansKR>;
+  }
+
   return (
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
           <NotoSansKR size={20}>프로필 수정</NotoSansKR>
-          <View>
+          <View style={{gap: 8}}>
             <NotoSansKR size={18} weight="Medium">
               닉네임 변경
             </NotoSansKR>
-            <TextContainer />
+            <RowContainer>
+              <TextContainer
+                placeholder={data.USER_NM}
+                value={userName}
+                onChangeText={setUserName}
+              />
+              <PencilIcon>
+                <OcticonIcons name="pencil" size={20} />
+              </PencilIcon>
+            </RowContainer>
           </View>
-          <View style={{gap: 16}}>
+          <View style={{gap: 16, flex: 1}}>
             <NotoSansKR size={18} weight="Medium">
               캐릭터/펫 변경
             </NotoSansKR>
             <SelectedContainer>
-              <SelectedButton>
+              <SelectedButton
+                onPress={() => {
+                  setCharacter(selectedCharacter);
+                }}>
                 <NotoSansKR size={14} color="primary1" weight="Medium">
                   선택하기
                 </NotoSansKR>
               </SelectedButton>
-              <View style={{height: 300}} />
+              <View style={{height: 300, justifyContent: 'center'}}>
+                <Image source={avatarImages[selectedCharacter - 1]} />
+              </View>
               <RowScrollContainer gap={8}>
-                <CharecterSlot />
-                <CharecterSlot />
-                <CharecterSlot />
-                <CharecterSlot />
-                <CharecterSlot />
-                <CharecterSlot />
+                {data.avatars.map((avatar: Avatar) => (
+                  <TouchableOpacity
+                    key={avatar.AVATAR_NO}
+                    onPress={() => {
+                      if (avatar.IS_OWNED) {
+                        setSelectedCharacter(avatar.AVATAR_NO);
+                      }
+                    }}>
+                    <CharecterSlot
+                      isEquip={avatar.IS_EQUIP}
+                      isOwned={avatar.IS_OWNED}>
+                      <Image source={avatarImages[avatar.AVATAR_NO - 1]} />
+                    </CharecterSlot>
+                  </TouchableOpacity>
+                ))}
               </RowScrollContainer>
             </SelectedContainer>
           </View>

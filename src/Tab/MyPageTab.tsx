@@ -1,16 +1,23 @@
 import React, {useState} from 'react';
 import {
+  GetImage,
   HomeContainer,
   InnerContainer,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
+  convertKoKRToUTC,
+  useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Pressable, Text, View} from 'react-native';
-import {Calendar} from 'react-native-calendars';
+import {Pressable, Text, TouchableOpacity, View} from 'react-native';
+import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useModal} from '../Modal/ModalProvider';
+import {useQuery} from 'react-query';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
@@ -104,9 +111,9 @@ const DailyPicContiner = styled.View`
   align-items: center;
 `;
 
-const DailyPic = styled.View`
-  width: 200px;
-  height: 200px;
+const DailyPic = styled.Image`
+  width: 300px;
+  height: 300px;
   border-radius: 10px;
   background-color: ${props => props.theme.gray7};
 `;
@@ -116,121 +123,188 @@ const DailyTextContiner = styled.View`
   align-items: flex-end;
 `;
 
-const DailyDiary = styled.View`
-  gap: 8px;
+const DailyDiary = styled(LinearGradient).attrs({
+  start: {x: 1.27, y: 4.29},
+  end: {x: -0.19, y: -2.08},
+})`
   border-radius: 10px;
   padding: 16px;
-  background-color: ${props => props.theme.primary1};
+  /* shadow-color: rgba(0, 0, 0, 0.15);
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.15;
+  shadow-radius: 30px;
+  elevation: 4; */
 `;
 
-const DailyTodo = styled.View`
+const DailyTodo = styled(LinearGradient).attrs({
+  start: {x: 0.05, y: 0},
+  end: {x: 1.07, y: 1},
+})`
   gap: 8px;
   border-radius: 10px;
   padding: 8px 16px;
-  background-color: ${props => props.theme.white};
 `;
 
 const DailyTodoList = styled(RowContainer)`
   padding: 4px 0;
 `;
 
-// const WeeklyTeamGoal = styled.View`
-//   align-items: center;
-//   border: 2px solid ${props => props.theme.primary1};
-//   padding: 8px;
-//   border-radius: 10px;
-// `;
-
-// const WeeklyTeamPic = styled.View`
-//   width: 96px;
-//   height: 96px;
-//   border-radius: 10px;
-//   margin-bottom: 8px;
-//   border: 2px solid ${props => props.theme.gray4};
-// `;
+interface PersonGoal {
+  PERSON_NO: number;
+  PERSON_NM: string;
+  IS_DONE: true;
+}
 
 const History = () => {
+  const {accessToken} = useSelector((state: RootState) => state.user);
+  const CallApi = useApi();
+  const currentDate = new Date();
+  const formattedDate = currentDate
+    .toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .replace(/\. /g, '-')
+    .replace('.', '');
+
   const theme = useTheme();
+  const [date, setDate] = useState(formattedDate);
+  const [index, setIndex] = useState(0);
+
+  const ChallengeHistory = async () => {
+    try {
+      const response = CallApi({
+        endpoint: `challenge/history?current_day=${convertKoKRToUTC(
+          date,
+        ).toISOString()}`,
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+  const {data, isLoading} = useQuery(
+    ['challenge_history', date],
+    ChallengeHistory,
+  );
+
   return (
     <>
-      <Calendar />
-      <RowContainer seperate>
-        <MaterialIcons name="chevron-left" size={24} />
-        <NotoSansKR size={18}>챌린지 이름</NotoSansKR>
-        <MaterialIcons name="chevron-right" size={24} />
-      </RowContainer>
-
-      <DailyPicContiner>
-        <DailyPic />
-        <DailyTextContiner>
-          <Text>😀</Text>
-        </DailyTextContiner>
-      </DailyPicContiner>
-
-      <View style={{gap: 16}}>
-        <DailyDiary>
-          <NotoSansKR color="white" size={16}>
-            11월 02일 한줄일기
-          </NotoSansKR>
-          <NotoSansKR color="white" size={14} weight="Regular">
-            오늘 달리기를 하고 물을 마시고 하루의 목표 달성에 힘썼다. 정말
-            유익하고 좋은 시간이었다. 앞으로도 계속 이어나가고 싶다.
-          </NotoSansKR>
-        </DailyDiary>
-
-        <DailyTodo>
-          <DailyTodoList gap={8}>
-            <MaterialIcons name="list-alt" color={theme.primary1} size={20} />
-            <NotoSansKR size={13} color="gray3">
-              달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
-            </NotoSansKR>
-          </DailyTodoList>
-          <DailyTodoList gap={8}>
-            <MaterialIcons name="list-alt" color={theme.primary1} size={20} />
-            <NotoSansKR size={13} color="gray3">
-              달리기 1km 오늘도 화이이이이ㅣ이이티ㅣㅇㅇ
-            </NotoSansKR>
-          </DailyTodoList>
-        </DailyTodo>
+      <View style={{marginHorizontal: -16}}>
+        <CalendarProvider date={date} onDateChanged={e => setDate(e)}>
+          <ExpandableCalendar firstDay={1} onDayPress={() => setIndex(0)} />
+        </CalendarProvider>
       </View>
+      {isLoading && <Text>로딩중</Text>}
+      {data?.length > 0 ? (
+        <>
+          <RowContainer seperate>
+            {index !== 0 ? (
+              <TouchableOpacity onPress={() => setIndex(prev => prev - 1)}>
+                <MaterialIcons name="chevron-left" size={24} />
+              </TouchableOpacity>
+            ) : (
+              <View style={{width: 24}} />
+            )}
+            <NotoSansKR size={18}>{data[index].CHALLENGE_MST_NM}</NotoSansKR>
+            {index < data.length - 1 ? (
+              <TouchableOpacity onPress={() => setIndex(prev => prev + 1)}>
+                <MaterialIcons name="chevron-right" size={24} />
+              </TouchableOpacity>
+            ) : (
+              <View style={{width: 24}} />
+            )}
+          </RowContainer>
 
-      {/* <View style={{gap: 16}}>
-        <NotoSansKR size={18}>팀 주간목표</NotoSansKR>
-        <WeeklyTeamGoal>
-          <NotoSansKR size={18} color="primary1">
-            “닭가슴살 1일 1회 먹기”
-          </NotoSansKR>
-        </WeeklyTeamGoal>
-        <RowScrollContainer gap={8}>
-          <View>
-            <WeeklyTeamPic />
-            <Text>😀😀😀</Text>
+          {data[index].IMAGE_FILE_NM && (
+            <DailyPicContiner>
+              <DailyPic source={{uri: GetImage(data[index].IMAGE_FILE_NM)}} />
+              <DailyTextContiner>
+                <Text>{data[index].EMOJI}</Text>
+              </DailyTextContiner>
+            </DailyPicContiner>
+          )}
+
+          <View style={{gap: 16}}>
+            {data[index].COMMENT && (
+              <DailyDiary colors={['#09277b', '#3967ef', '#9eb8f9']}>
+                <NotoSansKR color="white" size={16}>
+                  {date} 한줄일기
+                </NotoSansKR>
+                <NotoSansKR color="white" size={14} weight="Regular">
+                  {data[index].COMMENT}
+                </NotoSansKR>
+              </DailyDiary>
+            )}
+
+            {data[index].personGoal.length > 0 ? (
+              <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.3)']}>
+                {data[index].personGoal.map((goal: PersonGoal, idx: number) => (
+                  <DailyTodoList key={idx} gap={8}>
+                    {goal.IS_DONE ? (
+                      <MaterialIcons
+                        name="check-box"
+                        color={theme.primary1}
+                        size={20}
+                      />
+                    ) : (
+                      <MaterialIcons
+                        name="check-box-outline-blank"
+                        color={theme.primary1}
+                        size={20}
+                      />
+                    )}
+
+                    <NotoSansKR size={13} color="gray3">
+                      {goal.PERSON_NM}
+                    </NotoSansKR>
+                  </DailyTodoList>
+                ))}
+              </DailyTodo>
+            ) : (
+              <Text>해당 날짜에 진행사항이 없어요</Text>
+            )}
+
+            {data[index].teamGoal && (
+              <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.4)']}>
+                <DailyTodoList gap={8}>
+                  {data[index].teamGoal.IS_DONE ? (
+                    <MaterialIcons
+                      name="check-box"
+                      color={theme.primary1}
+                      size={20}
+                    />
+                  ) : (
+                    <MaterialIcons
+                      name="check-box-outline-blank"
+                      color={theme.primary1}
+                      size={20}
+                    />
+                  )}
+
+                  <NotoSansKR size={13} color="gray3">
+                    {data[index].teamGoal.TEAM_NM}
+                  </NotoSansKR>
+                </DailyTodoList>
+              </DailyTodo>
+            )}
           </View>
-          <View>
-            <WeeklyTeamPic />
-            <Text>😀😀😀</Text>
-          </View>
-          <View>
-            <WeeklyTeamPic />
-            <Text>😀😀😀</Text>
-          </View>
-          <View>
-            <WeeklyTeamPic />
-            <Text>😀😀😀</Text>
-          </View>
-        </RowScrollContainer>
-      </View> */}
+        </>
+      ) : (
+        <NotoSansKR size={16}>챌린지 기록이 존재하지 않아요</NotoSansKR>
+      )}
     </>
   );
 };
-
 const AlbumItem = styled.View`
   width: 72px;
   height: 72px;
   border-radius: 10px;
   background-color: ${props => props.theme.gray6};
 `;
-
 const AlbumGrid = styled(RowContainer)`
   width: 232px;
   height: 248px;
@@ -280,7 +354,34 @@ const Album = () => {
 };
 
 const MyPageTab = () => {
+  const CallApi = useApi();
   const [selected, setSelected] = useState('history');
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const UserProfile = async () => {
+    try {
+      const response = CallApi({
+        endpoint: 'user',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  const {data, isLoading, error} = useQuery('userData', UserProfile);
+
+  if (isLoading) {
+    return <Text>'Loading...'</Text>;
+  }
+
+  if (error) {
+    return <Text>'ERROR...'</Text>;
+  }
+
   return (
     <HomeContainer>
       <ScrollContainer>
@@ -288,13 +389,13 @@ const MyPageTab = () => {
           <ProfileContainer gap={24}>
             <UserIcon />
             <View>
-              <UserName size={16}>달려라 갓생팀</UserName>
+              <UserName size={16}>{data.USER_NM}</UserName>
               <RowContainer gap={16}>
-                <UserStats status="완료" count={8} />
+                <UserStats status="완료" count={data.COMPLETE} />
                 <Divider />
-                <UserStats status="진행중" count={1} />
+                <UserStats status="진행중" count={data.PROGRESS} />
                 <Divider />
-                <UserStats status="시작 전" count={3} />
+                <UserStats status="시작 전" count={data.PENDING} />
               </RowContainer>
             </View>
           </ProfileContainer>

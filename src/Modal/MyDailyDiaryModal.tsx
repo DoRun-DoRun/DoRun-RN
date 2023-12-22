@@ -1,18 +1,60 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import {
   ButtonComponent,
-  HomeContainer,
   InputNotoSansKR,
   NotoSansKR,
+  useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ModalHeadText} from './CustomModal';
-import {useModal} from './ModalProvider';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import {useMutation} from 'react-query';
+import {goalType} from '../../store/slice/GoalSlice';
 
-export const MyDailyDrayModal = () => {
+const transformData = (state: goalType[]) => {
+  return state.map(goal => ({
+    PERSON_NM: goal.title,
+    IS_DONE: goal.isComplete,
+  }));
+};
+
+// 사용 예시
+
+export const MyDailyDrayModal = ({
+  challenge_user_no,
+  personGoal,
+}: {
+  challenge_user_no: number;
+  personGoal: goalType[];
+}) => {
   const theme = useTheme();
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const [inputText, setInputText] = useState('');
+
+  const CreateDiary = () =>
+    CallApi({
+      endpoint: 'diary',
+      method: 'POST',
+      accessToken: accessToken!,
+      body: {
+        challenge_user_no: challenge_user_no,
+        IMAGE_FILE_NM: '',
+        COMMENT: inputText,
+        PERSON_GOAL: transformData(personGoal),
+      },
+    });
+
+  const {mutate} = useMutation(CreateDiary, {
+    onSuccess: async data => {
+      console.log(data);
+    },
+  });
+
   return (
     <View style={{gap: 24}}>
       <ModalHeadText>
@@ -27,6 +69,7 @@ export const MyDailyDrayModal = () => {
           해당 내용은 친구들이 24시간동안 확인할 수 있어요! {'\n'}
           24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
         </NotoSansKR>
+        {/* <PhotoView /> */}
         <PhotoUploadFrame>
           <MaterialIcons
             name="add-to-photos"
@@ -39,8 +82,17 @@ export const MyDailyDrayModal = () => {
           weight="Medium"
           color="gray3"
           placeholder="한줄 일기를 작성해봐요!"
+          value={inputText}
+          onChangeText={setInputText}
+          border
         />
-        <ButtonComponent type="gray">오늘은 넘어갈래요</ButtonComponent>
+        <ButtonComponent
+          type="gray"
+          onPress={() => {
+            mutate();
+          }}>
+          오늘은 넘어갈래요
+        </ButtonComponent>
       </View>
     </View>
   );
@@ -54,18 +106,3 @@ const PhotoUploadFrame = styled(View)`
   height: 96px;
   border: 2px solid ${props => props.theme.primary1};
 `;
-
-export const TryModal = () => {
-  const {showModal} = useModal();
-  const openModal = () => {
-    showModal(<MyDailyDrayModal />);
-  };
-
-  return (
-    <HomeContainer>
-      <ButtonComponent onPress={openModal}>
-        클릭 시 일일 일기 모달 호출
-      </ButtonComponent>
-    </HomeContainer>
-  );
-};

@@ -16,6 +16,8 @@ export const light: DefaultTheme = {
   secondary: '#D6BE00',
   green: '#21A03D',
   red: '#C52727',
+  yellow: '#FBEF84',
+  background: '#D3EFF3',
 };
 
 // export const dark = () => {

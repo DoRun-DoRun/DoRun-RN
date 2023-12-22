@@ -7,7 +7,9 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import ProfileSettingScreen from './screens/ProfileSettingScreen';
 import FriendScreen from './screens/FriendScreen';
+import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
+import EditChallengeScreen from './screens/EditChallengeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,16 @@ function App(): JSX.Element {
           />
         ),
       }}>
+      {/* <Stack.Screen
+        name="TestTab2"
+        component={TestTab2}
+        options={{headerShown: false}}
+      /> */}
+      <Stack.Screen
+        name="LoginTab"
+        component={LoginTab}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="MainTab"
         component={MainTab}
@@ -36,6 +48,10 @@ function App(): JSX.Element {
       <Stack.Screen
         name="CreateChallengeScreen"
         component={CreateChallengeScreen}
+      />
+      <Stack.Screen
+        name="EditChallengeScreen"
+        component={EditChallengeScreen}
       />
       <Stack.Screen
         name="ProfileSettingScreen"

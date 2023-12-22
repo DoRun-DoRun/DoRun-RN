@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 카메라로 찍은 사진 저장, SD 카드에 있는 사진 읽어올 때 필요함 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
       android:name=".MainApplication"
@@ -30,7 +33,7 @@
             <category android:name="android.intent.category.BROWSABLE" />
 
             <data android:host="oauth"
-              android:scheme="kakao093b844b2df44b4617e6a3330c269a78" />
+              android:scheme="kakao97d8ca4c2736fdb3f362246fe17f316b" />
           </intent-filter>
       </activity>
     </application>
