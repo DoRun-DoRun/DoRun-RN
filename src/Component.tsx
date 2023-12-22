@@ -13,7 +13,7 @@ interface ButtonType {
   onPress?: () => void;
 }
 
-const ButtonContainer = styled.TouchableOpacity<{color: string}>`
+export const ButtonContainer = styled.TouchableOpacity<{color: string}>`
   background-color: ${props => props.theme[props.color]};
   padding: 8px;
   width: 100%;

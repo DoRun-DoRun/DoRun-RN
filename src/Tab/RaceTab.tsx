@@ -37,7 +37,6 @@ interface ChallengeUserType {
     },
   ];
 }
-
 const RaceTab = () => {
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
