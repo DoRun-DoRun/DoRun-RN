@@ -31,13 +31,14 @@ export const PersonGoalChoiceModal = ({
   };
 
   return (
-    <View>
+    <View style={{gap: 24}}>
       <ModalHeadBorder />
       <View style={{gap: 8}}>
-        <ButtonComponent onPress={() => openEditeModal()}>
+        <ButtonComponent onPress={() => openEditeModal()} type="secondary">
           수정하기
         </ButtonComponent>
         <ButtonComponent
+          type="secondary"
           onPress={() => {
             dispatch(removeGoal({goalId: id, challenge_no: challenge_no}));
             hideModal();
@@ -60,7 +61,7 @@ export const PersonGoalEditModal = ({
   const [inputText, setInputText] = useState(title);
 
   return (
-    <View>
+    <View style={{gap: 24}}>
       <ModalHeadBorder />
       <InputNotoSansKR
         size={16}
@@ -69,6 +70,7 @@ export const PersonGoalEditModal = ({
       />
       <View style={{gap: 8}}>
         <ButtonComponent
+          type="secondary"
           onPress={() => {
             dispatch(
               updateGoalTitle({
@@ -82,6 +84,7 @@ export const PersonGoalEditModal = ({
           수정하기
         </ButtonComponent>
         <ButtonComponent
+          type="secondary"
           onPress={() => {
             hideModal();
           }}>
@@ -99,7 +102,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
   const [inputText, setInputText] = useState('');
 
   return (
-    <View>
+    <View style={{gap: 24}}>
       <ModalHeadBorder />
       <InputNotoSansKR
         size={16}
@@ -109,6 +112,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
       />
       <View style={{gap: 8}}>
         <ButtonComponent
+          type="secondary"
           onPress={() => {
             dispatch(
               addPersonalGoal({
@@ -121,6 +125,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
           생성하기
         </ButtonComponent>
         <ButtonComponent
+          type="secondary"
           onPress={() => {
             hideModal();
           }}>

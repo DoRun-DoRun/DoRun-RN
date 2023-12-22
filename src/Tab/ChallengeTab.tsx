@@ -28,6 +28,7 @@ import {
   PersonGoalChoiceModal,
 } from '../Modal/PersonGoalModal';
 import {challengeDataType} from '../../store/async/asyncStore';
+import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 
 const Profile = styled.View`
   width: 40px;
@@ -508,14 +509,24 @@ const ChallengeTab = () => {
               }
             />
           ) : (
-            <TeamGoalBox
-              title="팀 목표 생성을 기다리고 있습니다."
-              count="0/0"
-            />
+            <TeamGoalBox title="팀 목표 생성을 기다리고 있습니다." count="" />
           )}
         </CenterContainer>
         <CenterContainer>
-          <NotoSansKR size={18}>개인별 목표</NotoSansKR>
+          <RowContainer seperate>
+            <NotoSansKR size={18}>개인별 목표</NotoSansKR>
+            <TouchableOpacity
+              onPress={() => {
+                showModal(
+                  <MyDailyDrayModal
+                    challenge_user_no={detailData.CHALLENGE_USER_NO}
+                    personGoal={personGoal}
+                  />,
+                );
+              }}>
+              <OcticonIcons name="issue-closed" size={18} />
+            </TouchableOpacity>
+          </RowContainer>
           <View style={{gap: 8}}>
             {personGoal.map(goal => (
               <GoalBox

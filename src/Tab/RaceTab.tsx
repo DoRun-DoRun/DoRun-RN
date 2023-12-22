@@ -15,6 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
 import {decreaseIndex, increaseIndex} from '../../store/slice/IndexSlice';
+import {useModal} from '../Modal/ModalProvider';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -163,6 +164,7 @@ interface BGComponentType {
 }
 
 const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
+  const {showModal} = useModal();
   const BGA = [
     {url: require('../../assets/images/BGAHeader1.png'), height: 176},
     {url: require('../../assets/images/BGABody1.png'), height: 137},
@@ -178,12 +180,18 @@ const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
     require('../../assets/images/peats00.png'),
   ];
 
+  const handleTouch = () => {
+    showModal(<View />);
+    // 추가 로직 구현...
+  };
+
   const pan = useRef(new Animated.ValueXY()).current;
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
+        handleTouch();
         setScrollEnabled(false); // 드래그 시작 시 스크롤 비활성화
       },
       onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {

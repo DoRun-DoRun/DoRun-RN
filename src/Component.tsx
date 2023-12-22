@@ -141,17 +141,17 @@ interface Config {
   };
   body?: string;
 }
-// if (Platform.OS === 'android') {
-//   url = `http://10.0.2.2:8000/${endpoint}`; //andriod
-// } else {
-//   url = `http://127.0.0.1:8000/${endpoint}`; //ios
-// }
+
 export const useApi = () => {
   const navigation = useNavigation();
 
   async function CallApi({endpoint, method, accessToken, body}: API) {
     let url = `https://dorun.site/${endpoint}`;
-
+    if (Platform.OS === 'android') {
+      url = `http://10.0.2.2:8000/${endpoint}`; //andriod
+    } else {
+      url = `http://127.0.0.1:8000/${endpoint}`; //ios
+    }
     const config: Config = {
       method: method,
       headers: {
