@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Image, View} from 'react-native';
 import {
   ButtonComponent,
   ButtonContainer,
@@ -15,12 +15,16 @@ import {ChallengeUserType} from '../Tab/RaceTab';
 import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
+import {profileImage} from '../../store/data';
 
 const UserProfile = styled(View)`
   width: 64px;
   height: 64px;
   border-radius: 32px;
-  border: 4px solid #648cf3;
+  border: 3px solid ${props => props.theme.primary1};
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 `;
 const UserStatues = styled(View)`
   display: flex;
@@ -64,7 +68,12 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
     <View style={{paddingTop: 16}}>
       <View style={{gap: 9}}>
         <RowContainer gap={9}>
-          <UserProfile />
+          <UserProfile>
+            <Image
+              source={profileImage[user.CHARACTER_NO - 1]}
+              style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+            />
+          </UserProfile>
           <View style={{gap: 8, flex: 1}}>
             <RowContainer gap={8}>
               <UserStatues>

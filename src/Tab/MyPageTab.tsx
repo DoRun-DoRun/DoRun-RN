@@ -10,7 +10,7 @@ import {
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Pressable, Text, TouchableOpacity, View} from 'react-native';
+import {Image, Pressable, Text, TouchableOpacity, View} from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useModal} from '../Modal/ModalProvider';
@@ -18,6 +18,7 @@ import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import LinearGradient from 'react-native-linear-gradient';
+import {profileImage} from '../../store/data';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
@@ -29,7 +30,10 @@ const UserIcon = styled.View`
   width: 80px;
   height: 80px;
   border: 3px solid ${props => props.theme.primary1};
-  border-radius: 80px;
+  border-radius: 40px;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 `;
 
 const UserStatsCount = styled.View`
@@ -389,7 +393,12 @@ const MyPageTab = () => {
       <ScrollContainer>
         <InnerContainer gap={24}>
           <ProfileContainer gap={24}>
-            <UserIcon />
+            <UserIcon>
+              <Image
+                source={profileImage[data.USER_CHARACTER_NO - 1]}
+                style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+              />
+            </UserIcon>
             <View>
               <UserName size={16}>{data.USER_NM}</UserName>
               <RowContainer gap={16}>

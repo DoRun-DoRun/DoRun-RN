@@ -18,6 +18,8 @@ import {useQuery} from 'react-query';
 import {decreaseIndex, increaseIndex} from '../../store/slice/IndexSlice';
 import {useModal} from '../Modal/ModalProvider';
 import {CharacterModal} from '../Modal/CharacterModal';
+import LottieView from 'lottie-react-native';
+import {BackgroundImage, Dudus, struggleLottie} from '../../store/data';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -165,7 +167,7 @@ const DefaultImage = () => {
       resizeMode="stretch"
       height={432}>
       <Image
-        source={require('../../assets/images/race_image.png')}
+        source={require('../../assets/image/race_image.png')}
         style={{
           width: '80%',
           resizeMode: 'contain',
@@ -187,20 +189,6 @@ interface BGComponentType {
 const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
-  const BGA = [
-    {url: require('../../assets/images/BGAHeader1.png'), height: 176},
-    {url: require('../../assets/images/BGABody1.png'), height: 137},
-    {url: require('../../assets/images/BGABody2.png'), height: 137},
-    {url: require('../../assets/images/BGABody3.png'), height: 137},
-    {url: require('../../assets/images/BGABody3.png'), height: 137},
-    {url: require('../../assets/images/BGABody3.png'), height: 137},
-  ];
-  const Dudus = [
-    require('../../assets/images/dudu00.png'),
-    require('../../assets/images/nuts00.png'),
-    require('../../assets/images/pachi00.png'),
-    require('../../assets/images/peats00.png'),
-  ];
 
   const handleTouch = () => {
     showModal(<CharacterModal data={data} />, false);
@@ -237,7 +225,7 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
 
   let yPosition = 0;
   for (let i = BGN; i > 0; i--) {
-    yPosition += BGA[i].height;
+    yPosition += BackgroundImage[i].height;
   }
 
   const windowWidth = Dimensions.get('window').width;
@@ -251,10 +239,10 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
   return (
     <>
       <BGImage
-        source={BGA[BGN].url}
+        source={BackgroundImage[BGN].url}
         aspect-ratio={1}
         resizeMode="stretch"
-        height={BGA[BGN].height}
+        height={BackgroundImage[BGN].height}
       />
       <Animated.View
         style={{
@@ -266,9 +254,19 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
         }}
         {...panResponder.panHandlers}>
         {isDragging ? (
-          <Image source={Dudus[0]} />
+          <View style={{width: 60, height: 60}}>
+            <LottieView
+              source={struggleLottie[data.CHARACTER_NO - 1]}
+              autoPlay
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            />
+          </View>
         ) : (
-          <Image source={Dudus[BGN]} />
+          <Image source={Dudus[data.CHARACTER_NO - 1]} />
         )}
       </Animated.View>
     </>
