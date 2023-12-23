@@ -372,7 +372,9 @@ const MyPageTab = () => {
     }
   };
 
-  const {data, isLoading, error} = useQuery('userData', UserProfile);
+  const {data, isLoading, error} = useQuery('userData', UserProfile, {
+    refetchOnWindowFocus: true,
+  });
 
   if (isLoading) {
     return <Text>'Loading...'</Text>;

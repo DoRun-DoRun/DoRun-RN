@@ -351,7 +351,9 @@ const ChallengeTab = () => {
   const {data: listData, isLoading: listLoading} = useQuery(
     'getChallenge',
     getChallenge,
+    {refetchOnWindowFocus: true},
   );
+
   const current_day = new Date().toISOString();
   const getChallengeDetail = async () => {
     try {

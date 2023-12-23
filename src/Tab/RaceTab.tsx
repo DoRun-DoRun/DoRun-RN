@@ -25,6 +25,20 @@ import {CharacterModal} from '../Modal/CharacterModal';
 //   challenge_user: [ChallengeUserType];
 // }
 
+const ChallengeCreateButton = styled.TouchableOpacity`
+  position: absolute;
+  background-color: ${props => props.theme.white};
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  width: 205px;
+  height: 56px;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-102.5px) translateY(-56px);
+`;
+
 export interface ChallengeUserType {
   CHALLENGE_USER_NO: number;
   PROGRESS: number;
@@ -41,7 +55,6 @@ export interface ChallengeUserType {
 }
 const RaceTab = () => {
   const [scrollEnabled, setScrollEnabled] = useState(true);
-
   const CallApi = useApi();
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
@@ -66,6 +79,7 @@ const RaceTab = () => {
   const {data: challengeListData, isLoading} = useQuery(
     'ChallengeUserList',
     ChallengeUserList,
+    {refetchOnWindowFocus: true},
   );
 
   useEffect(() => {
@@ -128,6 +142,12 @@ const RaceTab = () => {
         </ScrollContainer>
       ) : (
         <View style={{flex: 1, justifyContent: 'flex-end'}}>
+          <ChallengeCreateButton
+            onPress={() => {
+              navigation.navigate('CreateChallengeScreen' as never);
+            }}>
+            <NotoSansKR size={16}>챌린지를 생성해주세요!</NotoSansKR>
+          </ChallengeCreateButton>
           <DefaultImage />
         </View>
       )}
