@@ -38,7 +38,7 @@ export const MainTab = () => {
         tabBarInactiveTintColor: theme.gray5,
       }}>
       <Tab.Screen
-        name="챌린지 이름"
+        name="두런두런"
         component={RaceTab}
         options={{
           tabBarIcon: ({color, size}) => (
@@ -56,6 +56,17 @@ export const MainTab = () => {
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="list-alt" color={color} size={size} />
           ),
+          headerRight: () => {
+            return (
+              <TouchableOpacity
+                style={{marginRight: 16}}
+                onPress={() => {
+                  navigation.navigate('EditChallengeScreen' as never);
+                }}>
+                <OcticonIcons name="pencil" size={24} />
+              </TouchableOpacity>
+            );
+          },
         }}
       />
       <Tab.Screen

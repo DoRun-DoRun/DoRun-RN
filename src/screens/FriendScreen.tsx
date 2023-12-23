@@ -6,39 +6,74 @@ import {
   InputNotoSansKR,
   NotoSansKR,
   RowContainer,
+  ScrollContainer,
+  useApi,
 } from '../Component';
 import {TouchableOpacity, View} from 'react-native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {styled, useTheme} from 'styled-components/native';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {InviteAcceptType} from '../../store/data';
 
-const FrinedCharacter = styled.View`
-  width: 32px;
-  height: 32px;
-  border-radius: 32px;
-  border: 1px solid ${props => props.theme.secondary};
-`;
+// const FrinedCharacter = styled.View`
+//   width: 32px;
+//   height: 32px;
+//   border-radius: 32px;
+//   border: 1px solid ${props => props.theme.secondary};
+// `;
 
-const Friend = ({invited}: {invited?: boolean}) => {
+interface FriendType {
+  accessToken: string | null;
+  name: string;
+  friendNo: number;
+  invited?: boolean;
+}
+
+const Friend = ({accessToken, name, friendNo, invited}: FriendType) => {
   const theme = useTheme();
+  const CallApi = useApi();
+  const queryClient = useQueryClient();
+
+  const changeFriend = (status: InviteAcceptType) =>
+    CallApi({
+      endpoint: `friend/${friendNo}?status=${status}`,
+      method: 'PUT',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: changeFriendMutation} = useMutation(changeFriend, {
+    onSuccess: response => {
+      console.log('Success:', response);
+      queryClient.invalidateQueries('FriendListModal');
+    },
+    onError: error => {
+      console.error('Challenge Status Change Error:', error);
+    },
+  });
 
   return (
     <RowContainer gap={8}>
-      <FrinedCharacter />
+      {/* <FrinedCharacter /> */}
       <NotoSansKR size={14} weight="Medium" style={{flex: 1}}>
-        닉네임 A
+        {name}
       </NotoSansKR>
 
       {invited ? (
         <>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => changeFriendMutation(InviteAcceptType.ACCEPTED)}>
             <OcticonIcons name="check" size={24} color={theme.green} />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => changeFriendMutation(InviteAcceptType.DECLINED)}>
             <OcticonIcons name="x" size={24} color={theme.red} />
           </TouchableOpacity>
         </>
       ) : (
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => changeFriendMutation(InviteAcceptType.DELETED)}>
           <OcticonIcons name="trash" size={24} color={theme.gray4} />
         </TouchableOpacity>
       )}
@@ -60,29 +95,81 @@ const ExpandedContainer = styled.View`
   background-color: #fff;
   padding: 0 8px;
   gap: 8px;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
 `;
 
-const InviteFriend = () => {
+interface InviteFriendType {
+  name: string;
+  UID: number;
+  setUidInput: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const InviteFriend = ({name, UID, setUidInput}: InviteFriendType) => {
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const inviteFriend = () =>
+    CallApi({
+      endpoint: `friend/${UID}`,
+      method: 'POST',
+      accessToken: accessToken!,
+    });
+
+  const {mutate} = useMutation(inviteFriend, {
+    onSuccess: response => {
+      console.log('Success:', response);
+      setUidInput('');
+    },
+    onError: error => {
+      console.error('Challenge Start Error:', error);
+    },
+  });
+
   return (
     <RowContainer seperate>
       <NotoSansKR size={14} weight="Regular">
-        닉네임 A
+        {name}
       </NotoSansKR>
-      <NotoSansKR
-        size={14}
-        weight="Regular"
-        color="gray3"
-        style={{textDecorationLine: 'underline'}}>
-        친구요청
-      </NotoSansKR>
+      <TouchableOpacity onPress={() => mutate()}>
+        <NotoSansKR
+          size={14}
+          weight="Regular"
+          color="gray3"
+          style={{textDecorationLine: 'underline'}}>
+          친구요청
+        </NotoSansKR>
+      </TouchableOpacity>
     </RowContainer>
   );
 };
 
 const SearchBox = () => {
   const [isClicked, setIsClicked] = useState(false);
-  const [textValue, setTextValue] = useState('');
+  const [uidInput, setUidInput] = useState('');
+  const CallApi = useApi();
+  const SearchList = async () => {
+    try {
+      const response = CallApi({
+        endpoint: `user/search/${uidInput}`,
+        method: 'GET',
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+  const isUidValid = uidInput.length === 7 && /^\d{7}$/.test(uidInput);
+
+  const {data, isLoading} = useQuery(
+    ['SearchList', uidInput], // 쿼리 키에 uidInput 포함
+    SearchList,
+    {enabled: isUidValid}, // 쿼리 실행 조건
+  );
+
+  if (isLoading) {
+    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+  }
 
   return (
     <SearchContainer isClicked={isClicked}>
@@ -90,8 +177,10 @@ const SearchBox = () => {
         <OcticonIcons name="search" size={16} />
         <InputNotoSansKR
           size={14}
-          value={textValue}
-          onChangeText={text => setTextValue(text)}
+          value={uidInput}
+          keyboardType="number-pad"
+          maxLength={7}
+          onChangeText={setUidInput}
           style={{flex: 1}}
           placeholder="Friend UID"
           onBlur={() => setIsClicked(false)}
@@ -99,70 +188,114 @@ const SearchBox = () => {
         />
       </RowContainer>
 
-      {isClicked && !textValue ? (
-        <ExpandedContainer>
-          <NotoSansKR size={14}>친구 목록</NotoSansKR>
-          <InviteFriend />
-          <InviteFriend />
-          <InviteFriend />
-        </ExpandedContainer>
-      ) : null}
-
-      {isClicked && textValue ? (
+      {isClicked && uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          <NotoSansKR size={14} weight="Regular">
-            닉네임 A
-          </NotoSansKR>
+          {data?.USER_NM ? (
+            <InviteFriend
+              name={data?.USER_NM}
+              UID={data?.UID}
+              setUidInput={setUidInput}
+            />
+          ) : (
+            <NotoSansKR size={14}>검색 결과가 없습니다.</NotoSansKR>
+          )}
         </ExpandedContainer>
       ) : null}
     </SearchContainer>
   );
 };
 
+interface friendAPIType {
+  USER_NM: string;
+  FRIEND_NO: number;
+  UID: number;
+}
+
 const FriendScreen = () => {
   const [reqeusted, setReqeusted] = useState(true);
   const theme = useTheme();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+  const CallApi = useApi();
+  const FriendListModal = async () => {
+    try {
+      const response = CallApi({
+        endpoint: 'friend/list',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+  const {data: friendData, isLoading: friendLoading} = useQuery(
+    'FriendListModal',
+    FriendListModal,
+    {refetchOnWindowFocus: true},
+  );
+
+  if (friendLoading) {
+    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+  }
+
   return (
     <HomeContainer>
       <InnerContainer seperate>
-        <View style={{gap: 24}}>
-          <NotoSansKR size={20}>친구 목록</NotoSansKR>
+        <ScrollContainer style={{flex: 1}}>
+          <View style={{gap: 24}}>
+            <NotoSansKR size={20}>친구 목록</NotoSansKR>
+            <SearchBox />
 
-          <SearchBox />
+            <View style={{gap: 8}}>
+              <RowContainer seperate>
+                <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
+                  요청된 친구 초대
+                </NotoSansKR>
+                <TouchableOpacity onPress={() => setReqeusted(!reqeusted)}>
+                  <OcticonIcons
+                    name={reqeusted ? 'chevron-down' : 'chevron-up'}
+                    size={28}
+                    color={theme.gray1}
+                  />
+                </TouchableOpacity>
+              </RowContainer>
+              {reqeusted ? (
+                <View style={{gap: 8}}>
+                  {friendData?.pending.map((data: friendAPIType) => {
+                    return (
+                      <Friend
+                        accessToken={accessToken}
+                        key={data.FRIEND_NO}
+                        name={data.USER_NM}
+                        friendNo={data.FRIEND_NO}
+                        invited
+                      />
+                    );
+                  })}
+                </View>
+              ) : null}
+            </View>
 
-          <View style={{gap: 8}}>
-            <RowContainer seperate>
+            <View style={{gap: 8}}>
               <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-                요청된 친구 초대
+                친구 목록
               </NotoSansKR>
-              <TouchableOpacity onPress={() => setReqeusted(!reqeusted)}>
-                <OcticonIcons
-                  name={reqeusted ? 'chevron-down' : 'chevron-up'}
-                  size={28}
-                  color={theme.gray1}
-                />
-              </TouchableOpacity>
-            </RowContainer>
-            {reqeusted ? (
-              <View style={{gap: 8}}>
-                <Friend invited />
-                <Friend invited />
-                <Friend invited />
-              </View>
-            ) : null}
-          </View>
 
-          <View style={{gap: 8}}>
-            <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-              친구 목록
-            </NotoSansKR>
-
-            <Friend />
-            <Friend />
-            <Friend />
+              {friendData?.accepted.map((data: friendAPIType) => {
+                return (
+                  <Friend
+                    accessToken={accessToken}
+                    key={data.FRIEND_NO}
+                    name={data.USER_NM}
+                    friendNo={data.FRIEND_NO}
+                  />
+                );
+              })}
+            </View>
           </View>
-        </View>
+        </ScrollContainer>
         <ButtonComponent>카카오톡으로 초대하기</ButtonComponent>
       </InnerContainer>
     </HomeContainer>

@@ -1,18 +1,34 @@
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
-import {TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Image, TouchableOpacity} from 'react-native';
 import {
   HomeContainer,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
   TossFace,
+  calculateDaysUntil,
+  calculateTimeDifference,
+  useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ScrollView} from 'react-native';
 import {View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import {useQuery} from 'react-query';
+import {ChallengeStatusType} from '../../store/data';
+import {useModal} from '../Modal/ModalProvider';
+import {ChallengeListModal} from '../Modal/ChallengeListModal';
+import {goalType, toggleGoal} from '../../store/slice/GoalSlice';
+import {
+  PersonGoalAddModal,
+  PersonGoalChoiceModal,
+} from '../Modal/PersonGoalModal';
+import {challengeDataType} from '../../store/async/asyncStore';
+import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 
 const Profile = styled.View`
   width: 40px;
@@ -23,13 +39,19 @@ const Profile = styled.View`
   align-items: center;
 `;
 
+interface ChallengeInfoType {
+  mainText: string;
+  subText: string;
+  headerEmoji: string;
+  isSelected?: boolean;
+}
+
 const ChallengeInfo = ({
   mainText,
   subText,
-}: {
-  mainText: String;
-  subText: String;
-}) => {
+  headerEmoji,
+  isSelected,
+}: ChallengeInfoType) => {
   const TextContainer = styled.View`
     width: 122px;
     height: 154px;
@@ -37,11 +59,15 @@ const ChallengeInfo = ({
     border-radius: 10px;
     padding: 12px 8px;
     background-color: white;
-    shadow-color: #000;
+    border-width: 2px;
+    border-color: ${props =>
+      isSelected ? props.theme.primary1 : props.theme.white};
+    box-sizing: border-box;
+    /* shadow-color: #000;
     shadow-offset: 2px 2px;
     shadow-opacity: 0.3;
     shadow-radius: 4px;
-    elevation: 5;
+    elevation: 5; */
     margin: 8px 0;
     gap: 40px;
   `;
@@ -49,7 +75,7 @@ const ChallengeInfo = ({
   return (
     <TextContainer>
       <Profile>
-        <TossFace size={22}>🥰</TossFace>
+        <TossFace size={22}>{headerEmoji}</TossFace>
       </Profile>
       <View style={{gap: 8}}>
         <NotoSansKR size={14}>{mainText}</NotoSansKR>
@@ -64,10 +90,8 @@ const ChallengeInfo = ({
 const ChallengeSubInfo = ({
   mainText,
   subText,
-}: {
-  mainText: String;
-  subText: String;
-}) => {
+  headerEmoji,
+}: ChallengeInfoType) => {
   const TextSubContainer = styled.View`
     width: 108px;
     height: 124px;
@@ -82,7 +106,7 @@ const ChallengeSubInfo = ({
   return (
     <TextSubContainer>
       <Profile>
-        <TossFace size={20}>🥰</TossFace>
+        <TossFace size={20}>{headerEmoji}</TossFace>
       </Profile>
       <View style={{gap: 4}}>
         <NotoSansKR size={14}>{mainText}</NotoSansKR>
@@ -95,73 +119,100 @@ const ChallengeSubInfo = ({
 };
 
 interface GoalBoxProps {
-  isTeam?: boolean;
+  goal: goalType;
+  challenge_no: number;
+}
+interface TeamGoalProps {
   isComplete?: boolean;
+  count: string;
   title: string;
-  count?: string;
 }
 
-const GoalBox: React.FC<GoalBoxProps> = ({
-  isTeam,
-  isComplete,
-  title,
-  count,
-}) => {
+const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
+  text-decoration: line-through;
+  color: ${props => props.theme.gray4};
+  background-color: ${props => props.theme.gray7};
+`;
+
+const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
+  background-color: ${props => props.bc};
+  border-radius: 10px;
+  border-color: ${props => props.border};
+  border-width: 2px;
+  padding: 12px;
+`;
+
+const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const {showModal} = useModal();
 
-  const backgroundColor = isComplete
-    ? theme.gray7
-    : isTeam
-    ? theme.primary1
-    : theme.white;
-
-  const textColor = isTeam ? 'white' : 'black';
-
-  const iconColor = isComplete
-    ? theme.gray4
-    : isTeam
-    ? theme.white
-    : theme.primary1;
-
-  const borderColor = !isComplete ? theme.primary1 : theme.gray7;
-
-  const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
-    text-decoration: line-through;
-    color: ${props => props.theme.gray4};
-    background-color: ${props => props.theme.gray7};
-  `;
-
-  const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
-    background-color: ${props => props.bc};
-    border-radius: 10px;
-    border-color: ${props => props.border};
-    border-width: 2px;
-    padding: 12px;
-  `;
+  if (goal === undefined) {
+    return (
+      <HomeContainer>
+        <NotoSansKR size={16}>오류</NotoSansKR>
+      </HomeContainer>
+    );
+  }
+  const backgroundColor = goal.isComplete ? theme.gray7 : theme.white;
+  const textColor = 'black';
+  const iconColor = goal.isComplete ? theme.gray4 : theme.primary1;
+  const borderColor = goal.isComplete ? theme.gray7 : theme.primary1;
 
   return (
-    <GoalContainer bc={backgroundColor} border={borderColor}>
+    <GoalContainer
+      onPress={() =>
+        dispatch(toggleGoal({goalId: goal.id, challenge_no: challenge_no}))
+      }
+      bc={backgroundColor}
+      border={borderColor}>
       <RowContainer seperate>
         <RowContainer gap={8}>
           <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
-          {isComplete ? (
-            <TodoTitle size={16}>{title}</TodoTitle>
+          {goal.isComplete ? (
+            <TodoTitle size={16}>{goal.title}</TodoTitle>
           ) : (
-            <NotoSansKR
-              size={16}
-              color={textColor}
-              weight={isTeam ? 'Bold' : 'Medium'}>
-              {title}
+            <NotoSansKR size={16} color={textColor} weight="Medium">
+              {goal.title}
             </NotoSansKR>
           )}
         </RowContainer>
-        {!isTeam ? (
+        <TouchableOpacity
+          onPress={() => {
+            showModal(
+              <PersonGoalChoiceModal
+                id={goal.id}
+                challenge_no={challenge_no}
+                title={goal.title}
+              />,
+            );
+          }}>
           <OcticonIcons name="kebab-horizontal" size={24} color={theme.gray5} />
-        ) : (
-          <NotoSansKR size={16} color={textColor}>
-            {count}
+        </TouchableOpacity>
+      </RowContainer>
+    </GoalContainer>
+  );
+};
+
+const TeamGoalBox: React.FC<TeamGoalProps> = ({title, count, isComplete}) => {
+  const theme = useTheme();
+
+  const backgroundColor = isComplete ? theme.gray7 : theme.primary1;
+  const textColor = 'white';
+  const iconColor = isComplete ? theme.gray4 : theme.white;
+
+  return (
+    <GoalContainer bc={backgroundColor} border={theme.primary1}>
+      <RowContainer seperate>
+        <RowContainer gap={8}>
+          <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
+          <NotoSansKR size={16} color={textColor} weight="Bold">
+            {title}
           </NotoSansKR>
-        )}
+        </RowContainer>
+        <NotoSansKR size={16} color={textColor}>
+          {count}
+        </NotoSansKR>
       </RowContainer>
     </GoalContainer>
   );
@@ -181,11 +232,11 @@ const PlusContainers = ({title}: {title: String}) => {
 };
 
 const ListItem = ({
-  title,
+  name,
   body,
   time,
 }: {
-  title: String;
+  name: String;
   body: String;
   time: String;
 }) => {
@@ -199,7 +250,7 @@ const ListItem = ({
     <SomeTargetContainer seperate>
       <RowContainer gap={32}>
         <NotoSansKR size={14} weight="Regular" color="white">
-          {title}
+          {name}
         </NotoSansKR>
         <NotoSansKR size={14} weight="Regular" color="white">
           {body}
@@ -227,16 +278,173 @@ const CenterContainer = styled.View`
   gap: 16px;
 `;
 
-const FootContainer = styled.View`
+const FootContainer = styled.View<{disalbed?: boolean}>`
   gap: 16px;
-  background-color: #2c2c2c;
+  /* background-color: #2c2c2c; */
+  background-color: ${props =>
+    props.disalbed ? props.theme.gray5 : props.theme.gray1};
   flex: 1;
   padding: 16px;
   text-align: left;
 `;
 
+interface ChallengeInfo {
+  CHALLENGE_MST_NO: number;
+  CHALLENGE_MST_NM: string;
+  START_DT: string;
+  END_DT: string;
+  HEADER_EMOJI: string;
+  CHALLENGE_STATUS: ChallengeStatusType;
+  PROGRESS: number;
+}
+
+interface TeamInfo {
+  TEAM_NO: number;
+  TEAM_NM: string;
+  IS_DONE: boolean;
+  CHALLENGE_USER_NO: number;
+}
+
+interface AdditionalInfo {
+  ADDITIONAL_NO: number;
+  ADDITIONAL_NM: string;
+  IS_DONE: boolean;
+  IMAGE_FILE_NM: string;
+  START_DT: string;
+  END_DT: string;
+  CHALLENGE_USER_NO: number;
+  CHALLENGE_USER_NN: string;
+}
+
+const getPersonalGoalsByChallengeNo = ({
+  challenges,
+  challengeNo,
+}: {
+  challenges: challengeDataType[];
+  challengeNo: number;
+}) => {
+  const challenge = challenges.find(ch => ch.challenge_no === challengeNo);
+  return challenge ? challenge.personalGoals : [];
+};
+
 const ChallengeTab = () => {
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
   const navigation = useNavigation();
+  const [selectedChallenge, setSelectedChallenge] = useState<number>();
+  const {showModal} = useModal();
+
+  const challenges = useSelector((state: RootState) => state.goal);
+
+  const getChallenge = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: 'challenge/list',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+  const {data: listData, isLoading: listLoading} = useQuery(
+    'getChallenge',
+    getChallenge,
+    {refetchOnWindowFocus: true},
+  );
+
+  const current_day = new Date().toISOString();
+  const getChallengeDetail = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: `challenge/detail/${selectedChallenge}?current_day=${current_day}`,
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const {data: detailData, isLoading: detailLoading} = useQuery(
+    ['getChallengeDetail', selectedChallenge],
+    getChallengeDetail,
+    {enabled: selectedChallenge !== undefined},
+  );
+
+  useEffect(() => {
+    setSelectedChallenge(listData?.progress_challenges[0]?.CHALLENGE_MST_NO);
+  }, [listData?.progress_challenges]);
+
+  if (listLoading || detailLoading) {
+    return <NotoSansKR size={15}>로딩중</NotoSansKR>;
+  }
+
+  if (listData?.progress_challenges.length === 0) {
+    return (
+      <HomeContainer>
+        <TopContainer style={{flex: 1}}>
+          <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1,
+              gap: 24,
+            }}>
+            <Image
+              style={{height: 136}}
+              source={require('../../assets/images/nuts05.png')}
+              resizeMode="contain"
+            />
+            <NotoSansKR size={16} color="gray5">
+              진행중인 챌린지가 없어요!
+            </NotoSansKR>
+          </View>
+
+          <NotoSansKR size={16}>초대된 챌린지</NotoSansKR>
+          {listData?.invited_challenges.length === 0 ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 16,
+              }}>
+              <NotoSansKR size={16} color="gray5">
+                초대된 챌린지가 없어요!
+              </NotoSansKR>
+            </View>
+          ) : (
+            listData?.invited_challenges.map((challenge: ChallengeInfo) => (
+              <ChallengeSubInfo
+                key={challenge.CHALLENGE_MST_NO}
+                headerEmoji={challenge.HEADER_EMOJI}
+                mainText={challenge.CHALLENGE_MST_NM}
+                subText={calculateDaysUntil(challenge.START_DT).toString()}
+              />
+            ))
+          )}
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CreateChallengeScreen' as never)
+            }>
+            <PlusContainers title="챌린지 추가하기" />
+          </TouchableOpacity>
+        </TopContainer>
+      </HomeContainer>
+    );
+  }
+  const openInviteModal = (challenge_mst_no: number) => {
+    showModal(<ChallengeListModal challenge_mst_no={challenge_mst_no} />);
+  };
+
+  const personGoal = getPersonalGoalsByChallengeNo({
+    challenges: challenges ? challenges : [],
+    challengeNo: selectedChallenge!,
+  });
 
   return (
     <ScrollView>
@@ -244,17 +452,42 @@ const ChallengeTab = () => {
         <TopContainer>
           <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
           <RowScrollContainer gap={8}>
-            <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
-            <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
-            <ChallengeInfo mainText={'프론트 엔드 팀'} subText={'50% 진행됨'} />
+            {listData?.progress_challenges.map((challenge: ChallengeInfo) => (
+              <TouchableOpacity
+                key={challenge.CHALLENGE_MST_NO}
+                onPress={() => {
+                  setSelectedChallenge(challenge.CHALLENGE_MST_NO);
+                }}>
+                <ChallengeInfo
+                  isSelected={challenge.CHALLENGE_MST_NO === selectedChallenge}
+                  headerEmoji={challenge.HEADER_EMOJI}
+                  mainText={challenge.CHALLENGE_MST_NM}
+                  subText={
+                    challenge.CHALLENGE_STATUS === ChallengeStatusType.PENDING
+                      ? '시작전'
+                      : `${Number(challenge.PROGRESS.toFixed(2))}% 진행됨`
+                  }
+                />
+              </TouchableOpacity>
+            ))}
           </RowScrollContainer>
 
           <NotoSansKR size={16}>초대된 챌린지</NotoSansKR>
           <RowScrollContainer gap={8}>
-            <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
-            <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
-            <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
-            <ChallengeSubInfo mainText={'챌린지 이름'} subText={'내일 시작'} />
+            {listData?.invited_challenges.map((challenge: ChallengeInfo) => {
+              const leftDay = calculateDaysUntil(challenge.START_DT);
+              return (
+                <TouchableOpacity
+                  key={challenge.CHALLENGE_MST_NO}
+                  onPress={() => openInviteModal(challenge.CHALLENGE_MST_NO)}>
+                  <ChallengeSubInfo
+                    headerEmoji={challenge.HEADER_EMOJI}
+                    mainText={challenge.CHALLENGE_MST_NM}
+                    subText={leftDay === 0 ? '내일시작' : `${leftDay}일후 시작`} // 여기에 적절한 날짜 처리 로직을 추가할 수 있습니다
+                  />
+                </TouchableOpacity>
+              );
+            })}
           </RowScrollContainer>
 
           <TouchableOpacity
@@ -264,39 +497,87 @@ const ChallengeTab = () => {
             <PlusContainers title="챌린지 추가하기" />
           </TouchableOpacity>
         </TopContainer>
-
         <CenterContainer>
           <NotoSansKR size={18}>팀 주간 목표</NotoSansKR>
-          <GoalBox isTeam title="개인이 맡은 UI 완료하기" count="1/4" />
+          {detailData?.teamGoal.length !== 0 ? (
+            <TeamGoalBox
+              title={detailData?.teamGoal[0].TEAM_NM}
+              count={
+                detailData?.teamGoal.filter(
+                  (item: TeamInfo) => item.IS_DONE === true,
+                ).length +
+                '/' +
+                detailData?.teamGoal.length
+              }
+            />
+          ) : (
+            <TeamGoalBox title="팀 목표 생성을 기다리고 있습니다." count="" />
+          )}
         </CenterContainer>
-
         <CenterContainer>
-          <NotoSansKR size={18}>개인별 목표</NotoSansKR>
+          <RowContainer seperate>
+            <NotoSansKR size={18}>개인별 목표</NotoSansKR>
+            <TouchableOpacity
+              onPress={() => {
+                showModal(
+                  <MyDailyDrayModal
+                    challenge_user_no={detailData.CHALLENGE_USER_NO}
+                    personGoal={personGoal}
+                  />,
+                );
+              }}>
+              <OcticonIcons name="issue-closed" size={18} />
+            </TouchableOpacity>
+          </RowContainer>
           <View style={{gap: 8}}>
-            <GoalBox title="한줄이라도 코드 작성하기" />
-            <GoalBox title="1시간씩 자리에 앉아 있기" />
-            <GoalBox title="밥 잘 챙겨먹기" />
-            <GoalBox title="팀 회의 참여하기" isComplete />
+            {personGoal.map(goal => (
+              <GoalBox
+                key={goal.id}
+                goal={goal}
+                challenge_no={selectedChallenge!}
+              />
+            ))}
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              showModal(
+                <PersonGoalAddModal challenge_no={selectedChallenge!} />,
+              );
+            }}>
             <PlusContainers title="목표 추가하기" />
           </TouchableOpacity>
         </CenterContainer>
-
-        <FootContainer>
-          <RowContainer seperate>
-            <NotoSansKR size={18} color="white">
-              추가 목표
-            </NotoSansKR>
-            <OcticonIcons name="hourglass" size={24} color={'white'} />
-          </RowContainer>
-          <View>
-            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-            <ListItem title={'닉네임'} body={'달리기 1km'} time={'00:00'} />
-          </View>
-        </FootContainer>
+        {detailData?.additionalGoal.length !== 0 ? (
+          <FootContainer>
+            <RowContainer seperate>
+              <NotoSansKR size={18} color="white">
+                추가 목표
+              </NotoSansKR>
+              <OcticonIcons name="hourglass" size={24} color={'white'} />
+            </RowContainer>
+            <View>
+              {detailData?.additionalGoal.map((data: AdditionalInfo) => {
+                return (
+                  <ListItem
+                    key={data.ADDITIONAL_NO}
+                    name={data.CHALLENGE_USER_NN}
+                    body={data.ADDITIONAL_NM}
+                    time={calculateTimeDifference(data.END_DT)}
+                  />
+                );
+              })}
+            </View>
+          </FootContainer>
+        ) : (
+          <FootContainer disalbed>
+            <RowContainer seperate>
+              <NotoSansKR size={18} color="white">
+                추가 목표
+              </NotoSansKR>
+              <OcticonIcons name="hourglass" size={24} color={'white'} />
+            </RowContainer>
+          </FootContainer>
+        )}
       </HomeContainer>
     </ScrollView>
   );

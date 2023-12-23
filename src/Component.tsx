@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ interface ButtonType {
   onPress?: () => void;
 }
 
-const ButtonContainer = styled.TouchableOpacity<{color: string}>`
+export const ButtonContainer = styled.TouchableOpacity<{color: string}>`
   background-color: ${props => props.theme[props.color]};
   padding: 8px;
   width: 100%;
@@ -141,35 +142,59 @@ interface Config {
   body?: string;
 }
 
-export async function CallApi({endpoint, method, accessToken, body}: API) {
-  const url = `https://dorun.site/${endpoint}`;
+export const useApi = () => {
+  const navigation = useNavigation();
 
-  const config: Config = {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
+  async function CallApi({endpoint, method, accessToken, body}: API) {
+    let url = `https://dorun.site/${endpoint}`;
+    if (Platform.OS === 'android') {
+      url = `http://10.0.2.2:8000/${endpoint}`; //andriod
+    } else {
+      url = `http://127.0.0.1:8000/${endpoint}`; //ios
+    }
+    const config: Config = {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: accessToken ? `Bearer ${accessToken}` : '',
+      },
+      body: body && method !== 'GET' ? JSON.stringify(body) : undefined,
+    };
 
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+    try {
+      let response = await fetch(url, config);
+      let contentType = response.headers.get('Content-Type');
+
+      if (!response.ok) {
+        let errorBodyText = await response.text(); // 응답을 텍스트로 받기
+        console.log(errorBodyText);
+        // Content-Type이 application/json인지 확인
+        if (contentType && contentType.includes('application/json')) {
+          let errorBody = JSON.parse(errorBodyText); // JSON으로 파싱
+
+          if (errorBody.detail === '토큰이 만료되었습니다.') {
+            navigation.navigate('LoginTab' as never);
+          }
+
+          throw new Error(
+            `API call failed: ${response.status}, Details: ${errorBody.detail}`,
+          );
+        } else {
+          console.error('Invalid Content-Type:', contentType);
+          throw new Error(`Invalid Content-Type: ${contentType}`);
+        }
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error Object:', error); // 전체 에러 객체 출력
+      console.error(`Error during API call to ${url}: ${error}`);
+      console.error('Access Token:', accessToken); // 토큰 출력 (운영 환경에서는 제거 필요)
+      throw error;
+    }
   }
-
-  if (body && method !== 'GET') {
-    config.body = JSON.stringify(body);
-  }
-
-  const response = await fetch(url, config);
-
-  if (!response.ok) {
-    throw new Error(`API call failed: ${response.status}`);
-  }
-
-  // return response.text();
-  // 현재 API 호출 시 반환값이 json이 아니라 string 형태임. 추후 json으로 수정하겠음
-
-  return response.json();
-}
+  return CallApi;
+};
 
 const ViewImageModalBackground = styled.TouchableOpacity`
   background-color: 'rgba(0,0,0,0.6)';
@@ -300,4 +325,75 @@ export const ContentSave = ({children}: {children: React.ReactNode}) => {
       </ViewShot>
     </>
   );
+};
+export const GetImage = (fileName: string) => {
+  return `https://do-run.s3.amazonaws.com/${fileName}`;
+};
+export function convertKoKRToUTC(dateString: string) {
+  // 한국 시간대의 'YYYY-MM-DD' 문자열을 Date 객체로 변환
+  const localDate = new Date(dateString + 'T00:00:00+09:00'); // 한국 시간대 GMT+9
+
+  // UTC Date 객체 생성
+  const utcDate = new Date(
+    localDate.getUTCFullYear(),
+    localDate.getUTCMonth(),
+    localDate.getUTCDate(),
+    localDate.getUTCHours(),
+    localDate.getUTCMinutes(),
+    localDate.getUTCSeconds(),
+  );
+
+  return utcDate;
+}
+
+export function convertUTCToKoKR(dateString: string) {
+  // 요일명 배열
+  const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // UTC 시간대의 Date 객체 생성
+  const utcDate = new Date(dateString);
+
+  // 한국 시간대로 변환 (UTC+9)
+  const koreaTimeOffset = 9 * 60; // 9시간을 분 단위로 변환
+  const localTime = new Date(utcDate.getTime() + koreaTimeOffset * 60000); // 밀리초 단위로 변환하여 더함
+
+  // YYYY-MM-DD 형식으로 변환
+  const year = localTime.getFullYear();
+  const month = (localTime.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 1을 더함
+  const day = localTime.getDate().toString().padStart(2, '0');
+  const weekDay = weekDays[localTime.getDay()]; // 요일명 추출
+
+  return `${year}-${month}-${day} (${weekDay})`;
+}
+
+export const calculateDaysUntil = (startDateString: string) => {
+  const startDate = new Date(startDateString);
+  const currentDate = new Date(Date.now());
+
+  const timeDifference = startDate.getTime() - currentDate.getTime();
+  const daysUntil = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+  return daysUntil;
+};
+
+export const calculateTimeDifference = (endDtString: string) => {
+  const currentDateTimeUtc = new Date(Date.now()); // 현재 시간 (UTC)
+  const endDateTimeUtc = new Date(endDtString); // 종료 시간 (UTC)
+
+  let timeDifference = endDateTimeUtc.getTime() - currentDateTimeUtc.getTime();
+
+  // 차이가 음수인 경우, 0으로 설정
+  if (timeDifference < 0) {
+    timeDifference = 0;
+  }
+
+  // 밀리초를 시간과 분으로 변환
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+  // 시간과 분을 문자열로 포매팅
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.toString().padStart(2, '0');
+
+  return `${formattedHours}:${formattedMinutes}`;
 };
