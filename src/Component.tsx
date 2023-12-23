@@ -1,6 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import styled from 'styled-components/native';
-import {launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
@@ -147,11 +146,11 @@ export const useApi = () => {
 
   async function CallApi({endpoint, method, accessToken, body}: API) {
     let url = `https://dorun.site/${endpoint}`;
-    if (Platform.OS === 'android') {
-      url = `http://10.0.2.2:8000/${endpoint}`; //andriod
-    } else {
-      url = `http://127.0.0.1:8000/${endpoint}`; //ios
-    }
+    // if (Platform.OS === 'android') {
+    //   url = `http://10.0.2.2:8000/${endpoint}`; //andriod
+    // } else {
+    //   url = `http://127.0.0.1:8000/${endpoint}`; //ios
+    // }
     const config: Config = {
       method: method,
       headers: {
@@ -203,7 +202,7 @@ const ViewImageModalBackground = styled.TouchableOpacity`
   align-items: center;
 `;
 
-export const ViewImage = ({visible, onClose, res}: any) => {
+export const ModalViewPhoto = ({visible, onClose, res}: any) => {
   const width = useWindowDimensions().width;
 
   return (
@@ -216,7 +215,7 @@ export const ViewImage = ({visible, onClose, res}: any) => {
         <ViewImageStyles
           source={{uri: res?.assets[0]?.uri}}
           height={width}
-          resizeMode="cover"
+          resizeMode="contain"
         />
       </ViewImageModalBackground>
     </Modal>
@@ -226,54 +225,6 @@ export const ViewImage = ({visible, onClose, res}: any) => {
 const ViewImageStyles = styled.Image<{height: any}>`
   width: ${props => props.height};
 `;
-
-export const PhotoView = () => {
-  const [modalImage, setModalImage] = useState<any>(null);
-  const [imageVisible, setImageVisible] = useState(false);
-
-  const imagePickerOption: any = {
-    mediaType: 'photo',
-    selectionLimit: 0,
-    includeBase64: Platform.OS === 'android',
-  };
-
-  const onPickImage = (res: any) => {
-    if (res.didCancel || !res) {
-      return;
-    }
-    setModalImage(res);
-  };
-
-  // 찍은 사진 확대모달로 보여주기
-  const onViewImage = () => {
-    setImageVisible(true);
-  };
-
-  // 카메라로 사진찍기
-  const onLaunchCamera = () => {
-    launchCamera(imagePickerOption, onPickImage);
-  };
-
-  const onPressToiOS = () => {
-    onLaunchCamera();
-  };
-
-  return (
-    <>
-      <Pressable onPress={onPressToiOS}>
-        <NotoSansKR size={12}>사진 찍기</NotoSansKR>
-      </Pressable>
-      <Pressable onPress={onViewImage}>
-        <NotoSansKR size={12}>찍은 이미지 보기</NotoSansKR>
-        <ViewImage
-          visible={imageVisible}
-          onClose={() => setImageVisible(false)}
-          res={modalImage}
-        />
-      </Pressable>
-    </>
-  );
-};
 
 export const ContentSave = ({children}: {children: React.ReactNode}) => {
   const ref = useRef<ViewShot | null>(null);
