@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
-import {ButtonComponent, HomeContainer, NotoSansKR} from '../Component';
+import {ButtonComponent, NotoSansKR} from '../Component';
 import styled from 'styled-components';
-import {useModal} from './ModalProvider';
 import {ModalHeadBorder} from './CustomModal';
 
 export const ShareModal = () => {
@@ -83,18 +82,3 @@ const ZoomImageDummy = styled(View)`
   height: 264px;
   background: ${props => props.theme.gray6};
 `;
-
-export const TryModal = () => {
-  const {showModal} = useModal();
-  const openModal = () => {
-    showModal(<DailyModal />);
-  };
-
-  return (
-    <HomeContainer>
-      <ButtonComponent onPress={openModal}>
-        클릭 시 일일 일기 모달 호출
-      </ButtonComponent>
-    </HomeContainer>
-  );
-};

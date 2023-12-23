@@ -6,6 +6,7 @@ import {
   Pressable,
   TouchableOpacity,
   View,
+  Dimensions,
 } from 'react-native';
 import {HomeContainer, NotoSansKR, ScrollContainer, useApi} from '../Component';
 import {useNavigation} from '@react-navigation/native';
@@ -16,6 +17,7 @@ import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
 import {decreaseIndex, increaseIndex} from '../../store/slice/IndexSlice';
 import {useModal} from '../Modal/ModalProvider';
+import {CharacterModal} from '../Modal/CharacterModal';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -23,7 +25,7 @@ import {useModal} from '../Modal/ModalProvider';
 //   challenge_user: [ChallengeUserType];
 // }
 
-interface ChallengeUserType {
+export interface ChallengeUserType {
   CHALLENGE_USER_NO: number;
   PROGRESS: number;
   CHARACTER_NO: number;
@@ -116,7 +118,7 @@ const RaceTab = () => {
               return (
                 <BGComponent
                   key={data.CHALLENGE_USER_NO}
-                  progress={data.PROGRESS}
+                  data={data}
                   BGN={key}
                   setScrollEnabled={setScrollEnabled}
                 />
@@ -159,10 +161,11 @@ const DefaultImage = () => {
 interface BGComponentType {
   BGN: number;
   setScrollEnabled: any;
-  progress: number;
+  data: ChallengeUserType;
 }
 
-const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
+const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
+  const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
   const BGA = [
     {url: require('../../assets/images/BGAHeader1.png'), height: 176},
@@ -180,8 +183,7 @@ const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
   ];
 
   const handleTouch = () => {
-    showModal(<View />);
-    // 추가 로직 구현...
+    showModal(<CharacterModal data={data} />, false);
   };
 
   const pan = useRef(new Animated.ValueXY()).current;
@@ -189,18 +191,26 @@ const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
-        handleTouch();
+        setIsDragging(true);
         setScrollEnabled(false); // 드래그 시작 시 스크롤 비활성화
       },
       onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {
         useNativeDriver: false,
       }),
-      onPanResponderRelease: () => {
-        Animated.spring(
-          pan,
-          {toValue: {x: 0, y: 0}, useNativeDriver: false}, // 원래 위치로 돌아가게 설정
-        ).start(() => setScrollEnabled(true)); // 드래그 종료 시 스크롤 활성화
+      onPanResponderRelease: (event, gestureState) => {
+        // 드래그 종료 시 스크롤 활성화
+        setIsDragging(false);
+        Animated.spring(pan, {
+          toValue: {x: 0, y: 0},
+          useNativeDriver: false,
+        }).start(() => setScrollEnabled(true));
+
+        // 드래그 거리가 짧으면 handleTouch 호출
+        if (Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10) {
+          handleTouch();
+        }
       },
     }),
   ).current;
@@ -210,8 +220,12 @@ const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
     yPosition += BGA[i].height;
   }
 
-  // const duduInitialX = `${progress * (80 / 100)}%`;
-  const duduInitialX = progress;
+  const windowWidth = Dimensions.get('window').width;
+  // const duduInitialX = `${data.PROGRESS * (60 / 100)}%`;
+  const duduInitialX =
+    data.PROGRESS >= 100
+      ? windowWidth - 60
+      : windowWidth * (data.PROGRESS / 100);
   const duduInitialY = yPosition + 10;
 
   return (
@@ -231,7 +245,11 @@ const BGComponent = ({BGN, setScrollEnabled, progress}: BGComponentType) => {
           zIndex: 1,
         }}
         {...panResponder.panHandlers}>
-        <Image source={Dudus[BGN]} />
+        {isDragging ? (
+          <Image source={Dudus[0]} />
+        ) : (
+          <Image source={Dudus[BGN]} />
+        )}
       </Animated.View>
     </>
   );

@@ -172,7 +172,7 @@ const LoginTab = () => {
   useEffect(() => {
     const bootstrapAsync = async () => {
       const userData = await loadUser();
-      if (userData.refreshToken) {
+      if (userData?.refreshToken) {
         dispatch(setUser(userData));
         loginMutation.mutate(userData.refreshToken);
       }
