@@ -233,6 +233,7 @@ const FriendScreen = () => {
   const {data: friendData, isLoading: friendLoading} = useQuery(
     'FriendListModal',
     FriendListModal,
+    {refetchOnWindowFocus: true},
   );
 
   if (friendLoading) {

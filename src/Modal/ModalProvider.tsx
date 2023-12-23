@@ -3,15 +3,18 @@ import {create} from 'zustand';
 
 type ModalState = {
   isVisible: boolean;
+  showOverlay: boolean;
   content: ReactNode | null;
-  showModal: (content: ReactNode) => void;
+  showModal: (content: ReactNode, showOverlay?: boolean) => void;
   hideModal: () => void;
 };
 
 const useModalStore = create<ModalState>(set => ({
   isVisible: false,
+  showOverlay: true,
   content: null,
-  showModal: content => set({isVisible: true, content}),
+  showModal: (content, showOverlay = true) =>
+    set({isVisible: true, content, showOverlay}),
   hideModal: () => set({isVisible: false, content: null}),
 }));
 

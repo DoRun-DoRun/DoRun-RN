@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
 import {OverlayContainer} from './OverlayContainer';
 
-const StyledModalContainer = styled(View)`
+const StyledModalContainer = styled.View`
   flex: 1;
   align-items: center;
   justify-content: flex-end;
@@ -61,7 +61,7 @@ const ModalShortDivider = styled(View)`
 `;
 
 const CustomModal = () => {
-  const {isVisible, content, hideModal} = useModal();
+  const {isVisible, content, hideModal, showOverlay} = useModal();
   const panY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -105,8 +105,8 @@ const CustomModal = () => {
       visible={isVisible}
       onRequestClose={() => hideModal()}
       style={{zIndex: 10}}>
-      <OverlayContainer>
-        <StyledModalContainer>
+      <OverlayContainer hideBackground={!showOverlay}>
+        <StyledModalContainer style={{marginBottom: !showOverlay ? 48 : 0}}>
           <StyledModalContent
             style={{
               transform: [{translateY: panY}],
