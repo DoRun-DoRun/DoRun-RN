@@ -78,8 +78,8 @@ export const BackgroundImage = [
   {url: require('../assets/image/background/BG_body5.png'), height: 137},
 ];
 export const Dudus = [
-  require('../assets/images/dudu00.png'),
-  require('../assets/images/nuts00.png'),
-  require('../assets/images/pachi00.png'),
-  require('../assets/images/peats00.png'),
+  require('../assets/lottie/dudu_walk.gif'),
+  require('../assets/lottie/nuts_walk.gif'),
+  require('../assets/lottie/pachi_walk.gif'),
+  require('../assets/lottie/peats_walk.gif'),
 ];

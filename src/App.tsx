@@ -10,6 +10,7 @@ import FriendScreen from './screens/FriendScreen';
 import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
+import {DailyNoteScreen} from './screens/DailyNoteScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -59,6 +60,7 @@ function App(): JSX.Element {
       />
       <Stack.Screen name="FriendScreen" component={FriendScreen} />
       <Stack.Screen name="SettingScreen" component={SettingScreen} />
+      <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} />
     </Stack.Navigator>
   );
 }

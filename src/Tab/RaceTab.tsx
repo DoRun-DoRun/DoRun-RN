@@ -15,11 +15,11 @@ import styled from 'styled-components/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
-import {decreaseIndex, increaseIndex} from '../../store/slice/IndexSlice';
 import {useModal} from '../Modal/ModalProvider';
 import {CharacterModal} from '../Modal/CharacterModal';
 import LottieView from 'lottie-react-native';
 import {BackgroundImage, Dudus, struggleLottie} from '../../store/data';
+import FastImage from 'react-native-fast-image';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -60,14 +60,15 @@ const RaceTab = () => {
   const CallApi = useApi();
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  const {index} = useSelector((state: RootState) => state.index);
+  // const {index} = useSelector((state: RootState) => state.index);
+  const [index, setIndex] = useState(1);
 
   const navigation = useNavigation();
 
   const ChallengeUserList = async () => {
     try {
       const response = await CallApi({
-        endpoint: 'challenge/user/list',
+        endpoint: `challenge/user/list?page=${index}`,
         method: 'GET',
         accessToken: accessToken!,
       });
@@ -79,38 +80,34 @@ const RaceTab = () => {
   };
 
   const {data: challengeListData, isLoading} = useQuery(
-    'ChallengeUserList',
+    ['ChallengeUserList', index],
     ChallengeUserList,
     {refetchOnWindowFocus: true},
   );
 
   useEffect(() => {
-    if (
-      challengeListData &&
-      challengeListData.length > 0 &&
-      index < challengeListData.length
-    ) {
+    if (challengeListData && challengeListData.total_page !== 0) {
       navigation.setOptions({
-        title: challengeListData[index]?.CHALLENGE_MST_NM,
+        title: challengeListData.CHALLENGE_MST_NM,
         headerRight:
-          index! < challengeListData?.length - 1
+          index < challengeListData?.total_page
             ? () => (
                 <TouchableOpacity
                   style={{marginRight: 16}}
                   onPress={() => {
-                    dispatch(increaseIndex());
+                    setIndex(prev => prev + 1);
                   }}>
                   <OcticonIcons name="arrow-right" size={24} />
                 </TouchableOpacity>
               )
             : undefined,
         headerLeft:
-          index! > 0
+          index > 1
             ? () => (
                 <TouchableOpacity
                   style={{marginLeft: 16}}
                   onPress={() => {
-                    dispatch(decreaseIndex());
+                    setIndex(prev => prev - 1);
                   }}>
                   <OcticonIcons name="arrow-left" size={24} />
                 </TouchableOpacity>
@@ -125,11 +122,11 @@ const RaceTab = () => {
   }
   return (
     <HomeContainer color="background">
-      {challengeListData && challengeListData?.length !== 0 ? (
+      {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
-          {challengeListData[index!].challenge_user.map(
+          {challengeListData.challenge_user.map(
             (data: ChallengeUserType, key: number) => {
               return (
                 <BGComponent
@@ -172,7 +169,7 @@ const DefaultImage = () => {
           width: '80%',
           resizeMode: 'contain',
           position: 'absolute',
-          bottom: 0,
+          bottom: 20,
           alignSelf: 'center',
         }}
       />
@@ -189,6 +186,7 @@ interface BGComponentType {
 const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
+  const navigation = useNavigation();
 
   const handleTouch = () => {
     showModal(<CharacterModal data={data} />, false);
@@ -229,6 +227,8 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
   }
 
   const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
   // const duduInitialX = `${data.PROGRESS * (60 / 100)}%`;
   const duduInitialX =
     data.PROGRESS >= 100
@@ -236,8 +236,33 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
       : windowWidth * (data.PROGRESS / 100);
   const duduInitialY = yPosition + 10;
 
+  // 랜덤 위치를 저장할 상태
+  const [position, setPosition] = useState({left: 0, top: 0});
+
+  useEffect(() => {
+    // 랜덤 위치 설정
+    const randomLeft = Math.random() * windowWidth;
+    const randomTop = Math.random() * windowHeight;
+
+    setPosition({left: randomLeft, top: randomTop});
+  }, [windowHeight, windowWidth]); // 빈 의존성 배열을 사용하여 마운트 시 한 번만 실행
+
   return (
     <>
+      {data.DIARIES.length > 0 && (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('DailyNoteScreen' as never);
+          }}
+          style={{
+            position: 'absolute',
+            left: position.left,
+            top: position.top,
+            zIndex: 1,
+          }}>
+          <Image source={require('../../assets/image/memo.png')} />
+        </TouchableOpacity>
+      )}
       <BGImage
         source={BackgroundImage[BGN].url}
         aspect-ratio={1}
@@ -247,8 +272,8 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
       <Animated.View
         style={{
           position: 'absolute',
-          left: duduInitialX,
-          bottom: duduInitialY,
+          left: duduInitialX - 20,
+          bottom: duduInitialY - 10,
           transform: [{translateX: pan.x}, {translateY: pan.y}],
           zIndex: 1,
         }}
@@ -266,7 +291,10 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
             />
           </View>
         ) : (
-          <Image source={Dudus[data.CHARACTER_NO - 1]} />
+          <FastImage
+            source={Dudus[data.CHARACTER_NO - 1]}
+            style={{width: 80, height: 80}}
+          />
         )}
       </Animated.View>
     </>
