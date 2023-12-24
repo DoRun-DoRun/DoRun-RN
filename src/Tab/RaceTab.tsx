@@ -287,8 +287,8 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
       <Animated.View
         style={{
           position: 'absolute',
-          left: duduInitialX - 20,
-          bottom: duduInitialY - 10,
+          left: duduInitialX,
+          bottom: duduInitialY,
           transform: [{translateX: pan.x}, {translateY: pan.y}],
           zIndex: 1,
         }}
@@ -308,7 +308,7 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
         ) : (
           <FastImage
             source={Dudus[data.CHARACTER_NO - 1]}
-            style={{width: 80, height: 80}}
+            style={{width: 60, height: 60}}
           />
         )}
       </Animated.View>

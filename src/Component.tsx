@@ -11,6 +11,7 @@ interface ButtonType {
   children: React.ReactNode;
   type?: 'primary' | 'secondary' | 'gray';
   onPress?: () => void;
+  disabled?: boolean;
 }
 
 export const ButtonContainer = styled.TouchableOpacity<{color: string}>`
@@ -98,7 +99,12 @@ export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
   );
 };
 
-export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
+export const ButtonComponent = ({
+  children,
+  type,
+  onPress,
+  disabled,
+}: ButtonType) => {
   let color = 'white';
   let backgroundColor = 'primary1';
 
@@ -110,8 +116,16 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
     backgroundColor = 'gray7';
   }
 
+  if (disabled) {
+    color = 'white';
+    backgroundColor = 'gray4';
+  }
+
   return (
-    <ButtonContainer color={backgroundColor} onPress={onPress}>
+    <ButtonContainer
+      color={backgroundColor}
+      onPress={onPress}
+      disabled={disabled}>
       <NotoSansKR color={color} size={16} lineHeight={23}>
         {children}
       </NotoSansKR>

@@ -90,3 +90,18 @@ export const groupImage = [
   require('../assets/image/group/group_default_2.png'),
   require('../assets/image/group/group_default_3.png'),
 ];
+
+export const usedItemImage = {
+  hammer: [
+    require('../assets/lottie/dudu_hammer.gif'),
+    require('../assets/lottie/nuts_hammer.gif'),
+    require('../assets/lottie/peats_hammer.gif'),
+    // require('../assets/lottie/pachi_hammer.gif'),
+  ],
+  bomb: [
+    require('../assets/lottie/dudu_bomb.json'),
+    require('../assets/lottie/nuts_bomb.json'),
+    // require('../assets/lottie/dudu_boom.json'),
+    // require('../assets/lottie/dudu_boom.json')
+  ],
+};

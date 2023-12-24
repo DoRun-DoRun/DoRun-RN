@@ -12,10 +12,12 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Slider} from '@miblanchard/react-native-slider';
 import {ChallengeUserType} from '../Tab/RaceTab';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {profileImage} from '../../store/data';
+import {useModal} from './ModalProvider';
+import {UsedItemModal} from './Modals';
 
 const UserProfile = styled(View)`
   width: 64px;
@@ -40,6 +42,13 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
   const CallApi = useApi();
   const theme = useTheme();
   const {accessToken} = useSelector((state: RootState) => state.user);
+  const {showModal} = useModal();
+  const useItem = ({item_no}: {item_no: number}) =>
+    CallApi({
+      endpoint: `item/${data.CHALLENGE_USER_NO}?item_no=${item_no}`,
+      method: 'POST',
+      accessToken: accessToken!,
+    });
 
   const ChallengeUser = async () => {
     try {
@@ -54,8 +63,24 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
       throw err;
     }
   };
-
   const {data: user, isLoading} = useQuery('ChallengeUser', ChallengeUser);
+
+  const {mutate} = useMutation(useItem, {
+    onSuccess: response => {
+      console.log('Success:', response);
+      showModal(
+        <UsedItemModal
+          item_no={response.item_no}
+          user_name={user.USER_NM}
+          character_no={data.CHARACTER_NO}
+        />,
+      );
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
   if (isLoading) {
     return <NotoSansKR size={16}>로딩중</NotoSansKR>;
   }
@@ -109,7 +134,11 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
         {user.ITEM && user.ITEM.length > 0 ? (
           <RowContainer gap={18}>
             <View style={{flex: 1}}>
-              <ButtonComponent>
+              <ButtonComponent
+                disabled={user.ITEM[0].COUNT === 0}
+                onPress={() => {
+                  mutate({item_no: 1});
+                }}>
                 <RowContainer gap={4}>
                   <MaterialCommunityIcons
                     name="bomb"
@@ -124,7 +153,11 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
             </View>
 
             <View style={{flex: 1}}>
-              <ButtonComponent>
+              <ButtonComponent
+                disabled={user.ITEM[1].COUNT === 0}
+                onPress={() => {
+                  mutate({item_no: 2});
+                }}>
                 <RowContainer gap={4}>
                   <MaterialCommunityIcons
                     name="hammer"
@@ -132,7 +165,7 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
                     color={theme.white}
                   />
                   <NotoSansKR size={12} color="white">
-                    망치 사용하기 X {user.ITEM[0].COUNT}
+                    망치 사용하기 X {user.ITEM[1].COUNT}
                   </NotoSansKR>
                 </RowContainer>
               </ButtonComponent>
