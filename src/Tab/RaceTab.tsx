@@ -18,8 +18,14 @@ import {useQuery} from 'react-query';
 import {useModal} from '../Modal/ModalProvider';
 import {CharacterModal} from '../Modal/CharacterModal';
 import LottieView from 'lottie-react-native';
-import {BackgroundImage, Dudus, struggleLottie} from '../../store/data';
+import {
+  BackgroundImage,
+  Dudus,
+  groupImage,
+  struggleLottie,
+} from '../../store/data';
 import FastImage from 'react-native-fast-image';
+import {NavigationType} from '../App';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -49,9 +55,6 @@ export interface ChallengeUserType {
   DIARIES: [
     {
       DAILY_COMPLETE_NO: number;
-      IMAGE_FILE_NM: string;
-      INSERT_DT: string;
-      COMMENTS: string;
     },
   ];
 }
@@ -157,6 +160,13 @@ const RaceTab = () => {
 };
 
 const DefaultImage = () => {
+  const [randomIndex, setRandomIndex] = useState(0);
+
+  useEffect(() => {
+    // 0부터 2까지의 랜덤한 정수 생성
+    const index = Math.floor(Math.random() * 3);
+    setRandomIndex(index);
+  }, []);
   return (
     <BGImage
       source={require('../../assets/images/BGABody0.png')}
@@ -164,7 +174,7 @@ const DefaultImage = () => {
       resizeMode="stretch"
       height={432}>
       <Image
-        source={require('../../assets/image/race_image.png')}
+        source={groupImage[randomIndex]}
         style={{
           width: '80%',
           resizeMode: 'contain',
@@ -186,7 +196,7 @@ interface BGComponentType {
 const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationType>();
 
   const handleTouch = () => {
     showModal(<CharacterModal data={data} />, false);
@@ -249,20 +259,25 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
 
   return (
     <>
-      {data.DIARIES.length > 0 && (
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('DailyNoteScreen' as never);
-          }}
-          style={{
-            position: 'absolute',
-            left: position.left,
-            top: position.top,
-            zIndex: 1,
-          }}>
-          <Image source={require('../../assets/image/memo.png')} />
-        </TouchableOpacity>
-      )}
+      {data.DIARIES.map((diary, index) => {
+        return (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              navigation.navigate('DailyNoteScreen', {
+                daily_no: diary.DAILY_COMPLETE_NO,
+              });
+            }}
+            style={{
+              position: 'absolute',
+              left: position.left,
+              top: position.top,
+              zIndex: 1,
+            }}>
+            <Image source={require('../../assets/image/memo.png')} />
+          </TouchableOpacity>
+        );
+      })}
       <BGImage
         source={BackgroundImage[BGN].url}
         aspect-ratio={1}

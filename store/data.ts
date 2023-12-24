@@ -77,9 +77,16 @@ export const BackgroundImage = [
   {url: require('../assets/image/background/BG_body4.png'), height: 137},
   {url: require('../assets/image/background/BG_body5.png'), height: 137},
 ];
+
 export const Dudus = [
   require('../assets/lottie/dudu_walk.gif'),
   require('../assets/lottie/nuts_walk.gif'),
   require('../assets/lottie/pachi_walk.gif'),
   require('../assets/lottie/peats_walk.gif'),
+];
+
+export const groupImage = [
+  require('../assets/image/group/group_default_1.png'),
+  require('../assets/image/group/group_default_2.png'),
+  require('../assets/image/group/group_default_3.png'),
 ];
