@@ -14,8 +14,12 @@ interface ButtonType {
   disabled?: boolean;
 }
 
-export const ButtonContainer = styled.TouchableOpacity<{color: string}>`
-  background-color: ${props => props.theme[props.color]};
+export const ButtonContainer = styled.TouchableOpacity<{
+  color: string;
+  disabled?: boolean;
+}>`
+  background-color: ${props =>
+    props.disabled ? props.theme.gray4 : props.theme[props.color]};
   padding: 8px;
   width: 100%;
   align-items: center;
@@ -181,7 +185,6 @@ export const useApi = () => {
 
       if (!response.ok) {
         let errorBodyText = await response.text(); // 응답을 텍스트로 받기
-        console.log(errorBodyText);
         // Content-Type이 application/json인지 확인
         if (contentType && contentType.includes('application/json')) {
           let errorBody = JSON.parse(errorBodyText); // JSON으로 파싱
@@ -194,16 +197,15 @@ export const useApi = () => {
             `API call failed: ${response.status}, Details: ${errorBody.detail}`,
           );
         } else {
-          console.error('Invalid Content-Type:', contentType);
-          throw new Error(`Invalid Content-Type: ${contentType}`);
+          console.log('errorMessage:', errorBodyText);
         }
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error Object:', error); // 전체 에러 객체 출력
+      // console.error('Error Object:', error); // 전체 에러 객체 출력
       console.error(`Error during API call to ${url}: ${error}`);
-      console.error('Access Token:', accessToken); // 토큰 출력 (운영 환경에서는 제거 필요)
+      // console.error('Access Token:', accessToken); // 토큰 출력 (운영 환경에서는 제거 필요)
       throw error;
     }
   }
