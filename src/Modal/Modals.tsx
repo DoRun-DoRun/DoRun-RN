@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, View} from 'react-native';
+import {View} from 'react-native';
 import {ButtonComponent, NotoSansKR} from '../Component';
 import styled from 'styled-components';
 import {ModalHeadBorder} from './CustomModal';

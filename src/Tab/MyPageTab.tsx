@@ -6,6 +6,7 @@ import {
   NotoSansKR,
   RowContainer,
   ScrollContainer,
+  TossFace,
   convertKoKRToUTC,
   useApi,
 } from '../Component';
@@ -124,7 +125,8 @@ const DailyPic = styled.Image`
 
 const DailyTextContiner = styled.View`
   width: 200px;
-  align-items: flex-end;
+  flex-direction: row;
+  justify-content: flex-end;
 `;
 
 const DailyDiary = styled(LinearGradient).attrs({
@@ -159,6 +161,11 @@ interface PersonGoal {
   IS_DONE: true;
 }
 
+interface EmojiDataType {
+  CHALLENGE_USER_NO: number;
+  EMOJI: string;
+}
+
 const History = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
@@ -174,14 +181,14 @@ const History = () => {
 
   const theme = useTheme();
   const [date, setDate] = useState(formattedDate);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(1);
 
   const ChallengeHistory = async () => {
     try {
       const response = CallApi({
         endpoint: `challenge/history?current_day=${convertKoKRToUTC(
           date,
-        ).toISOString()}`,
+        ).toISOString()}&page=${index}`,
         method: 'GET',
         accessToken: accessToken!,
       });
@@ -191,7 +198,7 @@ const History = () => {
     }
   };
   const {data, isLoading} = useQuery(
-    ['challenge_history', date],
+    ['challenge_history', date, index],
     ChallengeHistory,
   );
 
@@ -199,22 +206,22 @@ const History = () => {
     <>
       <View style={{marginHorizontal: -16}}>
         <CalendarProvider date={date} onDateChanged={e => setDate(e)}>
-          <ExpandableCalendar firstDay={1} onDayPress={() => setIndex(0)} />
+          <ExpandableCalendar firstDay={1} onDayPress={() => setIndex(1)} />
         </CalendarProvider>
       </View>
       {isLoading && <Text>로딩중</Text>}
-      {data?.length > 0 ? (
+      {data?.total_size > 0 ? (
         <>
           <RowContainer seperate>
-            {index !== 0 ? (
+            {index !== 1 ? (
               <TouchableOpacity onPress={() => setIndex(prev => prev - 1)}>
                 <MaterialIcons name="chevron-left" size={24} />
               </TouchableOpacity>
             ) : (
               <View style={{width: 24}} />
             )}
-            <NotoSansKR size={18}>{data[index].CHALLENGE_MST_NM}</NotoSansKR>
-            {index < data.length - 1 ? (
+            <NotoSansKR size={18}>{data.CHALLENGE_MST_NM}</NotoSansKR>
+            {index < data.total_size ? (
               <TouchableOpacity onPress={() => setIndex(prev => prev + 1)}>
                 <MaterialIcons name="chevron-right" size={24} />
               </TouchableOpacity>
@@ -223,30 +230,36 @@ const History = () => {
             )}
           </RowContainer>
 
-          {data[index].IMAGE_FILE_NM && (
+          {data.IMAGE_FILE_NM && (
             <DailyPicContiner>
-              <DailyPic source={{uri: GetImage(data[index].IMAGE_FILE_NM)}} />
+              <DailyPic source={{uri: GetImage(data.IMAGE_FILE_NM)}} />
               <DailyTextContiner>
-                <Text>{data[index].EMOJI}</Text>
+                {data.EMOJI.map((emojiData: EmojiDataType, key: number) => {
+                  return (
+                    <TossFace size={16} key={key}>
+                      {emojiData.EMOJI}
+                    </TossFace>
+                  );
+                })}
               </DailyTextContiner>
             </DailyPicContiner>
           )}
 
           <View style={{gap: 16}}>
-            {data[index].COMMENT && (
+            {data.COMMENT && (
               <DailyDiary colors={['#09277b', '#3967ef', '#9eb8f9']}>
                 <NotoSansKR color="white" size={16}>
                   {date} 한줄일기
                 </NotoSansKR>
                 <NotoSansKR color="white" size={14} weight="Regular">
-                  {data[index].COMMENT}
+                  {data.COMMENT}
                 </NotoSansKR>
               </DailyDiary>
             )}
 
-            {data[index].personGoal.length > 0 ? (
+            {data.personGoal.length > 0 ? (
               <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.3)']}>
-                {data[index].personGoal.map((goal: PersonGoal, idx: number) => (
+                {data.personGoal.map((goal: PersonGoal, idx: number) => (
                   <DailyTodoList key={idx} gap={8}>
                     {goal.IS_DONE ? (
                       <MaterialIcons
@@ -272,10 +285,10 @@ const History = () => {
               <Text>해당 날짜에 진행사항이 없어요</Text>
             )}
 
-            {data[index].teamGoal && (
+            {data.teamGoal && (
               <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.4)']}>
                 <DailyTodoList gap={8}>
-                  {data[index].teamGoal.IS_DONE ? (
+                  {data.teamGoal.IS_DONE ? (
                     <MaterialIcons
                       name="check-box"
                       color={theme.primary1}
@@ -290,7 +303,7 @@ const History = () => {
                   )}
 
                   <NotoSansKR size={13} color="gray3">
-                    {data[index].teamGoal.TEAM_NM}
+                    {data.teamGoal.TEAM_NM}
                   </NotoSansKR>
                 </DailyTodoList>
               </DailyTodo>
