@@ -42,7 +42,7 @@ const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
   width: 88px;
   height: 104px;
   border-radius: 10px;
-  border-width: ${props => (props.isEquip ? '2px' : null)};
+  border-width: ${props => (props.isEquip ? '2px' : 0)};
   opacity: ${props => (props.isOwned ? 1 : 0.5)};
   background: ${props => props.theme.white};
   justify-content: center;
