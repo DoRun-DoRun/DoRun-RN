@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {Image, Pressable, View} from 'react-native';
 import {
   ButtonComponent,
   InputNotoSansKR,
+  ModalViewPhoto,
   NotoSansKR,
   useApi,
 } from '../Component';
@@ -13,6 +14,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation} from 'react-query';
 import {goalType} from '../../store/slice/GoalSlice';
+import useCamera from '../Hook/UseCamera';
 
 const transformData = (state: goalType[]) => {
   return state.map(goal => ({
@@ -32,10 +34,13 @@ export const MyDailyDrayModal = ({
 }) => {
   const theme = useTheme();
   const CallApi = useApi();
+  const {onLaunchCamera, onViewPhoto, deletePhoto, modalImage, imageVisible} =
+    useCamera();
   const {accessToken} = useSelector((state: RootState) => state.user);
 
   const [inputText, setInputText] = useState('');
 
+  console.log('!!!!!!!!!!!personGoal: ', personGoal); // 개인별 목표 내용들
   const CreateDiary = () =>
     CallApi({
       endpoint: 'diary',
@@ -64,19 +69,46 @@ export const MyDailyDrayModal = ({
       </ModalHeadText>
 
       <View style={{gap: 16}}>
-        <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
-        <NotoSansKR size={12} color="gray3">
-          해당 내용은 친구들이 24시간동안 확인할 수 있어요! {'\n'}
-          24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
-        </NotoSansKR>
-        {/* <PhotoView /> */}
-        <PhotoUploadFrame>
-          <MaterialIcons
-            name="add-to-photos"
-            color={theme.primary1}
-            size={40}
-          />
-        </PhotoUploadFrame>
+        {modalImage ? (
+          <View style={{gap: 4}}>
+            <Pressable onPress={onViewPhoto}>
+              <ViewPhotoFrame
+                source={{uri: modalImage.assets[0]?.uri}}
+                resizeMode="cover"
+              />
+              <ModalViewPhoto
+                visible={imageVisible}
+                onClose={onViewPhoto}
+                res={modalImage}
+              />
+            </Pressable>
+            <View style={{alignItems: 'flex-end'}}>
+              <Pressable onPress={deletePhoto}>
+                <NotoSansKR size={10} color="gray4">
+                  사진 삭제
+                </NotoSansKR>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
+          <>
+            <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
+            <NotoSansKR size={12} color="gray3">
+              해당 내용은 친구들이 24시간동안 확인할 수 있어요! {'\n'}
+              24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
+            </NotoSansKR>
+
+            <Pressable onPress={onLaunchCamera}>
+              <PhotoUploadFrame>
+                <MaterialIcons
+                  name="add-to-photos"
+                  color={theme.primary1}
+                  size={40}
+                />
+              </PhotoUploadFrame>
+            </Pressable>
+          </>
+        )}
         <InputNotoSansKR
           size={14}
           weight="Medium"
@@ -86,13 +118,22 @@ export const MyDailyDrayModal = ({
           onChangeText={setInputText}
           border
         />
-        <ButtonComponent
-          type="gray"
-          onPress={() => {
-            mutate();
-          }}>
-          오늘은 넘어갈래요
-        </ButtonComponent>
+        {modalImage || inputText ? (
+          <ButtonComponent
+            onPress={() => {
+              mutate();
+            }}>
+            작성 완료
+          </ButtonComponent>
+        ) : (
+          <ButtonComponent
+            type="gray"
+            onPress={() => {
+              mutate();
+            }}>
+            오늘은 넘어갈래요
+          </ButtonComponent>
+        )}
       </View>
     </View>
   );
@@ -105,4 +146,9 @@ const PhotoUploadFrame = styled(View)`
   width: 88px;
   height: 96px;
   border: 2px solid ${props => props.theme.primary1};
+`;
+
+const ViewPhotoFrame = styled(Image)<{height: any}>`
+  height: 250px;
+  border-radius: 10px;
 `;
