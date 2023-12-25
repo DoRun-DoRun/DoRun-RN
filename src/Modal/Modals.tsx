@@ -3,6 +3,9 @@ import {View} from 'react-native';
 import {ButtonComponent, NotoSansKR} from '../Component';
 import styled from 'styled-components';
 import {ModalHeadBorder} from './CustomModal';
+import LottieView from 'lottie-react-native';
+import {usedItemImage} from '../../store/data';
+import FastImage from 'react-native-fast-image';
 
 export const ShareModal = () => {
   return (
@@ -35,7 +38,7 @@ export const ImageZoomModal = () => {
   );
 };
 
-export const UsedItemModal = () => {
+export const AlertItemModal = () => {
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
@@ -43,6 +46,41 @@ export const UsedItemModal = () => {
       <NotoSansKR size={18} weight="Bold" textAlign="center">
         이런! [닉네임A]님이{'\n'}
         [아이템]을 사용했어요!
+      </NotoSansKR>
+    </View>
+  );
+};
+
+export const UsedItemModal = ({
+  user_name,
+  item_no,
+  character_no,
+}: {
+  user_name: string;
+  item_no: number;
+  character_no: number;
+}) => {
+  return (
+    <View style={{gap: 24, alignItems: 'center'}}>
+      <ModalHeadBorder />
+      <View style={{width: 240, height: 240}}>
+        {item_no === 1 ? (
+          <LottieView
+            source={usedItemImage.bomb[character_no]}
+            style={{flex: 1}}
+            autoPlay
+          />
+        ) : (
+          <FastImage
+            source={usedItemImage.hammer[character_no]}
+            style={{flex: 1}}
+          />
+        )}
+      </View>
+      <NotoSansKR size={18} weight="Bold" textAlign="center">
+        [{user_name}]님에게{'\n'}
+        {item_no === 1 ? '[폭탄]을' : '[망치]를'}
+        사용했어요!
       </NotoSansKR>
     </View>
   );

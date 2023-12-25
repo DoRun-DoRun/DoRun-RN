@@ -4,14 +4,41 @@ import CreateChallengeScreen from './screens/CreateChallengeScreen';
 import {MainTab} from './Tab/MainTab';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import ProfileSettingScreen from './screens/ProfileSettingScreen';
 import FriendScreen from './screens/FriendScreen';
 import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
+import {DailyNoteScreen} from './screens/DailyNoteScreen';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  DailyNoteScreen: {
+    daily_no: number;
+  };
+  LoginTab: undefined;
+  MainTab: undefined;
+  CreateChallengeScreen: undefined;
+  EditChallengeScreen: undefined;
+  ProfileSettingScreen: undefined;
+  FriendScreen: undefined;
+  SettingScreen: undefined;
+};
+
+// Navigation 타입
+export type NavigationType = NavigationProp<
+  RootStackParamList,
+  'DailyNoteScreen'
+>;
+
+// Route 타입
+export type RouteType = RouteProp<RootStackParamList, 'DailyNoteScreen'>;
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
   const navigation = useNavigation();
@@ -59,6 +86,7 @@ function App(): JSX.Element {
       />
       <Stack.Screen name="FriendScreen" component={FriendScreen} />
       <Stack.Screen name="SettingScreen" component={SettingScreen} />
+      <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} />
     </Stack.Navigator>
   );
 }

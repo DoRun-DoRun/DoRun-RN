@@ -14,7 +14,7 @@ import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
-import {Avatar} from '../../store/data';
+import {Avatar, avatarImage} from '../../store/data';
 
 const TextContainer = styled.TextInput`
   flex: 1;
@@ -42,7 +42,7 @@ const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
   width: 88px;
   height: 104px;
   border-radius: 10px;
-  border-width: ${props => (props.isEquip ? '2px' : null)};
+  border-width: ${props => (props.isEquip ? '2px' : 0)};
   opacity: ${props => (props.isOwned ? 1 : 0.5)};
   background: ${props => props.theme.white};
   justify-content: center;
@@ -53,13 +53,6 @@ const PencilIcon = styled.TouchableOpacity`
   position: absolute;
   right: 8px;
 `;
-
-const avatarImages = [
-  require('../../assets/images/dudu00.png'),
-  require('../../assets/images/nuts00.png'),
-  require('../../assets/images/pachi00.png'),
-  require('../../assets/images/peats00.png'),
-];
 
 const ProfileSettingScreen = () => {
   const CallApi = useApi();
@@ -146,9 +139,20 @@ const ProfileSettingScreen = () => {
                   선택하기
                 </NotoSansKR>
               </SelectedButton>
-              <View style={{height: 300, justifyContent: 'center'}}>
-                <Image source={avatarImages[selectedCharacter - 1]} />
+              <View
+                style={{
+                  width: 200,
+                  height: 200,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  margin: 40,
+                }}>
+                <Image
+                  source={avatarImage[selectedCharacter - 1]}
+                  style={{width: '70%', height: '70%', resizeMode: 'contain'}}
+                />
               </View>
+
               <RowScrollContainer gap={8}>
                 {data.avatars.map((avatar: Avatar) => (
                   <TouchableOpacity
@@ -161,7 +165,7 @@ const ProfileSettingScreen = () => {
                     <CharecterSlot
                       isEquip={avatar.IS_EQUIP}
                       isOwned={avatar.IS_OWNED}>
-                      <Image source={avatarImages[avatar.AVATAR_NO - 1]} />
+                      <Image source={avatarImage[avatar.AVATAR_NO - 1]} />
                     </CharecterSlot>
                   </TouchableOpacity>
                 ))}

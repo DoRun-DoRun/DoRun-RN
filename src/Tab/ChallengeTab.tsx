@@ -14,6 +14,7 @@ import {
 import styled, {useTheme} from 'styled-components/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ScrollView} from 'react-native';
 import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
@@ -371,12 +372,16 @@ const ChallengeTab = () => {
   const {data: detailData, isLoading: detailLoading} = useQuery(
     ['getChallengeDetail', selectedChallenge],
     getChallengeDetail,
-    {enabled: selectedChallenge !== undefined},
+    {refetchOnWindowFocus: true, enabled: selectedChallenge !== undefined},
   );
 
   useEffect(() => {
     setSelectedChallenge(listData?.progress_challenges[0]?.CHALLENGE_MST_NO);
   }, [listData?.progress_challenges]);
+
+  // useEffect(()=>{
+  //   if (detailData?.)
+  // })
 
   if (listLoading || detailLoading) {
     return <NotoSansKR size={15}>로딩중</NotoSansKR>;
@@ -553,7 +558,7 @@ const ChallengeTab = () => {
               <NotoSansKR size={18} color="white">
                 추가 목표
               </NotoSansKR>
-              <OcticonIcons name="hourglass" size={24} color={'white'} />
+              <MaterialCommunityIcons name="bomb" size={24} color={'white'} />
             </RowContainer>
             <View>
               {detailData?.additionalGoal.map((data: AdditionalInfo) => {

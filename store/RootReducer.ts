@@ -1,6 +1,5 @@
 import {combineReducers} from '@reduxjs/toolkit';
 import UserSlice from './slice/UserSlice';
-import IndexSlice from './slice/IndexSlice';
 import GoalSlice from './slice/GoalSlice';
 
 /**
@@ -8,7 +7,6 @@ import GoalSlice from './slice/GoalSlice';
  */
 const RootReducer = combineReducers({
   user: UserSlice,
-  index: IndexSlice,
   goal: GoalSlice,
 });
 

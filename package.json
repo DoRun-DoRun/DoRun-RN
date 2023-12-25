@@ -25,6 +25,7 @@
     "react-native-animated-spinkit": "^1.5.2",
     "react-native-calendars": "^1.1302.0",
     "react-native-debugger-open": "^0.4.3",
+    "react-native-fast-image": "^8.6.3",
     "react-native-fast-shadow": "^0.1.0",
     "react-native-image-picker": "^7.0.3",
     "react-native-linear-gradient": "^2.8.3",

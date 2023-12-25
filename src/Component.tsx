@@ -11,6 +11,7 @@ interface ButtonType {
   children: React.ReactNode;
   type?: 'primary' | 'secondary' | 'gray';
   onPress?: () => void;
+  disabled?: boolean;
 }
 
 export const ButtonContainer = styled.TouchableOpacity<{color: string}>`
@@ -98,7 +99,12 @@ export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
   );
 };
 
-export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
+export const ButtonComponent = ({
+  children,
+  type,
+  onPress,
+  disabled,
+}: ButtonType) => {
   let color = 'white';
   let backgroundColor = 'primary1';
 
@@ -110,8 +116,16 @@ export const ButtonComponent = ({children, type, onPress}: ButtonType) => {
     backgroundColor = 'gray7';
   }
 
+  if (disabled) {
+    color = 'white';
+    backgroundColor = 'gray4';
+  }
+
   return (
-    <ButtonContainer color={backgroundColor} onPress={onPress}>
+    <ButtonContainer
+      color={backgroundColor}
+      onPress={onPress}
+      disabled={disabled}>
       <NotoSansKR color={color} size={16} lineHeight={23}>
         {children}
       </NotoSansKR>
@@ -330,8 +344,7 @@ export const GetImage = (fileName: string) => {
   return `https://do-run.s3.amazonaws.com/${fileName}`;
 };
 export function convertKoKRToUTC(dateString: string) {
-  // 한국 시간대의 'YYYY-MM-DD' 문자열을 Date 객체로 변환
-  const localDate = new Date(dateString + 'T00:00:00+09:00'); // 한국 시간대 GMT+9
+  const localDate = new Date(dateString); // 한국 시간대 GMT+9
 
   // UTC Date 객체 생성
   const utcDate = new Date(
@@ -349,7 +362,6 @@ export function convertKoKRToUTC(dateString: string) {
 export function convertUTCToKoKR(dateString: string) {
   // 요일명 배열
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-
   // UTC 시간대의 Date 객체 생성
   const utcDate = new Date(dateString);
 
@@ -377,8 +389,10 @@ export const calculateDaysUntil = (startDateString: string) => {
 };
 
 export const calculateTimeDifference = (endDtString: string) => {
-  const currentDateTimeUtc = new Date(Date.now()); // 현재 시간 (UTC)
-  const endDateTimeUtc = new Date(endDtString); // 종료 시간 (UTC)
+  // 현재 UTC 시간
+  const currentDateTimeUtc = new Date();
+  // 종료 UTC 시간
+  const endDateTimeUtc = new Date(`${endDtString}Z`);
 
   let timeDifference = endDateTimeUtc.getTime() - currentDateTimeUtc.getTime();
 

@@ -15,9 +15,17 @@ import styled from 'styled-components/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
-import {decreaseIndex, increaseIndex} from '../../store/slice/IndexSlice';
 import {useModal} from '../Modal/ModalProvider';
 import {CharacterModal} from '../Modal/CharacterModal';
+import LottieView from 'lottie-react-native';
+import {
+  BackgroundImage,
+  Dudus,
+  groupImage,
+  struggleLottie,
+} from '../../store/data';
+import FastImage from 'react-native-fast-image';
+import {NavigationType} from '../App';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -47,9 +55,6 @@ export interface ChallengeUserType {
   DIARIES: [
     {
       DAILY_COMPLETE_NO: number;
-      IMAGE_FILE_NM: string;
-      INSERT_DT: string;
-      COMMENTS: string;
     },
   ];
 }
@@ -58,14 +63,15 @@ const RaceTab = () => {
   const CallApi = useApi();
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  const {index} = useSelector((state: RootState) => state.index);
+  // const {index} = useSelector((state: RootState) => state.index);
+  const [index, setIndex] = useState(1);
 
   const navigation = useNavigation();
 
   const ChallengeUserList = async () => {
     try {
       const response = await CallApi({
-        endpoint: 'challenge/user/list',
+        endpoint: `challenge/user/list?page=${index}`,
         method: 'GET',
         accessToken: accessToken!,
       });
@@ -77,38 +83,34 @@ const RaceTab = () => {
   };
 
   const {data: challengeListData, isLoading} = useQuery(
-    'ChallengeUserList',
+    ['ChallengeUserList', index],
     ChallengeUserList,
     {refetchOnWindowFocus: true},
   );
 
   useEffect(() => {
-    if (
-      challengeListData &&
-      challengeListData.length > 0 &&
-      index < challengeListData.length
-    ) {
+    if (challengeListData && challengeListData.total_page !== 0) {
       navigation.setOptions({
-        title: challengeListData[index]?.CHALLENGE_MST_NM,
+        title: challengeListData.CHALLENGE_MST_NM,
         headerRight:
-          index! < challengeListData?.length - 1
+          index < challengeListData?.total_page
             ? () => (
                 <TouchableOpacity
                   style={{marginRight: 16}}
                   onPress={() => {
-                    dispatch(increaseIndex());
+                    setIndex(prev => prev + 1);
                   }}>
                   <OcticonIcons name="arrow-right" size={24} />
                 </TouchableOpacity>
               )
             : undefined,
         headerLeft:
-          index! > 0
+          index > 1
             ? () => (
                 <TouchableOpacity
                   style={{marginLeft: 16}}
                   onPress={() => {
-                    dispatch(decreaseIndex());
+                    setIndex(prev => prev - 1);
                   }}>
                   <OcticonIcons name="arrow-left" size={24} />
                 </TouchableOpacity>
@@ -123,11 +125,11 @@ const RaceTab = () => {
   }
   return (
     <HomeContainer color="background">
-      {challengeListData && challengeListData?.length !== 0 ? (
+      {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
-          {challengeListData[index!].challenge_user.map(
+          {challengeListData.challenge_user.map(
             (data: ChallengeUserType, key: number) => {
               return (
                 <BGComponent
@@ -158,6 +160,13 @@ const RaceTab = () => {
 };
 
 const DefaultImage = () => {
+  const [randomIndex, setRandomIndex] = useState(0);
+
+  useEffect(() => {
+    // 0부터 2까지의 랜덤한 정수 생성
+    const index = Math.floor(Math.random() * 3);
+    setRandomIndex(index);
+  }, []);
   return (
     <BGImage
       source={require('../../assets/images/BGABody0.png')}
@@ -165,12 +174,12 @@ const DefaultImage = () => {
       resizeMode="stretch"
       height={432}>
       <Image
-        source={require('../../assets/images/race_image.png')}
+        source={groupImage[randomIndex]}
         style={{
           width: '80%',
           resizeMode: 'contain',
           position: 'absolute',
-          bottom: 0,
+          bottom: 20,
           alignSelf: 'center',
         }}
       />
@@ -187,20 +196,7 @@ interface BGComponentType {
 const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
-  const BGA = [
-    {url: require('../../assets/images/BGAHeader1.png'), height: 176},
-    {url: require('../../assets/images/BGABody1.png'), height: 137},
-    {url: require('../../assets/images/BGABody2.png'), height: 137},
-    {url: require('../../assets/images/BGABody3.png'), height: 137},
-    {url: require('../../assets/images/BGABody3.png'), height: 137},
-    {url: require('../../assets/images/BGABody3.png'), height: 137},
-  ];
-  const Dudus = [
-    require('../../assets/images/dudu00.png'),
-    require('../../assets/images/nuts00.png'),
-    require('../../assets/images/pachi00.png'),
-    require('../../assets/images/peats00.png'),
-  ];
+  const navigation = useNavigation<NavigationType>();
 
   const handleTouch = () => {
     showModal(<CharacterModal data={data} />, false);
@@ -237,10 +233,12 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
 
   let yPosition = 0;
   for (let i = BGN; i > 0; i--) {
-    yPosition += BGA[i].height;
+    yPosition += BackgroundImage[i].height;
   }
 
   const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
   // const duduInitialX = `${data.PROGRESS * (60 / 100)}%`;
   const duduInitialX =
     data.PROGRESS >= 100
@@ -248,13 +246,43 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
       : windowWidth * (data.PROGRESS / 100);
   const duduInitialY = yPosition + 10;
 
+  // 랜덤 위치를 저장할 상태
+  const [position, setPosition] = useState({left: 0, top: 0});
+
+  useEffect(() => {
+    // 랜덤 위치 설정
+    const randomLeft = Math.random() * windowWidth;
+    const randomTop = Math.random() * windowHeight;
+
+    setPosition({left: randomLeft, top: randomTop});
+  }, [windowHeight, windowWidth]); // 빈 의존성 배열을 사용하여 마운트 시 한 번만 실행
+
   return (
     <>
+      {data.DIARIES.map((diary, index) => {
+        return (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              navigation.navigate('DailyNoteScreen', {
+                daily_no: diary.DAILY_COMPLETE_NO,
+              });
+            }}
+            style={{
+              position: 'absolute',
+              left: position.left,
+              top: position.top,
+              zIndex: 1,
+            }}>
+            <Image source={require('../../assets/image/memo.png')} />
+          </TouchableOpacity>
+        );
+      })}
       <BGImage
-        source={BGA[BGN].url}
+        source={BackgroundImage[BGN].url}
         aspect-ratio={1}
         resizeMode="stretch"
-        height={BGA[BGN].height}
+        height={BackgroundImage[BGN].height}
       />
       <Animated.View
         style={{
@@ -266,9 +294,22 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
         }}
         {...panResponder.panHandlers}>
         {isDragging ? (
-          <Image source={Dudus[0]} />
+          <View style={{width: 60, height: 60}}>
+            <LottieView
+              source={struggleLottie[data.CHARACTER_NO - 1]}
+              autoPlay
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            />
+          </View>
         ) : (
-          <Image source={Dudus[BGN]} />
+          <FastImage
+            source={Dudus[data.CHARACTER_NO - 1]}
+            style={{width: 60, height: 60}}
+          />
         )}
       </Animated.View>
     </>
