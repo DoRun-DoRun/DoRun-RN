@@ -66,7 +66,7 @@ export const DailyNoteScreen = ({route}: {route: RouteType}) => {
           </RowContainer>
 
           <View style={{gap: 16, alignContent: 'center'}}>
-            {data.diary.IMAGE_FILE_NAME !== '' ? (
+            {data.diary.IMAGE_FILE_NM !== '' ? (
               <Image
                 source={{
                   uri: `https://do-run.s3.amazonaws.com/${data.diary.IMAGE_FILE_NM}`,

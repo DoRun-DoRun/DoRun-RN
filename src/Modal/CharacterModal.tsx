@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Image, View} from 'react-native';
 import {ButtonContainer, NotoSansKR, RowContainer, useApi} from '../Component';
 import styled, {useTheme} from 'styled-components/native';
@@ -7,7 +7,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {Slider} from '@miblanchard/react-native-slider';
 import {ChallengeUserType} from '../Tab/RaceTab';
 import {useMutation, useQuery} from 'react-query';
-import {useSelector} from 'react-redux';
+import {shallowEqual, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {profileImage} from '../../store/data';
 import {useModal} from './ModalProvider';
@@ -34,11 +34,25 @@ const UserStatues = styled.View<{IS_ME: boolean}>`
     props.IS_ME ? props.theme.primary2 : props.theme.secondary2};
 `;
 
-export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
+export const CharacterModal = ({
+  data,
+  CHALLENGE_MST_NO,
+}: {
+  data: ChallengeUserType;
+  CHALLENGE_MST_NO: number;
+}) => {
   const CallApi = useApi();
   const theme = useTheme();
-  const {accessToken} = useSelector((state: RootState) => state.user);
   const {showModal} = useModal();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const goals = useSelector((state: RootState) => state.goal, shallowEqual);
+
+  const personalGoals = useMemo(() => {
+    const challenge = goals.find(ch => ch.challenge_no === CHALLENGE_MST_NO);
+    return challenge ? challenge.personalGoals : [];
+  }, [goals, CHALLENGE_MST_NO]);
+
   const useItem = ({item_no}: {item_no: number}) =>
     CallApi({
       endpoint: `item/${data.CHALLENGE_USER_NO}?item_no=${item_no}`,
@@ -175,16 +189,20 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
             </View>
           </RowContainer>
         ) : (
-          <RowContainer gap={8}>
-            <MaterialIcons
-              name="speaker-notes"
-              color={theme.primary1}
-              size={20}
-            />
-            <NotoSansKR size={13} color={'gray3'}>
-              달리기 1km 오늘도 화이ㅣ이이팅
-            </NotoSansKR>
-          </RowContainer>
+          personalGoals?.map(goal => {
+            return (
+              <RowContainer gap={8} key={goal.id}>
+                <MaterialIcons
+                  name="speaker-notes"
+                  color={theme.primary1}
+                  size={20}
+                />
+                <NotoSansKR size={13} color={'gray3'}>
+                  {goal.title}
+                </NotoSansKR>
+              </RowContainer>
+            );
+          })
         )}
       </View>
     </View>

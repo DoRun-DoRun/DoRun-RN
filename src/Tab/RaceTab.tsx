@@ -135,6 +135,7 @@ const RaceTab = () => {
                 <BGComponent
                   key={data.CHALLENGE_USER_NO}
                   data={data}
+                  CHALLENGE_MST_NO={challengeListData.CHALLENGE_MST_NO}
                   BGN={key}
                   setScrollEnabled={setScrollEnabled}
                 />
@@ -191,15 +192,24 @@ interface BGComponentType {
   BGN: number;
   setScrollEnabled: any;
   data: ChallengeUserType;
+  CHALLENGE_MST_NO: number;
 }
 
-const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
+const BGComponent = ({
+  BGN,
+  setScrollEnabled,
+  data,
+  CHALLENGE_MST_NO,
+}: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
   const navigation = useNavigation<NavigationType>();
 
   const handleTouch = () => {
-    showModal(<CharacterModal data={data} />, false);
+    showModal(
+      <CharacterModal data={data} CHALLENGE_MST_NO={CHALLENGE_MST_NO} />,
+      false,
+    );
   };
 
   const pan = useRef(new Animated.ValueXY()).current;
