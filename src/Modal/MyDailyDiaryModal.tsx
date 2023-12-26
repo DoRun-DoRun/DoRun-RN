@@ -15,6 +15,8 @@ import {RootState} from '../../store/RootReducer';
 import {useMutation} from 'react-query';
 import {goalType} from '../../store/slice/GoalSlice';
 import useCamera from '../Hook/UseCamera';
+import {useModal} from './ModalProvider';
+import {DailyModal} from './Modals';
 
 const transformData = (state: goalType[]) => {
   return state.map(goal => ({
@@ -22,8 +24,6 @@ const transformData = (state: goalType[]) => {
     IS_DONE: goal.isComplete,
   }));
 };
-
-// 사용 예시
 
 export const MyDailyDrayModal = ({
   challenge_user_no,
@@ -36,29 +36,66 @@ export const MyDailyDrayModal = ({
   const CallApi = useApi();
   const {onLaunchCamera, onViewPhoto, deletePhoto, modalImage, imageVisible} =
     useCamera();
+
   const {accessToken} = useSelector((state: RootState) => state.user);
+  const {showModal} = useModal();
 
   const [inputText, setInputText] = useState('');
 
-  console.log('!!!!!!!!!!!personGoal: ', personGoal); // 개인별 목표 내용들
-  const CreateDiary = () =>
+  const CreateDiary = async ({file_name}: {file_name: string}) =>
     CallApi({
       endpoint: 'diary',
       method: 'POST',
       accessToken: accessToken!,
       body: {
-        challenge_user_no: challenge_user_no,
-        IMAGE_FILE_NM: '',
+        CHALLENGE_USER_NO: challenge_user_no,
+        IMAGE_FILE_NM: file_name,
         COMMENT: inputText,
         PERSON_GOAL: transformData(personGoal),
       },
     });
 
-  const {mutate} = useMutation(CreateDiary, {
-    onSuccess: async data => {
-      console.log(data);
+  const {mutate: createDiary, isLoading: loadingDiary} = useMutation(
+    CreateDiary,
+    {
+      onSuccess: res => {
+        console.log('요청성공', res);
+        showModal(
+          <DailyModal item_no={res.item_no} item_type={res.item_type} />,
+        );
+      },
+      onError: error => {
+        console.error('요청 실패:', error);
+      },
     },
-  });
+  );
+
+  const UploadImage = async () => {
+    const formData = new FormData();
+    formData.append('image_file', {
+      name: modalImage?.fileName,
+      type: modalImage?.type,
+      uri: modalImage?.uri,
+    });
+
+    return CallApi({
+      endpoint: 'desc/upload/image',
+      method: 'POST',
+      accessToken: accessToken!,
+      body: formData,
+      formData: true,
+    });
+  };
+
+  const {mutate: uploadImage, isLoading: loadingImage} = useMutation(
+    UploadImage,
+    {
+      onSuccess: async data => {
+        console.log('요청성공', data);
+        createDiary({file_name: data.fileName});
+      },
+    },
+  );
 
   return (
     <View style={{gap: 24}}>
@@ -73,7 +110,7 @@ export const MyDailyDrayModal = ({
           <View style={{gap: 4}}>
             <Pressable onPress={onViewPhoto}>
               <ViewPhotoFrame
-                source={{uri: modalImage.assets[0]?.uri}}
+                source={{uri: modalImage?.uri}}
                 resizeMode="cover"
               />
               <ModalViewPhoto
@@ -120,18 +157,20 @@ export const MyDailyDrayModal = ({
         />
         {modalImage || inputText ? (
           <ButtonComponent
+            disabled={loadingImage}
             onPress={() => {
-              mutate();
+              modalImage ? uploadImage() : createDiary({file_name: ''});
             }}>
-            작성 완료
+            {loadingImage ? '업로드 중' : '작성 완료'}
           </ButtonComponent>
         ) : (
           <ButtonComponent
+            disabled={loadingDiary}
             type="gray"
             onPress={() => {
-              mutate();
+              createDiary({file_name: ''});
             }}>
-            오늘은 넘어갈래요
+            {loadingDiary ? '업로드 중 ' : '오늘은 넘어갈래요'}
           </ButtonComponent>
         )}
       </View>
@@ -148,7 +187,7 @@ const PhotoUploadFrame = styled(View)`
   border: 2px solid ${props => props.theme.primary1};
 `;
 
-const ViewPhotoFrame = styled(Image)<{height: any}>`
+const ViewPhotoFrame = styled(Image)`
   height: 250px;
   border-radius: 10px;
 `;

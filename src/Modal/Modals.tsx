@@ -1,10 +1,10 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Dimensions, View} from 'react-native';
 import {ButtonComponent, NotoSansKR} from '../Component';
 import styled from 'styled-components';
 import {ModalHeadBorder} from './CustomModal';
 import LottieView from 'lottie-react-native';
-import {usedItemImage} from '../../store/data';
+import {defaultData, usedItemImage} from '../../store/data';
 import FastImage from 'react-native-fast-image';
 
 export const ShareModal = () => {
@@ -86,15 +86,37 @@ export const UsedItemModal = ({
   );
 };
 
-export const DailyModal = () => {
+export const DailyModal = ({
+  item_type,
+  item_no,
+}: {
+  item_type: 'Avatar' | 'Item' | 'Nothing';
+  item_no: number;
+}) => {
+  const width = Dimensions.get('window').width;
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
-      <ZoomImageDummy />
-      <NotoSansKR size={18} weight="Bold" textAlign="center">
-        오늘도 수고했어요.{'\n'}
-        보상으로 [아이템]을 받았어요!
-      </NotoSansKR>
+      {item_type === 'Nothing' ? (
+        <NotoSansKR size={18} weight="Bold" textAlign="center">
+          오늘도 수고했어요.{'\n'}
+          내일도 화이팅!
+        </NotoSansKR>
+      ) : (
+        <>
+          <View style={{width: width, height: 256, padding: 24}}>
+            <FastImage
+              source={defaultData[item_type][item_no - 1].URL}
+              resizeMode="contain"
+              style={{flex: 1}}
+            />
+          </View>
+          <NotoSansKR size={18} weight="Bold" textAlign="center">
+            오늘도 수고했어요.{'\n'}
+            보상으로 [{defaultData[item_type][item_no - 1].NAME}]을 받았어요!
+          </NotoSansKR>
+        </>
+      )}
     </View>
   );
 };

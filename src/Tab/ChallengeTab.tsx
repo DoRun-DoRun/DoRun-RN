@@ -401,7 +401,7 @@ const ChallengeTab = () => {
             }}>
             <Image
               style={{height: 136}}
-              source={require('../../assets/images/nuts05.png')}
+              source={require('../../assets/image/character/nuts05.png')}
               resizeMode="contain"
             />
             <NotoSansKR size={16} color="gray5">

@@ -169,7 +169,7 @@ const DefaultImage = () => {
   }, []);
   return (
     <BGImage
-      source={require('../../assets/images/BGABody0.png')}
+      source={require('../../assets/image/background/BG_header.png')}
       aspect-ratio={1}
       resizeMode="stretch"
       height={432}>

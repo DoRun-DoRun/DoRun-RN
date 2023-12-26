@@ -5,6 +5,8 @@ import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+import ImageResizer from 'react-native-image-resizer';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -148,78 +150,85 @@ interface API {
   method: 'GET' | 'POST' | 'DELETE' | 'PUT';
   accessToken?: string;
   body?: object;
+  formData?: boolean;
 }
 
 interface Config {
   method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+  url: string;
   headers: {
-    'Content-Type': string;
+    'Content-Type'?: string;
     Authorization?: string;
   };
-  body?: string;
+  data?: object | FormData;
 }
 
 export const useApi = () => {
   const navigation = useNavigation();
 
-  async function CallApi({endpoint, method, accessToken, body}: API) {
-    let url = `https://dorun.site/${endpoint}`;
-    // if (Platform.OS === 'android') {
-    //   url = `http://10.0.2.2:8000/${endpoint}`; //andriod
-    // } else {
-    //   url = `http://127.0.0.1:8000/${endpoint}`; //ios
-    // }
-    const config: Config = {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: accessToken ? `Bearer ${accessToken}` : '',
-      },
-      body: body && method !== 'GET' ? JSON.stringify(body) : undefined,
-    };
+  async function CallApi({endpoint, method, accessToken, body, formData}: API) {
+    let baseUrl = 'https://dorun.site';
+
+    baseUrl =
+      Platform.OS === 'android'
+        ? 'http://10.0.2.2:8000'
+        : 'http://127.0.0.1:8000';
+
+    const url = `${baseUrl}/${endpoint}`;
 
     try {
-      let response = await fetch(url, config);
-      let contentType = response.headers.get('Content-Type');
+      const axiosConfig: Config = {
+        method: method,
+        url: url,
+        headers: {
+          Authorization: accessToken ? `Bearer ${accessToken}` : '',
+        },
+        data: body,
+      };
 
-      if (!response.ok) {
-        let errorBodyText = await response.text(); // 응답을 텍스트로 받기
-        // Content-Type이 application/json인지 확인
-        if (contentType && contentType.includes('application/json')) {
-          let errorBody = JSON.parse(errorBodyText); // JSON으로 파싱
-
-          if (errorBody.detail === '토큰이 만료되었습니다.') {
-            navigation.navigate('LoginTab' as never);
-          }
-
-          throw new Error(
-            `API call failed: ${response.status}, Details: ${errorBody.detail}`,
-          );
-        } else {
-          console.log('errorMessage:', errorBodyText);
-        }
+      if (formData) {
+        axiosConfig.headers['Content-Type'] = 'multipart/form-data';
       }
 
-      return await response.json();
+      const response = await axios(axiosConfig);
+
+      if (response.status !== 200) {
+        if (response.data?.detail === '토큰이 만료되었습니다.') {
+          navigation.navigate('LoginTab' as never);
+        }
+
+        throw new Error(
+          `API call failed: ${response.status}, Details: ${response.statusText}`,
+        );
+      }
+
+      console.log(response.data);
+
+      return response.data;
     } catch (error) {
-      // console.error('Error Object:', error); // 전체 에러 객체 출력
-      console.error(`Error during API call to ${url}: ${error}`);
-      // console.error('Access Token:', accessToken); // 토큰 출력 (운영 환경에서는 제거 필요)
+      // 오류 로깅 개선
+      if (axios.isAxiosError(error)) {
+        console.error('Axios Error:', error.response?.data || error.message);
+      } else {
+        console.error('Non-Axios error:', error);
+      }
+
       throw error;
     }
   }
+
   return CallApi;
 };
 
 const ViewImageModalBackground = styled.TouchableOpacity`
   background-color: 'rgba(0,0,0,0.6)';
-  flex: 1;
   justify-content: center;
   align-items: center;
 `;
 
 export const ModalViewPhoto = ({visible, onClose, res}: any) => {
   const width = useWindowDimensions().width;
+  const height = useWindowDimensions().height;
 
   return (
     <Modal
@@ -229,8 +238,9 @@ export const ModalViewPhoto = ({visible, onClose, res}: any) => {
       onRequestClose={onClose}>
       <ViewImageModalBackground onPress={onClose}>
         <ViewImageStyles
-          source={{uri: res?.assets[0]?.uri}}
-          height={width}
+          source={{uri: res?.uri}}
+          width={width}
+          height={height}
           resizeMode="contain"
         />
       </ViewImageModalBackground>
@@ -363,4 +373,25 @@ export const calculateTimeDifference = (endDtString: string) => {
   const formattedMinutes = minutes.toString().padStart(2, '0');
 
   return `${formattedHours}:${formattedMinutes}`;
+};
+
+export const resizeImage = async (uri: string | undefined) => {
+  if (!uri) {
+    console.error('Error: URI is undefined');
+    return null;
+  }
+
+  try {
+    const resizedImage = await ImageResizer.createResizedImage(
+      uri,
+      800,
+      600,
+      'JPEG',
+      80,
+    );
+    return resizedImage;
+  } catch (error) {
+    console.error('Error resizing image: ', error);
+    return null;
+  }
 };
