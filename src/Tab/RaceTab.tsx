@@ -8,7 +8,13 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import {HomeContainer, NotoSansKR, ScrollContainer, useApi} from '../Component';
+import {
+  HomeContainer,
+  LoadingIndicatior,
+  NotoSansKR,
+  ScrollContainer,
+  useApi,
+} from '../Component';
 import {useNavigation} from '@react-navigation/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
@@ -21,7 +27,7 @@ import LottieView from 'lottie-react-native';
 import {
   BackgroundImage,
   Dudus,
-  groupImage,
+  defaultData,
   struggleLottie,
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
@@ -121,7 +127,7 @@ const RaceTab = () => {
   }, [challengeListData, dispatch, index, navigation]);
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   return (
     <HomeContainer color="background">
@@ -161,13 +167,6 @@ const RaceTab = () => {
 };
 
 const DefaultImage = () => {
-  const [randomIndex, setRandomIndex] = useState(0);
-
-  useEffect(() => {
-    // 0부터 2까지의 랜덤한 정수 생성
-    const index = Math.floor(Math.random() * 3);
-    setRandomIndex(index);
-  }, []);
   return (
     <BGImage
       source={require('../../assets/image/background/BG_header.png')}
@@ -175,7 +174,7 @@ const DefaultImage = () => {
       resizeMode="stretch"
       height={432}>
       <Image
-        source={groupImage[randomIndex]}
+        source={require('../../assets/image/group/race_image.png')}
         style={{
           width: '80%',
           resizeMode: 'contain',
@@ -304,7 +303,7 @@ const BGComponent = ({
         }}
         {...panResponder.panHandlers}>
         {isDragging ? (
-          <View style={{width: 60, height: 60}}>
+          <View style={{width: 60, height: 70}}>
             <LottieView
               source={struggleLottie[data.CHARACTER_NO - 1]}
               autoPlay
@@ -315,10 +314,15 @@ const BGComponent = ({
               }}
             />
           </View>
+        ) : data.PROGRESS >= 100 ? (
+          <FastImage
+            source={defaultData.Avatar[data.CHARACTER_NO - 1].URL}
+            style={{width: 60, height: 70}}
+          />
         ) : (
           <FastImage
             source={Dudus[data.CHARACTER_NO - 1]}
-            style={{width: 60, height: 60}}
+            style={{width: 60, height: 70}}
           />
         )}
       </Animated.View>

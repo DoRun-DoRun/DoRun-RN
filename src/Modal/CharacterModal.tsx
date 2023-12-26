@@ -1,6 +1,12 @@
 import React, {useMemo} from 'react';
 import {Image, View} from 'react-native';
-import {ButtonContainer, NotoSansKR, RowContainer, useApi} from '../Component';
+import {
+  ButtonContainer,
+  LoadingIndicatior,
+  NotoSansKR,
+  RowContainer,
+  useApi,
+} from '../Component';
 import styled, {useTheme} from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -92,7 +98,7 @@ export const CharacterModal = ({
   });
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
 
   if (!user) {

@@ -5,6 +5,7 @@ import {
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -135,9 +136,7 @@ const SearchBox = ({
     SearchList,
     {enabled: isUidValid}, // 쿼리 실행 조건
   );
-  if (searchLoading || friendLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
-  }
+
   return (
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
@@ -158,21 +157,27 @@ const SearchBox = ({
       {isClicked && !uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>친구 목록</NotoSansKR>
-          {friendData?.accepted.map((data: FriendType, key: number) => (
-            <InviteFriend
-              key={key}
-              name={data.USER_NM}
-              UID={data.UID}
-              setInviteListData={setInviteListData}
-            />
-          ))}
+          {friendLoading ? (
+            <LoadingIndicatior />
+          ) : (
+            friendData?.accepted.map((data: FriendType, key: number) => (
+              <InviteFriend
+                key={key}
+                name={data.USER_NM}
+                UID={data.UID}
+                setInviteListData={setInviteListData}
+              />
+            ))
+          )}
         </ExpandedContainer>
       ) : null}
 
       {isClicked && uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {searchData?.USER_NM ? (
+          {searchLoading ? (
+            <LoadingIndicatior />
+          ) : searchData?.USER_NM ? (
             <InviteFriend
               name={searchData.USER_NM}
               UID={searchData.UID}

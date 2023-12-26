@@ -6,9 +6,11 @@ import styled, {useTheme} from 'styled-components/native';
 import {
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   TossFace,
+  timeSince,
   useApi,
 } from '../Component';
 import EmojiPicker from 'rn-emoji-keyboard';
@@ -48,7 +50,7 @@ export const DailyNoteScreen = ({route}: {route: RouteType}) => {
   const {data, isLoading} = useQuery('getDiary', getDiary);
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   if (!data || data.dairy!) {
     return <NotoSansKR size={16}>에러</NotoSansKR>;
@@ -61,7 +63,7 @@ export const DailyNoteScreen = ({route}: {route: RouteType}) => {
           <RowContainer>
             <NotoSansKR size={18}>[{data.user}]</NotoSansKR>
             <NotoSansKR size={14} color="gray4">
-              &nbsp;· 12시간전
+              &nbsp;· {timeSince(data.diary.INSERT_DT)}
             </NotoSansKR>
           </RowContainer>
 

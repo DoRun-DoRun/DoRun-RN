@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
@@ -94,16 +95,19 @@ const ProfileSettingScreen = () => {
     }
   };
 
-  const {mutate: setCharacter} = useMutation(SetAvatar, {
-    onSuccess: () => {
-      // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
-      queryClient.invalidateQueries('SettingProfile');
+  const {mutate: setCharacter, isLoading: loadingSetCharacter} = useMutation(
+    SetAvatar,
+    {
+      onSuccess: () => {
+        // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
+        queryClient.invalidateQueries('SettingProfile');
+      },
     },
-  });
+  );
   const {data, isLoading} = useQuery('SettingProfile', SettingProfile);
 
   if (isLoading) {
-    return <NotoSansKR size={18}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
 
   return (
@@ -132,11 +136,12 @@ const ProfileSettingScreen = () => {
             </NotoSansKR>
             <SelectedContainer>
               <SelectedButton
+                disabled={loadingSetCharacter}
                 onPress={() => {
                   setCharacter(selectedCharacter);
                 }}>
                 <NotoSansKR size={14} color="primary1" weight="Medium">
-                  선택하기
+                  {loadingSetCharacter ? '변경 중' : '선택하기'}
                 </NotoSansKR>
               </SelectedButton>
               <View

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import {
   ButtonComponent,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   TossFace,
@@ -105,7 +106,7 @@ export const ChallengeListModal = ({
   );
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   return (
     <View style={{gap: 24}}>

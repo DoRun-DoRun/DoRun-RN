@@ -66,13 +66,13 @@ export const UsedItemModal = ({
       <View style={{width: 240, height: 240}}>
         {item_no === 1 ? (
           <LottieView
-            source={usedItemImage.bomb[character_no]}
+            source={usedItemImage.bomb[character_no - 1]}
             style={{flex: 1}}
             autoPlay
           />
         ) : (
           <FastImage
-            source={usedItemImage.hammer[character_no]}
+            source={usedItemImage.hammer[character_no - 1]}
             style={{flex: 1}}
           />
         )}

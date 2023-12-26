@@ -4,6 +4,7 @@ import {
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -167,10 +168,6 @@ const SearchBox = () => {
     {enabled: isUidValid}, // 쿼리 실행 조건
   );
 
-  if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
-  }
-
   return (
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
@@ -191,7 +188,9 @@ const SearchBox = () => {
       {isClicked && uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {data?.USER_NM ? (
+          {isLoading ? (
+            <LoadingIndicatior />
+          ) : data?.USER_NM ? (
             <InviteFriend
               name={data?.USER_NM}
               UID={data?.UID}
@@ -237,7 +236,7 @@ const FriendScreen = () => {
   );
 
   if (friendLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
 
   return (

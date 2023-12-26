@@ -3,6 +3,7 @@ import {
   ButtonComponent,
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   useApi,
 } from '../Component';
@@ -38,7 +39,7 @@ const SettingScreen = () => {
   };
   const {data, isLoading} = useQuery('UserDataSetting', UserDataSetting);
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   const OnPushAlarmToggle = () => {
     setPushAlarm(!pushAlarm);

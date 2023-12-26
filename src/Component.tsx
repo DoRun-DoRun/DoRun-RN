@@ -3,7 +3,14 @@ import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
-import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
+import {
+  Pressable,
+  Platform,
+  Modal,
+  useWindowDimensions,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
@@ -351,7 +358,7 @@ export const calculateDaysUntil = (startDateString: string) => {
   return daysUntil;
 };
 
-export const calculateTimeDifference = (endDtString: string) => {
+export const calculateRemainTime = (endDtString: string) => {
   // 현재 UTC 시간
   const currentDateTimeUtc = new Date();
   // 종료 UTC 시간
@@ -374,6 +381,28 @@ export const calculateTimeDifference = (endDtString: string) => {
 
   return `${formattedHours}:${formattedMinutes}`;
 };
+
+export const timeSince = (utcDate: string) => {
+  const now = new Date();
+  const past = new Date(`${utcDate}Z`);
+
+  const msPerMinute = 60 * 1000;
+  const msPerHour = msPerMinute * 60;
+
+  const elapsed = now.getTime() - past.getTime();
+
+  if (elapsed < msPerHour) {
+    return Math.round(elapsed / msPerMinute) + '분 전';
+  } else {
+    return Math.round(elapsed / msPerHour) + '시간 전';
+  }
+};
+
+export const LoadingIndicatior = () => (
+  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <ActivityIndicator size="large" color="#0000ff" />
+  </View>
+);
 
 export const resizeImage = async (uri: string | undefined) => {
   if (!uri) {

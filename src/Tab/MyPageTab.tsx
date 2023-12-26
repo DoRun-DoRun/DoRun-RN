@@ -3,6 +3,7 @@ import {
   GetImage,
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -11,10 +12,9 @@ import {
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Image, Pressable, Text, TouchableOpacity, View} from 'react-native';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useModal} from '../Modal/ModalProvider';
 import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
@@ -209,7 +209,9 @@ const History = () => {
           <ExpandableCalendar firstDay={1} onDayPress={() => setIndex(1)} />
         </CalendarProvider>
       </View>
-      {isLoading && <Text>로딩중</Text>}
+
+      {isLoading && <LoadingIndicatior />}
+
       {data?.total_size > 0 ? (
         <>
           <RowContainer seperate>
@@ -316,57 +318,18 @@ const History = () => {
     </>
   );
 };
-const AlbumItem = styled.View`
-  width: 72px;
-  height: 72px;
-  border-radius: 10px;
-  background-color: ${props => props.theme.gray6};
-`;
-const AlbumGrid = styled(RowContainer)`
-  width: 232px;
-  height: 248px;
-  column-gap: 8px;
-  row-gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-`;
 
 const Album = () => {
-  const {showModal, hideModal} = useModal();
-
-  const openModal = () => {
-    const modalContent = (
-      <View style={{alignItems: 'center', gap: 24}}>
-        <View style={{height: 200, width: 200, backgroundColor: '#ccc'}} />
-        <NotoSansKR size={14} onPress={() => hideModal()}>
-          닫기
-        </NotoSansKR>
-      </View>
-    );
-    showModal(modalContent);
-  };
-
   return (
-    <RowContainer style={{justifyContent: 'space-between', padding: 16}}>
-      <MaterialIcons name="chevron-left" size={20} />
-      <AlbumGrid>
-        <Pressable
-          onPress={() => {
-            openModal();
-          }}>
-          <AlbumItem />
-        </Pressable>
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-      </AlbumGrid>
-      <MaterialIcons name="chevron-right" size={20} />
-    </RowContainer>
+    <View
+      style={{
+        width: '100%',
+        height: 200,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <NotoSansKR size={16}>열심히 개발중이에요!</NotoSansKR>
+    </View>
   );
 };
 
@@ -393,36 +356,37 @@ const MyPageTab = () => {
     refetchOnWindowFocus: true,
   });
 
-  if (isLoading) {
-    return <Text>'Loading...'</Text>;
-  }
-
   if (error) {
-    return <Text>'ERROR...'</Text>;
+    return <NotoSansKR size={16}>'ERROR...'</NotoSansKR>;
   }
 
   return (
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
-          <ProfileContainer gap={24}>
-            <UserIcon>
-              <Image
-                source={profileImage[data.USER_CHARACTER_NO - 1]}
-                style={{width: '100%', height: '100%', resizeMode: 'contain'}}
-              />
-            </UserIcon>
-            <View>
-              <UserName size={16}>{data.USER_NM}</UserName>
-              <RowContainer gap={16}>
-                <UserStats status="완료" count={data.COMPLETE} />
-                <Divider />
-                <UserStats status="진행중" count={data.PROGRESS} />
-                <Divider />
-                <UserStats status="시작 전" count={data.PENDING} />
-              </RowContainer>
-            </View>
-          </ProfileContainer>
+          {isLoading ? (
+            <LoadingIndicatior />
+          ) : (
+            <ProfileContainer gap={24}>
+              <UserIcon>
+                <Image
+                  source={profileImage[data.USER_CHARACTER_NO - 1]}
+                  style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+                />
+              </UserIcon>
+
+              <View>
+                <UserName size={16}>{data.USER_NM}</UserName>
+                <RowContainer gap={16}>
+                  <UserStats status="완료" count={data.COMPLETE} />
+                  <Divider />
+                  <UserStats status="진행중" count={data.PROGRESS} />
+                  <Divider />
+                  <UserStats status="시작 전" count={data.PENDING} />
+                </RowContainer>
+              </View>
+            </ProfileContainer>
+          )}
 
           <HistoryContainer>
             <CategoryContainer>

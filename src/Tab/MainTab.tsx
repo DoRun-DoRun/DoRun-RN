@@ -56,17 +56,6 @@ export const MainTab = () => {
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="list-alt" color={color} size={size} />
           ),
-          headerRight: () => {
-            return (
-              <TouchableOpacity
-                style={{marginRight: 16}}
-                onPress={() => {
-                  navigation.navigate('EditChallengeScreen' as never);
-                }}>
-                <OcticonIcons name="pencil" size={24} />
-              </TouchableOpacity>
-            );
-          },
         }}
       />
       <Tab.Screen
