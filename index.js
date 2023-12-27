@@ -13,6 +13,7 @@ const queryClient = new QueryClient();
 import {ModalProvider} from './src/Modal/ModalProvider';
 import CustomModal from './src/Modal/CustomModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 export default function Main() {
   React.useEffect(() => {
@@ -34,6 +35,7 @@ export default function Main() {
             <NavigationContainer>
               <CustomModal />
               <App />
+              <Toast />
             </NavigationContainer>
           </ModalProvider>
         </ThemeProvider>

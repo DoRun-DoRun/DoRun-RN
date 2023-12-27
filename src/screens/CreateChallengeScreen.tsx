@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
@@ -21,6 +21,8 @@ import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {Alert} from 'react-native';
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
   flex: 1;
@@ -28,49 +30,65 @@ const SearchContainer = styled.View<{isClicked: boolean}>`
   border: 1px solid ${props => props.theme.gray6};
   padding: 8px;
   border-radius: 10px;
-  gap: 16px;
+  /* gap: 16px; */
   z-index: 10;
 `;
 
 const ExpandedContainer = styled.View`
   background-color: #fff;
-  padding: 0 8px;
+  padding: 8px;
+  margin-top: 8px;
   gap: 16px;
-  padding-bottom: 8px;
 `;
 
-interface InviteFriendType {
+export interface InviteFriendType {
   name: string;
   UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
-  setIsClicked: Dispatch<SetStateAction<boolean>>;
-  setUidInput: Dispatch<SetStateAction<string>>;
+  setUidInput?: Dispatch<SetStateAction<string>>;
 }
 
 export const InviteFriend = ({
   name,
   UID,
   setInviteListData,
-  setIsClicked,
   setUidInput,
 }: InviteFriendType) => {
   return (
-    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+    <RowContainer seperate>
       <NotoSansKR size={14} weight="Regular">
         {name}
       </NotoSansKR>
 
       <TouchableOpacity
         onPress={() => {
+          const ToastModal = (message: string) =>
+            Toast.show({
+              type: 'error',
+              text1: '초대 실패',
+              text2: message,
+            });
           setInviteListData(prev => {
-            if (!prev.find(item => item.UID === UID)) {
-              return [...prev, {UserName: name, UID, accept: false}];
+            // 이미 초대된 사용자인지 확인
+            const existingUser = prev.find(item => item.UID === UID);
+            if (existingUser) {
+              ToastModal('이미 초대된 사용자입니다.');
+              return prev;
             }
-            // 중복된 항목이 있으면 리스트 변경 없이 반환
-            return prev;
+
+            // 초대 가능한 최대 인원수 확인
+            if (prev.length >= 6) {
+              ToastModal('최대 6명까지만 초대할 수 있습니다.');
+              return prev;
+            }
+
+            // 사용자 추가
+            return [...prev, {UserName: name, UID, accept: false}];
           });
-          setUidInput('');
-          setIsClicked(false);
+
+          if (setUidInput) {
+            setUidInput('');
+          }
         }}>
         <NotoSansKR
           size={14}
@@ -80,7 +98,7 @@ export const InviteFriend = ({
           초대하기
         </NotoSansKR>
       </TouchableOpacity>
-    </View>
+    </RowContainer>
   );
 };
 
@@ -95,7 +113,7 @@ interface FriendType {
   USER_NM: string;
 }
 
-const SearchBox = ({
+export const SearchBox = ({
   isClicked,
   setIsClicked,
   setInviteListData,
@@ -159,27 +177,29 @@ const SearchBox = ({
         />
       </RowContainer>
 
-      {isClicked && !uidInput ? (
-        <ExpandedContainer>
-          <NotoSansKR size={14}>친구 목록</NotoSansKR>
+      {isClicked && !uidInput && (
+        <>
           {friendLoading ? (
             <LoadingIndicatior />
           ) : (
-            friendData?.accepted.map((data: FriendType, key: number) => (
-              <InviteFriend
-                key={key}
-                name={data.USER_NM}
-                UID={data.UID}
-                setInviteListData={setInviteListData}
-                setIsClicked={setIsClicked}
-                setUidInput={setUidInput}
-              />
-            ))
+            friendData?.accepted.length > 0 && (
+              <ExpandedContainer>
+                <NotoSansKR size={14}>친구 목록</NotoSansKR>
+                {friendData?.accepted.map((data: FriendType, key: number) => (
+                  <InviteFriend
+                    key={key}
+                    name={data.USER_NM}
+                    UID={data.UID}
+                    setInviteListData={setInviteListData}
+                  />
+                ))}
+              </ExpandedContainer>
+            )
           )}
-        </ExpandedContainer>
-      ) : null}
+        </>
+      )}
 
-      {isClicked && uidInput ? (
+      {isClicked && uidInput && (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
           {searchLoading ? (
@@ -189,7 +209,6 @@ const SearchBox = ({
               name={searchData.USER_NM}
               UID={searchData.UID}
               setInviteListData={setInviteListData}
-              setIsClicked={setIsClicked}
               setUidInput={setUidInput}
             />
           ) : (
@@ -198,7 +217,7 @@ const SearchBox = ({
             </NotoSansKR>
           )}
         </ExpandedContainer>
-      ) : null}
+      )}
     </SearchContainer>
   );
 };
@@ -211,31 +230,53 @@ const DatePicker = styled.TouchableOpacity`
   border-radius: 100px;
 `;
 
-interface InviteList {
+export interface InviteList {
   UserName: string;
   UID: number;
   accept?: boolean;
 }
 
-const InviteList = ({UserName, accept}: InviteList) => {
+interface InviteListType {
+  UserName: string;
+  UID: number;
+  accept?: boolean;
+  setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+}
+
+export const InviteList = ({
+  UserName,
+  accept,
+  UID,
+  setInviteListData,
+}: InviteListType) => {
   return (
     <RowContainer seperate>
       <NotoSansKR size={16} weight="Medium">
         {UserName}
       </NotoSansKR>
-      <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
-        {accept ? '참여중이에요' : '참여를 기다리고 있어요'}
-      </NotoSansKR>
+      <RowContainer gap={9}>
+        <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
+          {accept ? '참여중이에요' : '참여를 기다리고 있어요'}
+        </NotoSansKR>
+        {!accept && (
+          <TouchableOpacity
+            onPress={() => {
+              setInviteListData(prev => prev.filter(item => item.UID !== UID));
+            }}>
+            <NotoSansKR
+              size={14}
+              weight="Regular"
+              color="gray3"
+              style={{textDecorationLine: 'underline'}}>
+              취소하기
+            </NotoSansKR>
+          </TouchableOpacity>
+        )}
+      </RowContainer>
     </RowContainer>
   );
 };
 
-// const emojiObject = {
-//   emoji: '❤️',
-//   name: 'red heart',
-//   slug: 'red_heart',
-//   unicode_version: '0.6',
-// };
 interface EmojiType {
   emoji: string;
   name: string;
@@ -261,7 +302,7 @@ interface MarkedDataType {
   };
 }
 
-const formatDate = (date: Date): string => {
+export const formatDate = (date: Date): string => {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
@@ -292,15 +333,56 @@ const CalendarRowContainer = styled(RowContainer)`
   border-color: ${props => props.theme.primary1};
 `;
 
-const CalendarContainer = ({
+export const CalendarContainer = ({
   setCalendarOpen,
   setCalendarData,
+  calendarData,
 }: {
   setCalendarOpen: Dispatch<SetStateAction<boolean>>;
   setCalendarData: Dispatch<SetStateAction<{start: string; end: string}>>;
+  calendarData: {start: string; end: string};
 }) => {
   const [markedDates, setMarkedDates] = useState<MarkedDataType>({});
   const theme = useTheme();
+
+  useEffect(() => {
+    if (calendarData.start !== '' && calendarData.end !== '') {
+      console.log(calendarData);
+      const {start, end} = calendarData;
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      const newMarkedDates = {...markedDates};
+
+      let day = new Date(startDate);
+      day.setDate(day.getDate() + 1); // 시작 날짜 다음 날부터 순회 시작
+
+      newMarkedDates[start] = {
+        startingDay: true,
+        color: theme.primary1,
+        textColor: 'white',
+      };
+
+      while (day < endDate) {
+        const dayStr = formatDate(day);
+        newMarkedDates[dayStr] = {
+          marked: true,
+          dotColor: 'transparent',
+          color: theme.primary1,
+          textColor: 'white',
+        };
+        day.setDate(day.getDate() + 1);
+      }
+
+      newMarkedDates[end] = {
+        endingDay: true,
+        color: theme.primary1,
+        textColor: 'white',
+      };
+
+      setMarkedDates(newMarkedDates);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onDayPress = (date: Day) => {
     const {dateString} = date;
@@ -324,6 +406,7 @@ const CalendarContainer = ({
         setMarkedDates({
           [dateString]: {
             startingDay: true,
+            endingDay: true,
             color: theme.primary1,
             textColor: 'white',
           },
@@ -359,6 +442,7 @@ const CalendarContainer = ({
       setMarkedDates({
         [dateString]: {
           startingDay: true,
+          endingDay: true,
           color: theme.primary1,
           textColor: 'white',
         },
@@ -369,19 +453,19 @@ const CalendarContainer = ({
   const sendCalendarData = () => {
     setCalendarOpen(false);
     const keys = Object.keys(markedDates);
-    const endDate = new Date(keys![keys.length - 1]);
-    endDate.setDate(endDate.getDate() + 1);
 
     setCalendarData({
       start: keys![0],
-      end: formatDate(endDate),
+      end: keys.length <= 1 ? keys![0] : keys![1],
     });
   };
+
   return (
     <CalendarModal onPress={() => setCalendarOpen(false)}>
       <CalendarModalContainer onPress={e => e.stopPropagation()}>
         <Calendar
           style={{padding: 16}}
+          minDate={formatDate(new Date())}
           onDayPress={onDayPress}
           markingType={'period'}
           markedDates={markedDates}
@@ -449,13 +533,49 @@ const CreateChallengeScreen = () => {
     });
 
   const {mutate: ChallengeCreateMutate} = useMutation(createChallenge, {
-    onSuccess: response => {
-      console.log('Success:', response);
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '챌린지가 생성되었어요.',
+      });
       queryClient.invalidateQueries('getChallenge');
       navigation.navigate('MainTab' as never);
     },
     onError: error => {
       console.error('Error:', error);
+    },
+  });
+
+  const {mutate: ChallengeStartMutate} = useMutation(createChallenge, {
+    onSuccess: response => {
+      ChallengeStart(response.CHALLENGE_MST_NO);
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
+  const challengeStart = (selectedChallengeMstNo: number) =>
+    CallApi({
+      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}`,
+      method: 'POST',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: ChallengeStart} = useMutation(challengeStart, {
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '챌린지가 시작되었어요.',
+      });
+      queryClient.invalidateQueries('getChallenge');
+      queryClient.invalidateQueries('ChallengeUserList');
+      queryClient.invalidateQueries('challenge_history');
+      queryClient.invalidateQueries('userData');
+      navigation.navigate('MainTab' as never);
+    },
+    onError: error => {
+      console.error('Challenge Start Error:', error);
     },
   });
 
@@ -506,6 +626,7 @@ const CreateChallengeScreen = () => {
                   UserName={data.UserName}
                   UID={data.UID}
                   accept={data.accept}
+                  setInviteListData={setInviteListData}
                 />
               ))}
             </View>
@@ -535,16 +656,50 @@ const CreateChallengeScreen = () => {
       <View style={{gap: 8, padding: 16}}>
         <ButtonComponent
           onPress={() => {
-            if (
-              !challengeName ||
-              !calendarData.start ||
-              !calendarData.end ||
-              !selectedEmoji
-            ) {
-              console.error('모든 필수 필드를 채워주세요.');
+            const missingItems = [];
+
+            if (!challengeName) {
+              missingItems.push('챌린지 목표');
+            }
+            if (!calendarData.start || !calendarData.end) {
+              missingItems.push('챌린지 날짜');
+            }
+            if (!selectedEmoji) {
+              missingItems.push('이모지');
+            }
+
+            if (missingItems.length > 0) {
+              Toast.show({
+                type: 'error',
+                text1: '모든 항목을 채워주세요',
+                text2: missingItems.join(', ') + '을(를) 작성해주세요.',
+              });
               return;
             }
-            ChallengeCreateMutate();
+
+            if (
+              calendarData.start === formatDate(new Date()) &&
+              inviteListData.length > 1
+            ) {
+              Alert.alert(
+                '챌린지 시작 날짜가 오늘입니다.', // 경고 제목
+                '친구들을 기다리지 않고 바로 시작할까요?', // 경고 메시지
+                [
+                  {
+                    text: '날짜 변경하기',
+                    style: 'cancel',
+                  },
+                  {
+                    text: '바로 시작하기',
+                    onPress: () => ChallengeStartMutate(),
+                    style: 'destructive',
+                  },
+                ],
+                {cancelable: false},
+              );
+            } else {
+              ChallengeCreateMutate();
+            }
           }}>
           챌린지 생성하기
         </ButtonComponent>
@@ -558,6 +713,7 @@ const CreateChallengeScreen = () => {
 
       {calendarOpen ? (
         <CalendarContainer
+          calendarData={calendarData}
           setCalendarOpen={setCalendarOpen}
           setCalendarData={setCalendarData}
         />

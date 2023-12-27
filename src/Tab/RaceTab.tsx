@@ -90,7 +90,6 @@ const RaceTab = () => {
   const {data: challengeListData, isLoading} = useQuery(
     ['ChallengeUserList', index],
     ChallengeUserList,
-    {refetchOnWindowFocus: true},
   );
 
   useEffect(() => {

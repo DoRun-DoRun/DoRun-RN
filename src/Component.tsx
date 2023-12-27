@@ -14,6 +14,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -218,6 +219,14 @@ export const useApi = () => {
         console.error('Axios Error:', error.response?.data || error.message);
       } else {
         console.error('Non-Axios error:', error);
+      }
+
+      if (navigation.canGoBack()) {
+        Toast.show({
+          type: 'error',
+          text1: '올바르지 않은 접근입니다',
+        });
+        navigation.goBack();
       }
 
       throw error;

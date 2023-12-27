@@ -16,6 +16,7 @@ import {InviteAcceptType} from '../../store/data';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useModal} from './ModalProvider';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const ChallengeTimeBox = styled.View`
   border-radius: 100px;
@@ -70,10 +71,15 @@ export const ChallengeListModal = ({
       const response = await CallApi({
         endpoint: `challenge/invite/${challenge_mst_no}`,
         method: 'GET',
+        accessToken: accessToken!,
       });
       return response;
     } catch (error) {
-      console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: '올바르지 않은 접근입니다',
+      });
+      hideModal();
     }
   };
   const {data, isLoading} = useQuery('GetInviteChallenge', GetInviteChallenge);

@@ -346,9 +346,7 @@ const MyPageTab = () => {
     }
   };
 
-  const {data, isLoading, error} = useQuery('userData', UserProfile, {
-    refetchOnWindowFocus: true,
-  });
+  const {data, isLoading, error} = useQuery('userData', UserProfile);
 
   if (error) {
     return <NotoSansKR size={16}>'ERROR...'</NotoSansKR>;
