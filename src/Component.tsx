@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {useModal} from './Modal/ModalProvider';
 
 interface ButtonType {
   children: React.ReactNode;
@@ -173,6 +174,7 @@ interface Config {
 
 export const useApi = () => {
   const navigation = useNavigation();
+  const {hideModal} = useModal();
 
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     let baseUrl = 'https://dorun.site';
@@ -226,6 +228,7 @@ export const useApi = () => {
           type: 'error',
           text1: '올바르지 않은 접근입니다',
         });
+        hideModal();
         navigation.goBack();
       }
 

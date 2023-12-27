@@ -58,8 +58,10 @@ interface participantsType {
 
 export const ChallengeListModal = ({
   challenge_mst_no,
+  count_challenge,
 }: {
   challenge_mst_no: number;
+  count_challenge: number;
 }) => {
   const queryClient = useQueryClient();
   const {accessToken} = useSelector((state: RootState) => state.user);
@@ -98,8 +100,11 @@ export const ChallengeListModal = ({
   const {mutate: changeChallengeStatusMutation} = useMutation(
     changeChallengeStatus,
     {
-      onSuccess: response => {
-        console.log('Success:', response);
+      onSuccess: () => {
+        Toast.show({
+          type: 'success',
+          text1: '챌린지가 참여 성공.',
+        });
         queryClient.invalidateQueries('getChallenge');
         hideModal();
       },
@@ -159,9 +164,17 @@ export const ChallengeListModal = ({
 
         <View style={{gap: 8}}>
           <ButtonComponent
-            onPress={() =>
-              changeChallengeStatusMutation(InviteAcceptType.ACCEPTED)
-            }>
+            onPress={() => {
+              if (count_challenge >= 3) {
+                Toast.show({
+                  type: 'error',
+                  text1: '현재는 챌린지를 3개까지만 진행할 수 있어요',
+                });
+                hideModal();
+              } else {
+                changeChallengeStatusMutation(InviteAcceptType.ACCEPTED);
+              }
+            }}>
             참여하기
           </ButtonComponent>
           <ButtonComponent

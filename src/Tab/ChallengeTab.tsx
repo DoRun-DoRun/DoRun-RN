@@ -33,6 +33,7 @@ import {
 import {challengeDataType} from '../../store/async/asyncStore';
 import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const Profile = styled.View`
   width: 40px;
@@ -317,11 +318,18 @@ const ChallengeTab = () => {
     getChallenge,
   );
 
-  const current_day = new Date().toISOString();
+  useEffect(() => {
+    if (listData?.progress_challenges?.length > 0) {
+      const firstChallengeMstNo =
+        listData.progress_challenges[0].CHALLENGE_MST_NO;
+      dispatch(setSelectedChallengeMstNo(firstChallengeMstNo));
+    }
+  }, [dispatch, listData.progress_challenges]);
+
   const getChallengeDetail = async () => {
     try {
       const response = await CallApi({
-        endpoint: `challenge/detail/${selectedChallengeMstNo}?current_day=${current_day}`,
+        endpoint: `challenge/detail/${selectedChallengeMstNo}`,
         method: 'GET',
         accessToken: accessToken!,
       });
@@ -335,30 +343,12 @@ const ChallengeTab = () => {
     ['getChallengeDetail', selectedChallengeMstNo],
     getChallengeDetail,
     {
-      enabled:
-        selectedChallengeMstNo !== null && selectedChallengeMstNo !== undefined,
+      enabled: !!selectedChallengeMstNo,
     },
   );
 
-  useEffect(() => {
-    if (!selectedChallengeMstNo) {
-      dispatch(
-        setSelectedChallengeMstNo(
-          listData?.progress_challenges[0]?.CHALLENGE_MST_NO,
-        ),
-      );
-    }
-    if (listData?.progress_challenges?.length === 0) {
-      dispatch(setSelectedChallengeMstNo(null));
-    }
-  }, [dispatch, listData?.progress_challenges, selectedChallengeMstNo]);
-
   if (listLoading || detailLoading) {
     return <LoadingIndicatior />;
-  }
-
-  if (!listData) {
-    return <NotoSansKR size={16}>API 에러</NotoSansKR>;
   }
 
   if (listData.progress_challenges?.length === 0) {
@@ -402,6 +392,7 @@ const ChallengeTab = () => {
                 onPress={() =>
                   showModal(
                     <ChallengeListModal
+                      count_challenge={listData.progress_challenges?.length}
                       challenge_mst_no={challenge.CHALLENGE_MST_NO}
                     />,
                   )
@@ -471,6 +462,7 @@ const ChallengeTab = () => {
                   onPress={() =>
                     showModal(
                       <ChallengeListModal
+                        count_challenge={listData.progress_challenges?.length}
                         challenge_mst_no={challenge.CHALLENGE_MST_NO}
                       />,
                     )
@@ -486,80 +478,114 @@ const ChallengeTab = () => {
           </RowScrollContainer>
 
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('CreateChallengeScreen' as never)
-            }>
+            onPress={() => {
+              if (listData.progress_challenges?.length >= 3) {
+                Toast.show({
+                  type: 'error',
+                  text1: '현재는 챌린지를 3개까지만 진행할 수 있어요',
+                });
+              } else {
+                navigation.navigate('CreateChallengeScreen' as never);
+              }
+            }}>
             <PlusContainers title="챌린지 시작하기" />
           </TouchableOpacity>
         </TopContainer>
 
-        <CenterContainer>
-          <RowContainer seperate>
-            <NotoSansKR size={18}>개인별 목표</NotoSansKR>
-          </RowContainer>
-          <View style={{gap: 8}}>
-            {personGoal.map(goal => (
-              <GoalBox
-                key={goal.id}
-                goal={goal}
-                challenge_no={selectedChallengeMstNo!}
-              />
-            ))}
-          </View>
-          <TouchableOpacity
-            onPress={() => {
-              showModal(
-                <PersonGoalAddModal challenge_no={selectedChallengeMstNo!} />,
-              );
-            }}>
-            <PlusContainers title="목표 추가하기" />
-          </TouchableOpacity>
-        </CenterContainer>
-
-        <CenterContainer>
-          <ButtonComponent
-            onPress={() => {
-              showModal(
-                <MyDailyDrayModal
-                  challenge_user_no={detailData.CHALLENGE_USER_NO}
-                  personGoal={personGoal}
-                />,
-              );
-            }}>
-            일기 작성하기
-          </ButtonComponent>
-        </CenterContainer>
-
-        {detailData?.additionalGoal.length !== 0 ? (
-          <FootContainer>
-            <RowContainer seperate>
-              <NotoSansKR size={18} color="white">
-                추가 목표
-              </NotoSansKR>
-              <MaterialCommunityIcons name="bomb" size={24} color={'white'} />
-            </RowContainer>
-            <View>
-              {detailData?.additionalGoal.map((data: AdditionalInfo) => {
-                return (
-                  <ListItem
-                    key={data.ADDITIONAL_NO}
-                    name={data.CHALLENGE_USER_NN}
-                    body={data.ADDITIONAL_NM}
-                    time={calculateRemainTime(data.END_DT)}
+        {detailData?.CHALLENGE_STATUS === ChallengeStatusType.PROGRESS ? (
+          <>
+            <CenterContainer>
+              <RowContainer seperate>
+                <NotoSansKR size={18}>개인별 목표</NotoSansKR>
+              </RowContainer>
+              <View style={{gap: 8}}>
+                {personGoal.map(goal => (
+                  <GoalBox
+                    key={goal.id}
+                    goal={goal}
+                    challenge_no={selectedChallengeMstNo!}
                   />
-                );
-              })}
-            </View>
-          </FootContainer>
+                ))}
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  showModal(
+                    <PersonGoalAddModal
+                      challenge_no={selectedChallengeMstNo!}
+                    />,
+                  );
+                }}>
+                <PlusContainers title="목표 추가하기" />
+              </TouchableOpacity>
+            </CenterContainer>
+            <CenterContainer>
+              <ButtonComponent
+                onPress={() => {
+                  showModal(
+                    <MyDailyDrayModal
+                      challenge_user_no={detailData.CHALLENGE_USER_NO}
+                      personGoal={personGoal}
+                    />,
+                  );
+                }}>
+                일기 작성하기
+              </ButtonComponent>
+            </CenterContainer>
+            {detailData?.additionalGoal.length !== 0 ? (
+              <FootContainer>
+                <RowContainer seperate>
+                  <NotoSansKR size={18} color="white">
+                    추가 목표
+                  </NotoSansKR>
+                  <MaterialCommunityIcons
+                    name="bomb"
+                    size={24}
+                    color={'white'}
+                  />
+                </RowContainer>
+                <View>
+                  {detailData?.additionalGoal.map((data: AdditionalInfo) => {
+                    return (
+                      <ListItem
+                        key={data.ADDITIONAL_NO}
+                        name={data.CHALLENGE_USER_NN}
+                        body={data.ADDITIONAL_NM}
+                        time={calculateRemainTime(data.END_DT)}
+                      />
+                    );
+                  })}
+                </View>
+              </FootContainer>
+            ) : (
+              <FootContainer disalbed>
+                <RowContainer seperate>
+                  <NotoSansKR size={18} color="white">
+                    추가 목표
+                  </NotoSansKR>
+                  <OcticonIcons name="hourglass" size={24} color={'white'} />
+                </RowContainer>
+              </FootContainer>
+            )}
+          </>
         ) : (
-          <FootContainer disalbed>
-            <RowContainer seperate>
-              <NotoSansKR size={18} color="white">
-                추가 목표
+          <CenterContainer style={{height: 300}}>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+                gap: 24,
+              }}>
+              <Image
+                style={{height: 136}}
+                source={require('../../assets/image/character/nuts05.png')}
+                resizeMode="contain"
+              />
+              <NotoSansKR size={16} color="gray5">
+                챌린지가 시작하지 않았어요!
               </NotoSansKR>
-              <OcticonIcons name="hourglass" size={24} color={'white'} />
-            </RowContainer>
-          </FootContainer>
+            </View>
+          </CenterContainer>
         )}
       </HomeContainer>
     </ScrollView>

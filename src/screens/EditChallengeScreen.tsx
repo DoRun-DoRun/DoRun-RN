@@ -156,14 +156,17 @@ const EditChallengeScreen = () => {
   const {mutate: ChallengeDeleteMutation} = useMutation(challengeDelete, {
     onSuccess: response => {
       console.log('Success:', response);
+      dispatch(setSelectedChallengeMstNo(null));
+
+      // 상태 업데이트가 반영된 후 쿼리 무효화
       queryClient.invalidateQueries('getChallenge');
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
       queryClient.invalidateQueries('userData');
 
-      dispatch(setSelectedChallengeMstNo(null));
       navigation.navigate('MainTab' as never);
     },
+
     onError: error => {
       console.error('Challenge Start Error:', error);
     },
@@ -171,7 +174,6 @@ const EditChallengeScreen = () => {
 
   useEffect(() => {
     if (challengeData !== undefined) {
-      console.log(challengeData);
       const listData = challengeData.PARTICIPANTS?.map(
         (participant: participantsDataType) => ({
           UserName: participant.USER_NM,
@@ -382,16 +384,15 @@ const EditChallengeScreen = () => {
                 type="secondary"
                 onPress={() => {
                   Alert.alert(
-                    '챌린지 삭제', // 대화상자 제목
+                    '', // 대화상자 제목
                     '정말로 챌린지를 삭제하시겠습니까?', // 메시지
                     [
                       {
                         text: '취소',
-                        onPress: () => console.log('삭제 취소'),
                         style: 'cancel',
                       },
                       {
-                        text: '삭제',
+                        text: '삭제하기',
                         onPress: () => {
                           ChallengeDeleteMutation(); // 챌린지 삭제 함수 호출
                         },
@@ -411,7 +412,24 @@ const EditChallengeScreen = () => {
           <ButtonComponent
             type="primary"
             onPress={() => {
-              ChallengeDeleteMutation();
+              Alert.alert(
+                '', // 대화상자 제목
+                '정말로 챌린지를 그만두시겠습니까?', // 메시지
+                [
+                  {
+                    text: '취소',
+                    style: 'cancel',
+                  },
+                  {
+                    text: '그만두기',
+                    onPress: () => {
+                      ChallengeDeleteMutation(); // 챌린지 삭제 함수 호출
+                    },
+                    style: 'destructive',
+                  },
+                ],
+                {cancelable: false}, // 바깥쪽을 눌러 대화상자를 닫을 수 없도록 설정
+              );
             }}>
             챌린지 중단하기
           </ButtonComponent>

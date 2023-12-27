@@ -20,6 +20,7 @@ import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 // import 'react-native-get-random-values';
 import {v4 as uuid} from 'uuid';
 import {SignType} from '../../store/data';
+import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 
 const signInWithApple = async () => {
   // performs login request
@@ -215,12 +216,20 @@ const LoginTab = () => {
           </RowContainer>
         </LoginButton>
         <TouchableOpacity
-          onPress={() => {
+          onPress={async () => {
             if (isLoading) {
               console.log('Guest login is already in progress.');
               return;
             } else {
-              create_guest();
+              const userData = await loadUser();
+              await dispatch(setSelectedChallengeMstNo(null));
+
+              if (userData?.refreshToken) {
+                dispatch(setUser(userData));
+                loginMutation.mutate(userData.refreshToken);
+              } else {
+                create_guest();
+              }
             }
           }}>
           <NotoSansKR
