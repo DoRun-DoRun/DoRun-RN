@@ -548,6 +548,7 @@ const CreateChallengeScreen = () => {
 
   const {mutate: ChallengeStartMutate} = useMutation(createChallenge, {
     onSuccess: response => {
+      console.log(response);
       ChallengeStart(response.CHALLENGE_MST_NO);
     },
     onError: error => {
@@ -592,7 +593,7 @@ const CreateChallengeScreen = () => {
               {selectedEmoji ? (
                 <TossFace size={40}>{selectedEmoji?.emoji}</TossFace>
               ) : (
-                <OcticonIcons name="plus-circle" size={40} />
+                <OcticonIcons name="plus-circle" size={40} color={'black'} />
               )}
             </TouchableOpacity>
             <InputNotoSansKR
@@ -677,10 +678,7 @@ const CreateChallengeScreen = () => {
               return;
             }
 
-            if (
-              calendarData.start === formatDate(new Date()) &&
-              inviteListData.length > 1
-            ) {
+            if (calendarData.start === formatDate(new Date())) {
               Alert.alert(
                 '챌린지 시작 날짜가 오늘입니다.', // 경고 제목
                 '친구들을 기다리지 않고 바로 시작할까요?', // 경고 메시지

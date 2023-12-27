@@ -17,25 +17,6 @@ import ImageResizer from 'react-native-image-resizer';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useModal} from './Modal/ModalProvider';
 
-interface ButtonType {
-  children: React.ReactNode;
-  type?: 'primary' | 'secondary' | 'gray';
-  onPress?: () => void;
-  disabled?: boolean;
-}
-
-export const ButtonContainer = styled.TouchableOpacity<{
-  color: string;
-  disabled?: boolean;
-}>`
-  background-color: ${props =>
-    props.disabled ? props.theme.gray4 : props.theme[props.color]};
-  padding: 8px;
-  width: 100%;
-  align-items: center;
-  border-radius: 10px;
-`;
-
 interface FontType {
   size: number;
   weight?: 'Bold' | 'Medium' | 'Regular';
@@ -47,30 +28,35 @@ interface FontType {
 
 export const NotoSansKR = styled.Text<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  /* 안드로이드에서 font 오류 */
-  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.75 + 'px'};
+    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
   font-size: ${({size}) => size + 'px'};
   text-align: ${({textAlign}) => (textAlign ? textAlign : 'auto')};
 `;
 
 export const InputNotoSansKR = styled.TextInput<FontType>`
+  include-font-padding: false;
+  vertical-align: middle;
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  /* 안드로이드에서 font 오류 */
-  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  font-weight: normal;
   line-height: ${({lineHeight, size}) =>
     lineHeight ? `${lineHeight}px` : `${size * 1.45}px`};
   font-size: ${({size}) => `${size}px`};
   padding: 0;
-  padding-bottom: 4px;
   margin: 0;
   border-bottom-width: ${({border}) => (border ? '1px' : 0)};
 `;
 
 export const TossFace = styled.Text<{size: number}>`
+  color: black;
   font-size: ${({size}) => size + 'px'};
-  line-height: ${({size}) => size * 2 + 'px'};
+  line-height: ${({size}) =>
+    Platform.select({
+      ios: size * 2,
+      android: size * 2.25,
+    })}px;
   font-family: 'TossFaceFontMac';
 `;
 
@@ -112,6 +98,25 @@ export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
     </ScrollContainer>
   );
 };
+
+interface ButtonType {
+  children: React.ReactNode;
+  type?: 'primary' | 'secondary' | 'gray';
+  onPress?: () => void;
+  disabled?: boolean;
+}
+
+export const ButtonContainer = styled.TouchableOpacity<{
+  color: string;
+  disabled?: boolean;
+}>`
+  background-color: ${props =>
+    props.disabled ? props.theme.gray4 : props.theme[props.color]};
+  padding: 8px;
+  width: 100%;
+  align-items: center;
+  border-radius: 10px;
+`;
 
 export const ButtonComponent = ({
   children,
@@ -227,6 +232,9 @@ export const useApi = () => {
         Toast.show({
           type: 'error',
           text1: '올바르지 않은 접근입니다',
+          text2: axios.isAxiosError(error)
+            ? error.response?.data || error.message
+            : error,
         });
         hideModal();
         navigation.goBack();

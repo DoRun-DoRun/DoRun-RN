@@ -55,7 +55,7 @@ export const MainTab = () => {
                 onPress={() => {
                   navigation.navigate('EditChallengeScreen' as never);
                 }}>
-                <OcticonIcons name="pencil" size={24} />
+                <OcticonIcons name="pencil" size={24} color={'black'} />
               </TouchableOpacity>
             ),
         }}
@@ -87,7 +87,7 @@ export const MainTab = () => {
                 onPress={() => {
                   navigation.navigate('ProfileSettingScreen' as never);
                 }}>
-                <OcticonIcons name="gear" size={24} />
+                <OcticonIcons name="gear" size={24} color={'black'} />
               </TouchableOpacity>
             );
           },

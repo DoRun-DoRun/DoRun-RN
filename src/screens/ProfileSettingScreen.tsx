@@ -126,7 +126,7 @@ const ProfileSettingScreen = () => {
                 onChangeText={setUserName}
               />
               <PencilIcon>
-                <OcticonIcons name="pencil" size={20} />
+                <OcticonIcons name="pencil" size={20} color={'black'} />
               </PencilIcon>
             </RowContainer>
           </View>

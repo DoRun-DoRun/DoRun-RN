@@ -16,40 +16,6 @@ interface PersonModalType {
   title: string;
 }
 
-export const PersonGoalChoiceModal = ({
-  id,
-  challenge_no,
-  title,
-}: PersonModalType) => {
-  const dispatch = useDispatch();
-  const {hideModal, showModal} = useModal();
-
-  const openEditeModal = () => {
-    showModal(
-      <PersonGoalEditModal id={id} challenge_no={challenge_no} title={title} />,
-    );
-  };
-
-  return (
-    <View style={{gap: 24}}>
-      <ModalHeadBorder />
-      <View style={{gap: 8}}>
-        <ButtonComponent onPress={() => openEditeModal()} type="secondary">
-          수정하기
-        </ButtonComponent>
-        <ButtonComponent
-          type="secondary"
-          onPress={() => {
-            dispatch(removeGoal({goalId: id, challenge_no: challenge_no}));
-            hideModal();
-          }}>
-          삭제하기
-        </ButtonComponent>
-      </View>
-    </View>
-  );
-};
-
 export const PersonGoalEditModal = ({
   id,
   challenge_no,
@@ -67,6 +33,7 @@ export const PersonGoalEditModal = ({
         size={16}
         value={inputText}
         onChangeText={setInputText}
+        border
       />
       <View style={{gap: 8}}>
         <ButtonComponent
@@ -86,9 +53,10 @@ export const PersonGoalEditModal = ({
         <ButtonComponent
           type="secondary"
           onPress={() => {
+            dispatch(removeGoal({goalId: id, challenge_no: challenge_no}));
             hideModal();
           }}>
-          취소하기
+          삭제하기
         </ButtonComponent>
       </View>
     </View>
@@ -109,6 +77,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
         value={inputText}
         placeholder="새로운 목표를 추가해주세요."
         onChangeText={setInputText}
+        border
       />
       <View style={{gap: 8}}>
         <ButtonComponent

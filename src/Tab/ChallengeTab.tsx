@@ -28,7 +28,7 @@ import {ChallengeListModal} from '../Modal/ChallengeListModal';
 import {goalType, toggleGoal} from '../../store/slice/GoalSlice';
 import {
   PersonGoalAddModal,
-  PersonGoalChoiceModal,
+  PersonGoalEditModal,
 } from '../Modal/PersonGoalModal';
 import {challengeDataType} from '../../store/async/asyncStore';
 import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
@@ -39,7 +39,7 @@ const Profile = styled.View`
   width: 40px;
   height: 40px;
   border-radius: 20px;
-  background-color: #fbef84;
+  background-color: ${props => props.theme.secondary2};
   justify-content: center;
   align-items: center;
 `;
@@ -154,6 +154,15 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
 
   return (
     <GoalContainer
+      onLongPress={() => {
+        showModal(
+          <PersonGoalEditModal
+            id={goal.id}
+            challenge_no={challenge_no}
+            title={goal.title}
+          />,
+        );
+      }}
       onPress={() =>
         dispatch(toggleGoal({goalId: goal.id, challenge_no: challenge_no}))
       }
@@ -173,7 +182,7 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
         <TouchableOpacity
           onPress={() => {
             showModal(
-              <PersonGoalChoiceModal
+              <PersonGoalEditModal
                 id={goal.id}
                 challenge_no={challenge_no}
                 title={goal.title}
@@ -324,7 +333,7 @@ const ChallengeTab = () => {
         listData.progress_challenges[0].CHALLENGE_MST_NO;
       dispatch(setSelectedChallengeMstNo(firstChallengeMstNo));
     }
-  }, [dispatch, listData.progress_challenges]);
+  }, [dispatch, listData?.progress_challenges]);
 
   const getChallengeDetail = async () => {
     try {
@@ -562,7 +571,11 @@ const ChallengeTab = () => {
                   <NotoSansKR size={18} color="white">
                     추가 목표
                   </NotoSansKR>
-                  <OcticonIcons name="hourglass" size={24} color={'white'} />
+                  <MaterialCommunityIcons
+                    name="bomb"
+                    size={24}
+                    color={'white'}
+                  />
                 </RowContainer>
               </FootContainer>
             )}
