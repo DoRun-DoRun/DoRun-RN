@@ -1,16 +1,15 @@
-import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 import {
   ButtonComponent,
   LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   TossFace,
-  convertUTCToKoKR,
+  convertUTCToKoKRDay,
   useApi,
 } from '../Component';
 import {ModalHeadText} from './CustomModal';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {InviteAcceptType} from '../../store/data';
@@ -65,7 +64,6 @@ export const ChallengeListModal = ({
   const {accessToken} = useSelector((state: RootState) => state.user);
   const {hideModal} = useModal();
   const CallApi = useApi();
-  const [isSecondSectionVisible, setSecondSectionVisible] = useState(true);
 
   const GetInviteChallenge = async () => {
     try {
@@ -122,41 +120,33 @@ export const ChallengeListModal = ({
           <NotoSansKR size={20}>{data?.CHALLENGE_MST_NM}</NotoSansKR>
         </RowContainer>
 
-        <TouchableOpacity
-          onPress={() => setSecondSectionVisible(!isSecondSectionVisible)}>
-          <RowContainer seperate>
-            <NotoSansKR size={18}>챌린지 참여 인원</NotoSansKR>
-            <OcticonIcons name="chevron-down" size={28} />
-          </RowContainer>
-        </TouchableOpacity>
+        <NotoSansKR size={18}>챌린지 참여 인원</NotoSansKR>
 
-        {isSecondSectionVisible && (
-          <View style={{gap: 8}}>
-            {data?.PARTICIPANTS.map((user: participantsType) => {
-              return (
-                <StatusComponent
-                  key={user.UID}
-                  username={user.USER_NM}
-                  status={
-                    user.ACCEPT_STATUS === InviteAcceptType.ACCEPTED
-                      ? true
-                      : user.ACCEPT_STATUS === InviteAcceptType.PENDING
-                      ? false
-                      : null
-                  }
-                />
-              );
-            })}
-          </View>
-        )}
+        <View style={{gap: 8}}>
+          {data?.PARTICIPANTS.map((user: participantsType) => {
+            return (
+              <StatusComponent
+                key={user.UID}
+                username={user.USER_NM}
+                status={
+                  user.ACCEPT_STATUS === InviteAcceptType.ACCEPTED
+                    ? true
+                    : user.ACCEPT_STATUS === InviteAcceptType.PENDING
+                    ? false
+                    : null
+                }
+              />
+            );
+          })}
+        </View>
 
         <View style={{gap: 8}}>
           <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
           <ChallengeTimeBox>
             <NotoSansKR size={14} weight="Medium" lineHeight={28}>
-              {convertUTCToKoKR(data?.START_DT) +
+              {convertUTCToKoKRDay(data?.START_DT) +
                 ' ~ ' +
-                convertUTCToKoKR(data?.END_DT)}
+                convertUTCToKoKRDay(data?.END_DT)}
             </NotoSansKR>
           </ChallengeTimeBox>
         </View>

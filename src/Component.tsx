@@ -329,10 +329,8 @@ export function convertKoKRToUTC(dateString: string) {
   return utcDate;
 }
 
-export function convertUTCToKoKR(dateString: string) {
-  // 요일명 배열
+export function convertUTCToKoKRDay(dateString: string) {
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-  // UTC 시간대의 Date 객체 생성
   const utcDate = new Date(dateString);
 
   // 한국 시간대로 변환 (UTC+9)
@@ -346,6 +344,21 @@ export function convertUTCToKoKR(dateString: string) {
   const weekDay = weekDays[localTime.getDay()]; // 요일명 추출
 
   return `${year}-${month}-${day} (${weekDay})`;
+}
+
+export function convertUTCToKoKR(dateString: string) {
+  const utcDate = new Date(dateString);
+
+  // 한국 시간대로 변환 (UTC+9)
+  const koreaTimeOffset = 9 * 60; // 9시간을 분 단위로 변환
+  const localTime = new Date(utcDate.getTime() + koreaTimeOffset * 60000); // 밀리초 단위로 변환하여 더함
+
+  // YYYY-MM-DD 형식으로 변환
+  const year = localTime.getFullYear();
+  const month = (localTime.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 1을 더함
+  const day = localTime.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }
 
 export const calculateDaysUntil = (startDateString: string) => {

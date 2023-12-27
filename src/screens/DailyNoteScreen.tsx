@@ -15,14 +15,14 @@ import {
 } from '../Component';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {useMutation, useQuery} from 'react-query';
-import {RouteType} from '../App';
+import {DailyNoteRouteType} from '../App';
 import {groupImage} from '../../store/data';
 import {useNavigation} from '@react-navigation/native';
 import {RootState} from '../../store/RootReducer';
 import {useSelector} from 'react-redux';
 
 // DailyNoteScreen 컴포넌트
-export const DailyNoteScreen = ({route}: {route: RouteType}) => {
+export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   const {daily_no} = route.params;
   const CallApi = useApi();
 

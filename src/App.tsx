@@ -36,7 +36,10 @@ export type NavigationType = NavigationProp<
 >;
 
 // Route 타입
-export type RouteType = RouteProp<RootStackParamList, 'DailyNoteScreen'>;
+export type DailyNoteRouteType = RouteProp<
+  RootStackParamList,
+  'DailyNoteScreen'
+>;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {Alert, TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -43,12 +43,16 @@ interface InviteFriendType {
   name: string;
   UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+  setIsClicked: Dispatch<SetStateAction<boolean>>;
+  setUidInput: Dispatch<SetStateAction<string>>;
 }
 
 export const InviteFriend = ({
   name,
   UID,
   setInviteListData,
+  setIsClicked,
+  setUidInput,
 }: InviteFriendType) => {
   return (
     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -65,6 +69,8 @@ export const InviteFriend = ({
             // 중복된 항목이 있으면 리스트 변경 없이 반환
             return prev;
           });
+          setUidInput('');
+          setIsClicked(false);
         }}>
         <NotoSansKR
           size={14}
@@ -149,7 +155,6 @@ const SearchBox = ({
           onChangeText={text => setUidInput(text)}
           style={{flex: 1}}
           placeholder="Friend UID"
-          onBlur={() => setIsClicked(false)}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
@@ -166,6 +171,8 @@ const SearchBox = ({
                 name={data.USER_NM}
                 UID={data.UID}
                 setInviteListData={setInviteListData}
+                setIsClicked={setIsClicked}
+                setUidInput={setUidInput}
               />
             ))
           )}
@@ -182,6 +189,8 @@ const SearchBox = ({
               name={searchData.USER_NM}
               UID={searchData.UID}
               setInviteListData={setInviteListData}
+              setIsClicked={setIsClicked}
+              setUidInput={setUidInput}
             />
           ) : (
             <NotoSansKR size={14} color="gray5">
@@ -408,7 +417,6 @@ const CreateChallengeScreen = () => {
   const validUserName = userName || '기본 사용자 이름';
   const validUID = UID || 1000000;
 
-  const [listOpen, setListOpen] = useState(true);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<EmojiType>();
   const [challengeName, setChallengeName] = useState('');
@@ -421,7 +429,6 @@ const CreateChallengeScreen = () => {
     {UserName: validUserName, UID: validUID, accept: true},
   ]);
 
-  const theme = useTheme();
   const CallApi = useApi();
 
   const createChallenge = () =>
@@ -449,49 +456,6 @@ const CreateChallengeScreen = () => {
     },
     onError: error => {
       console.error('Error:', error);
-    },
-  });
-
-  const {mutate: ChallengeCreateNowMutate} = useMutation(createChallenge, {
-    onSuccess: response => {
-      console.log('Success:', response);
-      queryClient.invalidateQueries('getChallenge');
-      Alert.alert(
-        '챌린지 시작하기',
-        '시작 날짜까지 참가지를 기다리지 않고 바로 시작하시겠습니까?',
-        [
-          {
-            text: '바로시작',
-            onPress: () => ChallengeStartMutate(response.CHALLENGE_MST_NO),
-            style: 'default',
-          },
-          {
-            text: '기다리기',
-            onPress: () => navigation.navigate('MainTab' as never),
-          },
-        ],
-      );
-    },
-    onError: error => {
-      console.error('Error:', error);
-    },
-  });
-
-  const challengeStart = (challenge_mst_no: number) =>
-    CallApi({
-      endpoint: `challenge/start?challenge_mst_no=${challenge_mst_no}`,
-      method: 'POST',
-      accessToken: accessToken!,
-    });
-
-  const {mutate: ChallengeStartMutate} = useMutation(challengeStart, {
-    onSuccess: response => {
-      console.log('Success:', response);
-
-      navigation.navigate('MainTab' as never);
-    },
-    onError: error => {
-      console.error('Challenge Start Error:', error);
     },
   });
 
@@ -525,7 +489,7 @@ const CreateChallengeScreen = () => {
               setIsClicked={setSearchOpen}
               setInviteListData={setInviteListData}
             />
-            {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
+            {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
           </RowContainer>
 
           <View style={{gap: 16}}>
@@ -533,27 +497,18 @@ const CreateChallengeScreen = () => {
               <NotoSansKR size={18} style={{marginBottom: 4}}>
                 챌린지 참여 인원
               </NotoSansKR>
-              <TouchableOpacity onPress={() => setListOpen(!listOpen)}>
-                <OcticonIcons
-                  name={listOpen ? 'chevron-down' : 'chevron-up'}
-                  size={28}
-                  color={theme.gray3}
-                />
-              </TouchableOpacity>
             </RowContainer>
 
-            {listOpen ? (
-              <View style={{gap: 12}}>
-                {inviteListData.map((data, key) => (
-                  <InviteList
-                    key={key}
-                    UserName={data.UserName}
-                    UID={data.UID}
-                    accept={data.accept}
-                  />
-                ))}
-              </View>
-            ) : null}
+            <View style={{gap: 12}}>
+              {inviteListData.map((data, key) => (
+                <InviteList
+                  key={key}
+                  UserName={data.UserName}
+                  UID={data.UID}
+                  accept={data.accept}
+                />
+              ))}
+            </View>
           </View>
 
           <View style={{gap: 8}}>
@@ -589,25 +544,9 @@ const CreateChallengeScreen = () => {
               console.error('모든 필수 필드를 채워주세요.');
               return;
             }
-            ChallengeCreateNowMutate();
-          }}>
-          바로 시작하기
-        </ButtonComponent>
-        <ButtonComponent
-          type="secondary"
-          onPress={() => {
-            if (
-              !challengeName ||
-              !calendarData.start ||
-              !calendarData.end ||
-              !selectedEmoji
-            ) {
-              console.error('모든 필수 필드를 채워주세요.');
-              return;
-            }
             ChallengeCreateMutate();
           }}>
-          시작 날짜까지 기다리기
+          챌린지 생성하기
         </ButtonComponent>
       </View>
 

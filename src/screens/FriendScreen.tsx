@@ -180,7 +180,6 @@ const SearchBox = () => {
           onChangeText={setUidInput}
           style={{flex: 1}}
           placeholder="Friend UID"
-          onBlur={() => setIsClicked(false)}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
@@ -212,8 +211,6 @@ interface friendAPIType {
 }
 
 const FriendScreen = () => {
-  const [reqeusted, setReqeusted] = useState(true);
-  const theme = useTheme();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
   const FriendListModal = async () => {
@@ -248,33 +245,23 @@ const FriendScreen = () => {
             <SearchBox />
 
             <View style={{gap: 8}}>
-              <RowContainer seperate>
-                <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-                  요청된 친구 초대
-                </NotoSansKR>
-                <TouchableOpacity onPress={() => setReqeusted(!reqeusted)}>
-                  <OcticonIcons
-                    name={reqeusted ? 'chevron-down' : 'chevron-up'}
-                    size={28}
-                    color={theme.gray1}
-                  />
-                </TouchableOpacity>
-              </RowContainer>
-              {reqeusted ? (
-                <View style={{gap: 8}}>
-                  {friendData?.pending.map((data: friendAPIType) => {
-                    return (
-                      <Friend
-                        accessToken={accessToken}
-                        key={data.FRIEND_NO}
-                        name={data.USER_NM}
-                        friendNo={data.FRIEND_NO}
-                        invited
-                      />
-                    );
-                  })}
-                </View>
-              ) : null}
+              <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
+                요청된 친구 초대
+              </NotoSansKR>
+
+              <View style={{gap: 8}}>
+                {friendData?.pending.map((data: friendAPIType) => {
+                  return (
+                    <Friend
+                      accessToken={accessToken}
+                      key={data.FRIEND_NO}
+                      name={data.USER_NM}
+                      friendNo={data.FRIEND_NO}
+                      invited
+                    />
+                  );
+                })}
+              </View>
             </View>
 
             <View style={{gap: 8}}>

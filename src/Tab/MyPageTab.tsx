@@ -12,7 +12,7 @@ import {
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useQuery} from 'react-query';
@@ -210,9 +210,9 @@ const History = () => {
         </CalendarProvider>
       </View>
 
-      {isLoading && <LoadingIndicatior />}
-
-      {data?.total_size > 0 ? (
+      {isLoading ? (
+        <LoadingIndicatior />
+      ) : data.total_size > 0 ? (
         <>
           <RowContainer seperate>
             {index !== 1 ? (
@@ -259,7 +259,7 @@ const History = () => {
               </DailyDiary>
             )}
 
-            {data.personGoal.length > 0 ? (
+            {data.personGoal.length > 0 && (
               <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.3)']}>
                 {data.personGoal.map((goal: PersonGoal, idx: number) => (
                   <DailyTodoList key={idx} gap={8}>
@@ -283,37 +283,31 @@ const History = () => {
                   </DailyTodoList>
                 ))}
               </DailyTodo>
-            ) : (
-              <Text>해당 날짜에 진행사항이 없어요</Text>
-            )}
-
-            {data.teamGoal && (
-              <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.4)']}>
-                <DailyTodoList gap={8}>
-                  {data.teamGoal.IS_DONE ? (
-                    <MaterialIcons
-                      name="check-box"
-                      color={theme.primary1}
-                      size={20}
-                    />
-                  ) : (
-                    <MaterialIcons
-                      name="check-box-outline-blank"
-                      color={theme.primary1}
-                      size={20}
-                    />
-                  )}
-
-                  <NotoSansKR size={13} color="gray3">
-                    {data.teamGoal.TEAM_NM}
-                  </NotoSansKR>
-                </DailyTodoList>
-              </DailyTodo>
             )}
           </View>
+
+          {!data?.IMAGE_FILE_NM &&
+            !data?.COMMENT &&
+            data?.personGoal?.length === 0 && (
+              <View
+                style={{
+                  height: 140,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <NotoSansKR size={16}>
+                  해당 날짜에는 챌린지를 수행하지 못했어요
+                </NotoSansKR>
+              </View>
+            )}
         </>
       ) : (
-        <NotoSansKR size={16}>챌린지 기록이 존재하지 않아요</NotoSansKR>
+        <View
+          style={{height: 200, justifyContent: 'center', alignItems: 'center'}}>
+          <NotoSansKR size={16}>
+            해당 날짜에는 챌린지를 진행하지 않았어요
+          </NotoSansKR>
+        </View>
       )}
     </>
   );

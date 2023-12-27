@@ -69,7 +69,6 @@ const RaceTab = () => {
   const CallApi = useApi();
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  // const {index} = useSelector((state: RootState) => state.index);
   const [index, setIndex] = useState(1);
 
   const navigation = useNavigation();
