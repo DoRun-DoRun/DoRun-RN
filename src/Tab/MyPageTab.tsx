@@ -3,27 +3,30 @@ import {
   GetImage,
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
   TossFace,
   convertKoKRToUTC,
+  formatDate,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Image, Pressable, Text, TouchableOpacity, View} from 'react-native';
+import {Dimensions, Image, TouchableOpacity, View} from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useModal} from '../Modal/ModalProvider';
 import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import LinearGradient from 'react-native-linear-gradient';
 import {profileImage} from '../../store/data';
+import {Direction} from 'react-native-calendars/src/types';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
   padding: 16px;
+  padding-right: 36px;
   border-radius: 10px;
 `;
 
@@ -117,7 +120,7 @@ const DailyPicContiner = styled.View`
 `;
 
 const DailyPic = styled.Image`
-  width: 300px;
+  width: 100%;
   height: 300px;
   border-radius: 10px;
   background-color: ${props => props.theme.gray7};
@@ -135,11 +138,6 @@ const DailyDiary = styled(LinearGradient).attrs({
 })`
   border-radius: 10px;
   padding: 16px;
-  /* shadow-color: rgba(0, 0, 0, 0.15);
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.15;
-  shadow-radius: 30px;
-  elevation: 4; */
 `;
 
 const DailyTodo = styled(LinearGradient).attrs({
@@ -182,6 +180,7 @@ const History = () => {
   const theme = useTheme();
   const [date, setDate] = useState(formattedDate);
   const [index, setIndex] = useState(1);
+  const [disabledRight, setDisabledRight] = useState(true);
 
   const ChallengeHistory = async () => {
     try {
@@ -202,15 +201,48 @@ const History = () => {
     ChallengeHistory,
   );
 
+  const width = Dimensions.get('screen').width;
+
   return (
     <>
-      <View style={{marginHorizontal: -16}}>
-        <CalendarProvider date={date} onDateChanged={e => setDate(e)}>
-          <ExpandableCalendar firstDay={1} onDayPress={() => setIndex(1)} />
-        </CalendarProvider>
-      </View>
-      {isLoading && <Text>로딩중</Text>}
-      {data?.total_size > 0 ? (
+      <CalendarProvider
+        date={date}
+        onMonthChange={e =>
+          e.month !== currentDate.getMonth() + 1
+            ? setDisabledRight(false)
+            : setDisabledRight(true)
+        }>
+        <ExpandableCalendar
+          style={{borderRadius: 10, padding: 10}}
+          renderArrow={(direction: Direction) =>
+            direction === 'left' ? (
+              <MaterialIcons
+                name="arrow-back"
+                size={20}
+                color={theme.primary1}
+              />
+            ) : (
+              !disabledRight && (
+                <MaterialIcons
+                  name="arrow-forward"
+                  size={20}
+                  color={theme.primary1}
+                />
+              )
+            )
+          }
+          disableArrowRight={disabledRight}
+          monthFormat="yy년 MM월"
+          calendarWidth={width - 52}
+          allowShadow
+          onDayPress={e => setDate(e.dateString)}
+          maxDate={formatDate(new Date())}
+        />
+      </CalendarProvider>
+
+      {isLoading ? (
+        <LoadingIndicatior />
+      ) : data.total_size > 0 ? (
         <>
           <RowContainer seperate>
             {index !== 1 ? (
@@ -257,7 +289,7 @@ const History = () => {
               </DailyDiary>
             )}
 
-            {data.personGoal.length > 0 ? (
+            {data.personGoal.length > 0 && (
               <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.3)']}>
                 {data.personGoal.map((goal: PersonGoal, idx: number) => (
                   <DailyTodoList key={idx} gap={8}>
@@ -281,92 +313,47 @@ const History = () => {
                   </DailyTodoList>
                 ))}
               </DailyTodo>
-            ) : (
-              <Text>해당 날짜에 진행사항이 없어요</Text>
-            )}
-
-            {data.teamGoal && (
-              <DailyTodo colors={['#ffffff', 'rgba(255, 255, 255, 0.4)']}>
-                <DailyTodoList gap={8}>
-                  {data.teamGoal.IS_DONE ? (
-                    <MaterialIcons
-                      name="check-box"
-                      color={theme.primary1}
-                      size={20}
-                    />
-                  ) : (
-                    <MaterialIcons
-                      name="check-box-outline-blank"
-                      color={theme.primary1}
-                      size={20}
-                    />
-                  )}
-
-                  <NotoSansKR size={13} color="gray3">
-                    {data.teamGoal.TEAM_NM}
-                  </NotoSansKR>
-                </DailyTodoList>
-              </DailyTodo>
             )}
           </View>
+
+          {!data?.IMAGE_FILE_NM &&
+            !data?.COMMENT &&
+            data?.personGoal?.length === 0 && (
+              <View
+                style={{
+                  height: 140,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <NotoSansKR size={16}>
+                  해당 날짜에는 챌린지를 수행하지 못했어요
+                </NotoSansKR>
+              </View>
+            )}
         </>
       ) : (
-        <NotoSansKR size={16}>챌린지 기록이 존재하지 않아요</NotoSansKR>
+        <View
+          style={{height: 200, justifyContent: 'center', alignItems: 'center'}}>
+          <NotoSansKR size={16}>
+            해당 날짜에는 챌린지를 진행하지 않았어요
+          </NotoSansKR>
+        </View>
       )}
     </>
   );
 };
-const AlbumItem = styled.View`
-  width: 72px;
-  height: 72px;
-  border-radius: 10px;
-  background-color: ${props => props.theme.gray6};
-`;
-const AlbumGrid = styled(RowContainer)`
-  width: 232px;
-  height: 248px;
-  column-gap: 8px;
-  row-gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-`;
 
 const Album = () => {
-  const {showModal, hideModal} = useModal();
-
-  const openModal = () => {
-    const modalContent = (
-      <View style={{alignItems: 'center', gap: 24}}>
-        <View style={{height: 200, width: 200, backgroundColor: '#ccc'}} />
-        <NotoSansKR size={14} onPress={() => hideModal()}>
-          닫기
-        </NotoSansKR>
-      </View>
-    );
-    showModal(modalContent);
-  };
-
   return (
-    <RowContainer style={{justifyContent: 'space-between', padding: 16}}>
-      <MaterialIcons name="chevron-left" size={20} />
-      <AlbumGrid>
-        <Pressable
-          onPress={() => {
-            openModal();
-          }}>
-          <AlbumItem />
-        </Pressable>
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-        <AlbumItem />
-      </AlbumGrid>
-      <MaterialIcons name="chevron-right" size={20} />
-    </RowContainer>
+    <View
+      style={{
+        width: '100%',
+        height: 200,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <NotoSansKR size={16}>열심히 개발중이에요!</NotoSansKR>
+    </View>
   );
 };
 
@@ -389,40 +376,43 @@ const MyPageTab = () => {
     }
   };
 
-  const {data, isLoading, error} = useQuery('userData', UserProfile, {
-    refetchOnWindowFocus: true,
-  });
-
-  if (isLoading) {
-    return <Text>'Loading...'</Text>;
-  }
+  const {data, isLoading, error} = useQuery('userData', UserProfile);
 
   if (error) {
-    return <Text>'ERROR...'</Text>;
+    return <NotoSansKR size={16}>'ERROR...'</NotoSansKR>;
   }
 
   return (
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
-          <ProfileContainer gap={24}>
-            <UserIcon>
-              <Image
-                source={profileImage[data.USER_CHARACTER_NO - 1]}
-                style={{width: '100%', height: '100%', resizeMode: 'contain'}}
-              />
-            </UserIcon>
-            <View>
-              <UserName size={16}>{data.USER_NM}</UserName>
-              <RowContainer gap={16}>
-                <UserStats status="완료" count={data.COMPLETE} />
-                <Divider />
-                <UserStats status="진행중" count={data.PROGRESS} />
-                <Divider />
-                <UserStats status="시작 전" count={data.PENDING} />
-              </RowContainer>
-            </View>
-          </ProfileContainer>
+          {isLoading ? (
+            <LoadingIndicatior />
+          ) : (
+            <ProfileContainer gap={24}>
+              <UserIcon>
+                <Image
+                  source={profileImage[data.USER_CHARACTER_NO - 1]}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    resizeMode: 'contain',
+                  }}
+                />
+              </UserIcon>
+
+              <View style={{flex: 1}}>
+                <UserName size={16}>{data.USER_NM}</UserName>
+                <RowContainer gap={16} seperate>
+                  <UserStats status="완료" count={data.COMPLETE} />
+                  <Divider />
+                  <UserStats status="진행중" count={data.PROGRESS} />
+                  <Divider />
+                  <UserStats status="시작 전" count={data.PENDING} />
+                </RowContainer>
+              </View>
+            </ProfileContainer>
+          )}
 
           <HistoryContainer>
             <CategoryContainer>

@@ -1,10 +1,11 @@
-import React, {Dispatch, SetStateAction, useState} from 'react';
-import {Alert, TouchableOpacity, View} from 'react-native';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -13,6 +14,7 @@ import {
   useApi,
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
@@ -20,6 +22,9 @@ import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {Alert} from 'react-native';
+import {Direction} from 'react-native-calendars/src/types';
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
   flex: 1;
@@ -27,43 +32,65 @@ const SearchContainer = styled.View<{isClicked: boolean}>`
   border: 1px solid ${props => props.theme.gray6};
   padding: 8px;
   border-radius: 10px;
-  gap: 16px;
+  /* gap: 16px; */
   z-index: 10;
 `;
 
 const ExpandedContainer = styled.View`
   background-color: #fff;
-  padding: 0 8px;
+  padding: 8px;
+  margin-top: 8px;
   gap: 16px;
-  padding-bottom: 8px;
 `;
 
-interface InviteFriendType {
+export interface InviteFriendType {
   name: string;
   UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+  setUidInput?: Dispatch<SetStateAction<string>>;
 }
 
 export const InviteFriend = ({
   name,
   UID,
   setInviteListData,
+  setUidInput,
 }: InviteFriendType) => {
   return (
-    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+    <RowContainer seperate>
       <NotoSansKR size={14} weight="Regular">
         {name}
       </NotoSansKR>
 
       <TouchableOpacity
         onPress={() => {
+          const ToastModal = (message: string) =>
+            Toast.show({
+              type: 'error',
+              text1: '초대 실패',
+              text2: message,
+            });
           setInviteListData(prev => {
-            if (!prev.find(item => item.UID === UID)) {
-              return [...prev, {UserName: name, UID, accept: false}];
+            // 이미 초대된 사용자인지 확인
+            const existingUser = prev.find(item => item.UID === UID);
+            if (existingUser) {
+              ToastModal('이미 초대된 사용자입니다.');
+              return prev;
             }
-            // 중복된 항목이 있으면 리스트 변경 없이 반환
-            return prev;
+
+            // 초대 가능한 최대 인원수 확인
+            if (prev.length >= 6) {
+              ToastModal('최대 6명까지만 초대할 수 있습니다.');
+              return prev;
+            }
+
+            // 사용자 추가
+            return [...prev, {UserName: name, UID, accept: false}];
           });
+
+          if (setUidInput) {
+            setUidInput('');
+          }
         }}>
         <NotoSansKR
           size={14}
@@ -73,7 +100,7 @@ export const InviteFriend = ({
           초대하기
         </NotoSansKR>
       </TouchableOpacity>
-    </View>
+    </RowContainer>
   );
 };
 
@@ -88,7 +115,7 @@ interface FriendType {
   USER_NM: string;
 }
 
-const SearchBox = ({
+export const SearchBox = ({
   isClicked,
   setIsClicked,
   setInviteListData,
@@ -135,9 +162,7 @@ const SearchBox = ({
     SearchList,
     {enabled: isUidValid}, // 쿼리 실행 조건
   );
-  if (searchLoading || friendLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
-  }
+
   return (
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
@@ -150,33 +175,43 @@ const SearchBox = ({
           onChangeText={text => setUidInput(text)}
           style={{flex: 1}}
           placeholder="Friend UID"
-          onBlur={() => setIsClicked(false)}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
 
-      {isClicked && !uidInput ? (
-        <ExpandedContainer>
-          <NotoSansKR size={14}>친구 목록</NotoSansKR>
-          {friendData?.accepted.map((data: FriendType, key: number) => (
-            <InviteFriend
-              key={key}
-              name={data.USER_NM}
-              UID={data.UID}
-              setInviteListData={setInviteListData}
-            />
-          ))}
-        </ExpandedContainer>
-      ) : null}
+      {isClicked && !uidInput && (
+        <>
+          {friendLoading ? (
+            <LoadingIndicatior />
+          ) : (
+            friendData?.accepted.length > 0 && (
+              <ExpandedContainer>
+                <NotoSansKR size={14}>친구 목록</NotoSansKR>
+                {friendData?.accepted.map((data: FriendType, key: number) => (
+                  <InviteFriend
+                    key={key}
+                    name={data.USER_NM}
+                    UID={data.UID}
+                    setInviteListData={setInviteListData}
+                  />
+                ))}
+              </ExpandedContainer>
+            )
+          )}
+        </>
+      )}
 
-      {isClicked && uidInput ? (
+      {isClicked && uidInput && (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {searchData?.USER_NM ? (
+          {searchLoading ? (
+            <LoadingIndicatior />
+          ) : searchData?.USER_NM ? (
             <InviteFriend
               name={searchData.USER_NM}
               UID={searchData.UID}
               setInviteListData={setInviteListData}
+              setUidInput={setUidInput}
             />
           ) : (
             <NotoSansKR size={14} color="gray5">
@@ -184,7 +219,7 @@ const SearchBox = ({
             </NotoSansKR>
           )}
         </ExpandedContainer>
-      ) : null}
+      )}
     </SearchContainer>
   );
 };
@@ -197,31 +232,53 @@ const DatePicker = styled.TouchableOpacity`
   border-radius: 100px;
 `;
 
-interface InviteList {
+export interface InviteList {
   UserName: string;
   UID: number;
   accept?: boolean;
 }
 
-const InviteList = ({UserName, accept}: InviteList) => {
+interface InviteListType {
+  UserName: string;
+  UID: number;
+  accept?: boolean;
+  setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+}
+
+export const InviteList = ({
+  UserName,
+  accept,
+  UID,
+  setInviteListData,
+}: InviteListType) => {
   return (
     <RowContainer seperate>
       <NotoSansKR size={16} weight="Medium">
         {UserName}
       </NotoSansKR>
-      <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
-        {accept ? '참여중이에요' : '참여를 기다리고 있어요'}
-      </NotoSansKR>
+      <RowContainer gap={9}>
+        <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
+          {accept ? '참여중이에요' : '참여를 기다리고 있어요'}
+        </NotoSansKR>
+        {!accept && (
+          <TouchableOpacity
+            onPress={() => {
+              setInviteListData(prev => prev.filter(item => item.UID !== UID));
+            }}>
+            <NotoSansKR
+              size={14}
+              weight="Regular"
+              color="gray3"
+              style={{textDecorationLine: 'underline'}}>
+              취소하기
+            </NotoSansKR>
+          </TouchableOpacity>
+        )}
+      </RowContainer>
     </RowContainer>
   );
 };
 
-// const emojiObject = {
-//   emoji: '❤️',
-//   name: 'red heart',
-//   slug: 'red_heart',
-//   unicode_version: '0.6',
-// };
 interface EmojiType {
   emoji: string;
   name: string;
@@ -247,14 +304,16 @@ interface MarkedDataType {
   };
 }
 
-const formatDate = (date: Date): string => {
+export const formatDate = (date: Date): string => {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
-const CalendarModal = styled.TouchableOpacity`
+const CalendarModal = styled.Modal``;
+
+const CalendarView = styled.TouchableOpacity`
   position: absolute;
   width: 100%;
   height: 100%;
@@ -265,9 +324,9 @@ const CalendarModal = styled.TouchableOpacity`
 `;
 
 const CalendarModalContainer = styled.Pressable`
-  padding-top: 16px;
+  padding-top: 10px;
   background-color: #fff;
-  border-radius: 16px;
+  border-radius: 10px;
   z-index: 2;
 `;
 
@@ -278,15 +337,69 @@ const CalendarRowContainer = styled(RowContainer)`
   border-color: ${props => props.theme.primary1};
 `;
 
-const CalendarContainer = ({
+export const CalendarContainer = ({
   setCalendarOpen,
   setCalendarData,
+  calendarData,
 }: {
   setCalendarOpen: Dispatch<SetStateAction<boolean>>;
   setCalendarData: Dispatch<SetStateAction<{start: string; end: string}>>;
+  calendarData: {start: string; end: string};
 }) => {
   const [markedDates, setMarkedDates] = useState<MarkedDataType>({});
+  const [disabledLeft, setDisabledLeft] = useState(true);
+
   const theme = useTheme();
+  const currentDate = new Date();
+
+  useEffect(() => {
+    if (calendarData.start !== '' && calendarData.end !== '') {
+      const {start, end} = calendarData;
+      if (start === end) {
+        setMarkedDates({
+          [start]: {
+            startingDay: true,
+            endingDay: true,
+            color: theme.primary1,
+            textColor: 'white',
+          },
+        });
+      } else {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const newMarkedDates = {...markedDates};
+
+        let day = new Date(startDate);
+        day.setDate(day.getDate() + 1); // 시작 날짜 다음 날부터 순회 시작
+
+        newMarkedDates[start] = {
+          startingDay: true,
+          color: theme.primary1,
+          textColor: 'white',
+        };
+
+        while (day < endDate) {
+          const dayStr = formatDate(day);
+          newMarkedDates[dayStr] = {
+            marked: true,
+            dotColor: 'transparent',
+            color: theme.primary1,
+            textColor: 'white',
+          };
+          day.setDate(day.getDate() + 1);
+        }
+
+        newMarkedDates[end] = {
+          endingDay: true,
+          color: theme.primary1,
+          textColor: 'white',
+        };
+
+        setMarkedDates(newMarkedDates);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onDayPress = (date: Day) => {
     const {dateString} = date;
@@ -310,6 +423,7 @@ const CalendarContainer = ({
         setMarkedDates({
           [dateString]: {
             startingDay: true,
+            endingDay: true,
             color: theme.primary1,
             textColor: 'white',
           },
@@ -345,6 +459,7 @@ const CalendarContainer = ({
       setMarkedDates({
         [dateString]: {
           startingDay: true,
+          endingDay: true,
           color: theme.primary1,
           textColor: 'white',
         },
@@ -355,39 +470,68 @@ const CalendarContainer = ({
   const sendCalendarData = () => {
     setCalendarOpen(false);
     const keys = Object.keys(markedDates);
-    const endDate = new Date(keys![keys.length - 1]);
-    endDate.setDate(endDate.getDate() + 1);
-
-    setCalendarData({
-      start: keys![0],
-      end: formatDate(endDate),
-    });
+    console.log(keys);
+    if (keys.length !== 0) {
+      setCalendarData({
+        start: keys![0],
+        end: keys.length === 1 ? keys![0] : keys![1],
+      });
+    }
   };
-  return (
-    <CalendarModal onPress={() => setCalendarOpen(false)}>
-      <CalendarModalContainer onPress={e => e.stopPropagation()}>
-        <Calendar
-          style={{padding: 16}}
-          onDayPress={onDayPress}
-          markingType={'period'}
-          markedDates={markedDates}
-        />
-        <CalendarRowContainer gap={16}>
-          <TouchableOpacity
-            style={{padding: 10}}
-            onPress={() => setCalendarOpen(false)}>
-            <NotoSansKR size={14} color="primary1">
-              Cancel
-            </NotoSansKR>
-          </TouchableOpacity>
 
-          <TouchableOpacity style={{padding: 10}} onPress={sendCalendarData}>
-            <NotoSansKR size={14} color="primary1">
-              Ok
-            </NotoSansKR>
-          </TouchableOpacity>
-        </CalendarRowContainer>
-      </CalendarModalContainer>
+  return (
+    <CalendarModal transparent={true}>
+      <CalendarView onPress={() => setCalendarOpen(false)}>
+        <CalendarModalContainer onPress={e => e.stopPropagation()}>
+          <Calendar
+            onMonthChange={e =>
+              e.month !== currentDate.getMonth() + 1
+                ? setDisabledLeft(false)
+                : setDisabledLeft(true)
+            }
+            allowShadow
+            renderArrow={(direction: Direction) =>
+              direction === 'left' ? (
+                !disabledLeft && (
+                  <MaterialIcons
+                    name="arrow-back"
+                    size={20}
+                    color={theme.primary1}
+                  />
+                )
+              ) : (
+                <MaterialIcons
+                  name="arrow-forward"
+                  size={20}
+                  color={theme.primary1}
+                />
+              )
+            }
+            disableArrowLeft={disabledLeft}
+            monthFormat="yy년 MM월"
+            style={{padding: 16, gap: 8}}
+            minDate={formatDate(new Date())}
+            onDayPress={onDayPress}
+            markingType={'period'}
+            markedDates={markedDates}
+          />
+          <CalendarRowContainer gap={16}>
+            <TouchableOpacity
+              style={{padding: 10}}
+              onPress={() => setCalendarOpen(false)}>
+              <NotoSansKR size={14} color="primary1">
+                취소
+              </NotoSansKR>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{padding: 10}} onPress={sendCalendarData}>
+              <NotoSansKR size={14} color="primary1">
+                선택하기
+              </NotoSansKR>
+            </TouchableOpacity>
+          </CalendarRowContainer>
+        </CalendarModalContainer>
+      </CalendarView>
     </CalendarModal>
   );
 };
@@ -403,7 +547,6 @@ const CreateChallengeScreen = () => {
   const validUserName = userName || '기본 사용자 이름';
   const validUID = UID || 1000000;
 
-  const [listOpen, setListOpen] = useState(true);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<EmojiType>();
   const [challengeName, setChallengeName] = useState('');
@@ -416,7 +559,6 @@ const CreateChallengeScreen = () => {
     {UserName: validUserName, UID: validUID, accept: true},
   ]);
 
-  const theme = useTheme();
   const CallApi = useApi();
 
   const createChallenge = () =>
@@ -437,8 +579,11 @@ const CreateChallengeScreen = () => {
     });
 
   const {mutate: ChallengeCreateMutate} = useMutation(createChallenge, {
-    onSuccess: response => {
-      console.log('Success:', response);
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '챌린지가 생성되었어요.',
+      });
       queryClient.invalidateQueries('getChallenge');
       navigation.navigate('MainTab' as never);
     },
@@ -447,42 +592,33 @@ const CreateChallengeScreen = () => {
     },
   });
 
-  const {mutate: ChallengeCreateNowMutate} = useMutation(createChallenge, {
+  const {mutate: ChallengeStartMutate} = useMutation(createChallenge, {
     onSuccess: response => {
-      console.log('Success:', response);
-      queryClient.invalidateQueries('getChallenge');
-      Alert.alert(
-        '챌린지 시작하기',
-        '시작 날짜까지 참가지를 기다리지 않고 바로 시작하시겠습니까?',
-        [
-          {
-            text: '바로시작',
-            onPress: () => ChallengeStartMutate(response.CHALLENGE_MST_NO),
-            style: 'default',
-          },
-          {
-            text: '기다리기',
-            onPress: () => navigation.navigate('MainTab' as never),
-          },
-        ],
-      );
+      console.log(response);
+      ChallengeStart(response.CHALLENGE_MST_NO);
     },
     onError: error => {
       console.error('Error:', error);
     },
   });
 
-  const challengeStart = (challenge_mst_no: number) =>
+  const challengeStart = (selectedChallengeMstNo: number) =>
     CallApi({
-      endpoint: `challenge/start?challenge_mst_no=${challenge_mst_no}`,
+      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}`,
       method: 'POST',
       accessToken: accessToken!,
     });
 
-  const {mutate: ChallengeStartMutate} = useMutation(challengeStart, {
-    onSuccess: response => {
-      console.log('Success:', response);
-
+  const {mutate: ChallengeStart} = useMutation(challengeStart, {
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '챌린지가 시작되었어요.',
+      });
+      queryClient.invalidateQueries('getChallenge');
+      queryClient.invalidateQueries('ChallengeUserList');
+      queryClient.invalidateQueries('challenge_history');
+      queryClient.invalidateQueries('userData');
       navigation.navigate('MainTab' as never);
     },
     onError: error => {
@@ -503,7 +639,7 @@ const CreateChallengeScreen = () => {
               {selectedEmoji ? (
                 <TossFace size={40}>{selectedEmoji?.emoji}</TossFace>
               ) : (
-                <OcticonIcons name="plus-circle" size={40} />
+                <OcticonIcons name="plus-circle" size={40} color={'black'} />
               )}
             </TouchableOpacity>
             <InputNotoSansKR
@@ -520,7 +656,7 @@ const CreateChallengeScreen = () => {
               setIsClicked={setSearchOpen}
               setInviteListData={setInviteListData}
             />
-            {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
+            {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
           </RowContainer>
 
           <View style={{gap: 16}}>
@@ -528,27 +664,19 @@ const CreateChallengeScreen = () => {
               <NotoSansKR size={18} style={{marginBottom: 4}}>
                 챌린지 참여 인원
               </NotoSansKR>
-              <TouchableOpacity onPress={() => setListOpen(!listOpen)}>
-                <OcticonIcons
-                  name={listOpen ? 'chevron-down' : 'chevron-up'}
-                  size={28}
-                  color={theme.gray3}
-                />
-              </TouchableOpacity>
             </RowContainer>
 
-            {listOpen ? (
-              <View style={{gap: 12}}>
-                {inviteListData.map((data, key) => (
-                  <InviteList
-                    key={key}
-                    UserName={data.UserName}
-                    UID={data.UID}
-                    accept={data.accept}
-                  />
-                ))}
-              </View>
-            ) : null}
+            <View style={{gap: 12}}>
+              {inviteListData.map((data, key) => (
+                <InviteList
+                  key={key}
+                  UserName={data.UserName}
+                  UID={data.UID}
+                  accept={data.accept}
+                  setInviteListData={setInviteListData}
+                />
+              ))}
+            </View>
           </View>
 
           <View style={{gap: 8}}>
@@ -575,34 +703,49 @@ const CreateChallengeScreen = () => {
       <View style={{gap: 8, padding: 16}}>
         <ButtonComponent
           onPress={() => {
-            if (
-              !challengeName ||
-              !calendarData.start ||
-              !calendarData.end ||
-              !selectedEmoji
-            ) {
-              console.error('모든 필수 필드를 채워주세요.');
+            const missingItems = [];
+
+            if (!challengeName) {
+              missingItems.push('챌린지 목표');
+            }
+            if (!calendarData.start || !calendarData.end) {
+              missingItems.push('챌린지 날짜');
+            }
+            if (!selectedEmoji) {
+              missingItems.push('이모지');
+            }
+
+            if (missingItems.length > 0) {
+              Toast.show({
+                type: 'error',
+                text1: '모든 항목을 채워주세요',
+                text2: missingItems.join(', ') + '을(를) 작성해주세요.',
+              });
               return;
             }
-            ChallengeCreateNowMutate();
-          }}>
-          바로 시작하기
-        </ButtonComponent>
-        <ButtonComponent
-          type="secondary"
-          onPress={() => {
-            if (
-              !challengeName ||
-              !calendarData.start ||
-              !calendarData.end ||
-              !selectedEmoji
-            ) {
-              console.error('모든 필수 필드를 채워주세요.');
-              return;
+
+            if (calendarData.start === formatDate(new Date())) {
+              Alert.alert(
+                '챌린지 시작 날짜가 오늘입니다.', // 경고 제목
+                '친구들을 기다리지 않고 바로 시작할까요?', // 경고 메시지
+                [
+                  {
+                    text: '날짜 변경하기',
+                    style: 'cancel',
+                  },
+                  {
+                    text: '바로 시작하기',
+                    onPress: () => ChallengeStartMutate(),
+                    style: 'destructive',
+                  },
+                ],
+                {cancelable: false},
+              );
+            } else {
+              ChallengeCreateMutate();
             }
-            ChallengeCreateMutate();
           }}>
-          시작 날짜까지 기다리기
+          챌린지 생성하기
         </ButtonComponent>
       </View>
 
@@ -612,12 +755,13 @@ const CreateChallengeScreen = () => {
         onClose={() => setEmojiOpen(false)}
       />
 
-      {calendarOpen ? (
+      {calendarOpen && (
         <CalendarContainer
+          calendarData={calendarData}
           setCalendarOpen={setCalendarOpen}
           setCalendarData={setCalendarData}
         />
-      ) : null}
+      )}
     </HomeContainer>
   );
 };

@@ -1,10 +1,10 @@
 import React from 'react';
-import {View} from 'react-native';
-import {ButtonComponent, NotoSansKR} from '../Component';
+import {Dimensions, Image, View} from 'react-native';
+import {ButtonComponent, GetImage, NotoSansKR} from '../Component';
 import styled from 'styled-components';
 import {ModalHeadBorder} from './CustomModal';
 import LottieView from 'lottie-react-native';
-import {usedItemImage} from '../../store/data';
+import {defaultData, usedItemImage} from '../../store/data';
 import FastImage from 'react-native-fast-image';
 
 export const ShareModal = () => {
@@ -29,11 +29,15 @@ export const ShareModal = () => {
   );
 };
 
-export const ImageZoomModal = () => {
+export const ImageZoomModal = ({file_name}: {file_name: string}) => {
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
-      <ZoomImageDummy />
+      <Image
+        source={{uri: GetImage(file_name)}}
+        style={{width: '100%', height: 300, borderRadius: 10}}
+        resizeMode="cover"
+      />
     </View>
   );
 };
@@ -66,13 +70,13 @@ export const UsedItemModal = ({
       <View style={{width: 240, height: 240}}>
         {item_no === 1 ? (
           <LottieView
-            source={usedItemImage.bomb[character_no]}
+            source={usedItemImage.bomb[character_no - 1]}
             style={{flex: 1}}
             autoPlay
           />
         ) : (
           <FastImage
-            source={usedItemImage.hammer[character_no]}
+            source={usedItemImage.hammer[character_no - 1]}
             style={{flex: 1}}
           />
         )}
@@ -86,15 +90,37 @@ export const UsedItemModal = ({
   );
 };
 
-export const DailyModal = () => {
+export const DailyModal = ({
+  item_type,
+  item_no,
+}: {
+  item_type: 'Avatar' | 'Item' | 'Nothing';
+  item_no: number;
+}) => {
+  const width = Dimensions.get('window').width;
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
-      <ZoomImageDummy />
-      <NotoSansKR size={18} weight="Bold" textAlign="center">
-        오늘도 수고했어요.{'\n'}
-        보상으로 [아이템]을 받았어요!
-      </NotoSansKR>
+      {item_type === 'Nothing' ? (
+        <NotoSansKR size={18} weight="Bold" textAlign="center">
+          오늘도 수고했어요.{'\n'}
+          내일도 화이팅!
+        </NotoSansKR>
+      ) : (
+        <>
+          <View style={{width: width, height: 256, padding: 24}}>
+            <FastImage
+              source={defaultData[item_type][item_no - 1].URL}
+              resizeMode="contain"
+              style={{flex: 1}}
+            />
+          </View>
+          <NotoSansKR size={18} weight="Bold" textAlign="center">
+            오늘도 수고했어요.{'\n'}
+            보상으로 [{defaultData[item_type][item_no - 1].NAME}]을 받았어요!
+          </NotoSansKR>
+        </>
+      )}
     </View>
   );
 };
@@ -103,11 +129,11 @@ const ImageDummy = styled(View)`
   width: 248px;
   height: 264px;
   background: ${props => props.theme.gray6};
-  shadow-color: #000;
+  /* shadow-color: #000;
   shadow-offset: 0px 2px;
   shadow-opacity: 0.25;
   shadow-radius: 3.84;
-  elevation: 3;
+  elevation: 3; */
 `;
 
 const ImageContainer = styled(View)`

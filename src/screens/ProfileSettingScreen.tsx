@@ -2,13 +2,14 @@ import React, {useState} from 'react';
 import {
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
   ScrollContainer,
   useApi,
 } from '../Component';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {Image, Platform, TouchableOpacity, View} from 'react-native';
 import {styled} from 'styled-components/native';
 import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
@@ -24,7 +25,7 @@ const TextContainer = styled.TextInput`
 
 const SelectedContainer = styled.View`
   flex: 1;
-  background-color: ${props => props.theme.primary1};
+  background-color: ${props => props.theme.primary2};
   margin: 0 -16px;
   padding: 24px 16px;
   align-items: center;
@@ -41,12 +42,21 @@ const SelectedButton = styled.TouchableOpacity`
 const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
   width: 88px;
   height: 104px;
+  margin: 8px 0;
   border-radius: 10px;
   border-width: ${props => (props.isEquip ? '2px' : 0)};
+  border-color: ${props => props.theme.primary1};
   opacity: ${props => (props.isOwned ? 1 : 0.5)};
   background: ${props => props.theme.white};
   justify-content: center;
   align-items: center;
+  ${Platform.OS === 'ios'
+    ? `
+    shadow-color: #000;
+    shadow-offset: 2px 2px;
+    shadow-opacity: 0.3;
+    shadow-radius: 2px;`
+    : 'elevation: 3'}
 `;
 
 const PencilIcon = styled.TouchableOpacity`
@@ -60,6 +70,7 @@ const ProfileSettingScreen = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
   const [userName, setUserName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(1);
+  const [selectedPet, setSelectedPet] = useState<null | number>(null);
 
   const SettingProfile = async () => {
     try {
@@ -94,16 +105,19 @@ const ProfileSettingScreen = () => {
     }
   };
 
-  const {mutate: setCharacter} = useMutation(SetAvatar, {
-    onSuccess: () => {
-      // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
-      queryClient.invalidateQueries('SettingProfile');
+  const {mutate: setCharacter, isLoading: loadingSetCharacter} = useMutation(
+    SetAvatar,
+    {
+      onSuccess: () => {
+        // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
+        queryClient.invalidateQueries('SettingProfile');
+      },
     },
-  });
+  );
   const {data, isLoading} = useQuery('SettingProfile', SettingProfile);
 
   if (isLoading) {
-    return <NotoSansKR size={18}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
 
   return (
@@ -111,7 +125,7 @@ const ProfileSettingScreen = () => {
       <ScrollContainer>
         <InnerContainer gap={24}>
           <NotoSansKR size={20}>프로필 수정</NotoSansKR>
-          <View style={{gap: 8}}>
+          {/* <View style={{gap: 8}}>
             <NotoSansKR size={18} weight="Medium">
               닉네임 변경
             </NotoSansKR>
@@ -122,21 +136,22 @@ const ProfileSettingScreen = () => {
                 onChangeText={setUserName}
               />
               <PencilIcon>
-                <OcticonIcons name="pencil" size={20} />
+                <OcticonIcons name="pencil" size={20} color={'black'} />
               </PencilIcon>
             </RowContainer>
-          </View>
+          </View> */}
           <View style={{gap: 16, flex: 1}}>
             <NotoSansKR size={18} weight="Medium">
               캐릭터/펫 변경
             </NotoSansKR>
             <SelectedContainer>
               <SelectedButton
+                disabled={loadingSetCharacter}
                 onPress={() => {
                   setCharacter(selectedCharacter);
                 }}>
                 <NotoSansKR size={14} color="primary1" weight="Medium">
-                  선택하기
+                  {loadingSetCharacter ? '변경 중' : '선택하기'}
                 </NotoSansKR>
               </SelectedButton>
               <View
@@ -151,6 +166,19 @@ const ProfileSettingScreen = () => {
                   source={avatarImage[selectedCharacter - 1]}
                   style={{width: '70%', height: '70%', resizeMode: 'contain'}}
                 />
+                {!!selectedPet && (
+                  <Image
+                    source={avatarImage[selectedPet - 1]}
+                    style={{
+                      right: 0,
+                      top: 0,
+                      position: 'absolute',
+                      width: '30%',
+                      height: '30%',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                )}
               </View>
 
               <RowScrollContainer gap={8}>
@@ -158,8 +186,14 @@ const ProfileSettingScreen = () => {
                   <TouchableOpacity
                     key={avatar.AVATAR_NO}
                     onPress={() => {
-                      if (avatar.IS_OWNED) {
+                      if (
+                        avatar.IS_OWNED &&
+                        avatar.AVATAR_TYPE === 'CHARACTER'
+                      ) {
                         setSelectedCharacter(avatar.AVATAR_NO);
+                      }
+                      if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
+                        setSelectedPet(avatar.AVATAR_NO);
                       }
                     }}>
                     <CharecterSlot

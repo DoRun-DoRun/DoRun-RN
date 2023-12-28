@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {Image, Pressable, View} from 'react-native';
 import {
   ButtonComponent,
   InputNotoSansKR,
+  ModalViewPhoto,
   NotoSansKR,
   useApi,
 } from '../Component';
@@ -13,6 +14,9 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation} from 'react-query';
 import {goalType} from '../../store/slice/GoalSlice';
+import useCamera from '../Hook/UseCamera';
+import {useModal} from './ModalProvider';
+import {DailyModal} from './Modals';
 
 const transformData = (state: goalType[]) => {
   return state.map(goal => ({
@@ -20,8 +24,6 @@ const transformData = (state: goalType[]) => {
     IS_DONE: goal.isComplete,
   }));
 };
-
-// 사용 예시
 
 export const MyDailyDrayModal = ({
   challenge_user_no,
@@ -32,51 +34,118 @@ export const MyDailyDrayModal = ({
 }) => {
   const theme = useTheme();
   const CallApi = useApi();
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {onLaunchCamera, onViewPhoto, deletePhoto, modalImage, imageVisible} =
+    useCamera();
+
+  const {accessToken, userName} = useSelector((state: RootState) => state.user);
+  const {showModal} = useModal();
 
   const [inputText, setInputText] = useState('');
 
-  const CreateDiary = () =>
+  const CreateDiary = async ({file_name}: {file_name: string}) =>
     CallApi({
       endpoint: 'diary',
       method: 'POST',
       accessToken: accessToken!,
       body: {
-        challenge_user_no: challenge_user_no,
-        IMAGE_FILE_NM: '',
+        CHALLENGE_USER_NO: challenge_user_no,
+        IMAGE_FILE_NM: file_name,
         COMMENT: inputText,
         PERSON_GOAL: transformData(personGoal),
       },
     });
 
-  const {mutate} = useMutation(CreateDiary, {
-    onSuccess: async data => {
-      console.log(data);
+  const {mutate: createDiary, isLoading: loadingDiary} = useMutation(
+    CreateDiary,
+    {
+      onSuccess: res => {
+        console.log('요청성공', res);
+        showModal(
+          <DailyModal item_no={res.item_no} item_type={res.item_type} />,
+        );
+      },
+      onError: error => {
+        console.error('요청 실패:', error);
+      },
     },
-  });
+  );
+
+  const UploadImage = async () => {
+    const formData = new FormData();
+    formData.append('image_file', {
+      name: modalImage?.fileName,
+      type: modalImage?.type,
+      uri: modalImage?.uri,
+    });
+
+    return CallApi({
+      endpoint: 'desc/upload/image',
+      method: 'POST',
+      accessToken: accessToken!,
+      body: formData,
+      formData: true,
+    });
+  };
+
+  const {mutate: uploadImage, isLoading: loadingImage} = useMutation(
+    UploadImage,
+    {
+      onSuccess: async data => {
+        console.log('요청성공', data);
+        createDiary({file_name: data.fileName});
+      },
+    },
+  );
 
   return (
     <View style={{gap: 24}}>
       <ModalHeadText>
         <NotoSansKR size={20} weight="Bold">
-          [닉네임A]님 축하드려요! {'\n'}오늘 목표를 전부 완료했어요!
+          [{userName}]님 축하드려요! {'\n'}오늘 목표를 전부 완료했어요!
         </NotoSansKR>
       </ModalHeadText>
 
       <View style={{gap: 16}}>
-        <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
-        <NotoSansKR size={12} color="gray3">
-          해당 내용은 친구들이 24시간동안 확인할 수 있어요! {'\n'}
-          24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
-        </NotoSansKR>
-        {/* <PhotoView /> */}
-        <PhotoUploadFrame>
-          <MaterialIcons
-            name="add-to-photos"
-            color={theme.primary1}
-            size={40}
-          />
-        </PhotoUploadFrame>
+        {modalImage ? (
+          <View style={{gap: 4}}>
+            <Pressable onPress={onViewPhoto}>
+              <ViewPhotoFrame
+                source={{uri: modalImage?.uri}}
+                resizeMode="cover"
+              />
+              <ModalViewPhoto
+                visible={imageVisible}
+                onClose={onViewPhoto}
+                res={modalImage}
+              />
+            </Pressable>
+            <View style={{alignItems: 'flex-end'}}>
+              <Pressable onPress={deletePhoto}>
+                <NotoSansKR size={10} color="gray4">
+                  사진 삭제
+                </NotoSansKR>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
+          <>
+            <NotoSansKR size={16}>오늘을 사진과 글로 남겨봐요!</NotoSansKR>
+            <NotoSansKR size={12} color="gray3">
+              해당 내용은 친구들이 24시간동안 확인할 수 있어요! {'\n'}
+              24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
+            </NotoSansKR>
+
+            <Pressable onPress={onLaunchCamera}>
+              <PhotoUploadFrame>
+                <MaterialIcons
+                  name="photo-camera"
+                  color={theme.primary1}
+                  size={40}
+                />
+              </PhotoUploadFrame>
+            </Pressable>
+          </>
+        )}
         <InputNotoSansKR
           size={14}
           weight="Medium"
@@ -86,13 +155,25 @@ export const MyDailyDrayModal = ({
           onChangeText={setInputText}
           border
         />
-        <ButtonComponent
-          type="gray"
-          onPress={() => {
-            mutate();
-          }}>
-          오늘은 넘어갈래요
-        </ButtonComponent>
+        {modalImage || inputText ? (
+          <ButtonComponent
+            type="primary"
+            disabled={loadingImage}
+            onPress={() => {
+              modalImage ? uploadImage() : createDiary({file_name: ''});
+            }}>
+            {loadingImage ? '업로드 중' : '작성 완료'}
+          </ButtonComponent>
+        ) : (
+          <ButtonComponent
+            disabled={loadingDiary}
+            type="gray"
+            onPress={() => {
+              createDiary({file_name: ''});
+            }}>
+            {loadingDiary ? '업로드 중 ' : '오늘은 넘어갈래요'}
+          </ButtonComponent>
+        )}
       </View>
     </View>
   );
@@ -105,4 +186,9 @@ const PhotoUploadFrame = styled(View)`
   width: 88px;
   height: 96px;
   border: 2px solid ${props => props.theme.primary1};
+`;
+
+const ViewPhotoFrame = styled(Image)`
+  height: 250px;
+  border-radius: 10px;
 `;

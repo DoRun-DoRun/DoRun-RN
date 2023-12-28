@@ -1,48 +1,73 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Image, View} from 'react-native';
 import {
-  ButtonComponent,
-  ButtonContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Slider} from '@miblanchard/react-native-slider';
 import {ChallengeUserType} from '../Tab/RaceTab';
 import {useMutation, useQuery} from 'react-query';
-import {useSelector} from 'react-redux';
+import {shallowEqual, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {profileImage} from '../../store/data';
+import {UserStatusType, profileImage} from '../../store/data';
 import {useModal} from './ModalProvider';
 import {UsedItemModal} from './Modals';
 
-const UserProfile = styled(View)`
+const ButtonContainer = styled.TouchableOpacity<{
+  color: string;
+}>`
+  background-color: ${props =>
+    props.disabled ? props.theme.gray4 : props.theme[props.color]};
+  padding: 8px;
+  width: 100%;
+  align-items: center;
+  border-radius: 10px;
+`;
+
+const UserProfile = styled.View<{IS_ME: boolean}>`
   width: 64px;
   height: 64px;
   border-radius: 32px;
-  border: 3px solid ${props => props.theme.primary1};
+  border: 3px solid
+    ${props => (props.IS_ME ? props.theme.primary1 : props.theme.secondary1)};
   justify-content: center;
   align-items: center;
   overflow: hidden;
 `;
-const UserStatues = styled(View)`
+const UserStatues = styled.View<{IS_ME: boolean}>`
   display: flex;
   padding: 2px 4px;
   justify-content: center;
   align-items: center;
   flex-direction: row;
   gap: 4px;
-  background-color: #dfeaff;
+  background-color: ${props =>
+    props.IS_ME ? props.theme.primary2 : props.theme.secondary2};
 `;
 
-export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
+export const CharacterModal = ({
+  data,
+  CHALLENGE_MST_NO,
+}: {
+  data: ChallengeUserType;
+  CHALLENGE_MST_NO: number;
+}) => {
   const CallApi = useApi();
   const theme = useTheme();
-  const {accessToken} = useSelector((state: RootState) => state.user);
   const {showModal} = useModal();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const goals = useSelector((state: RootState) => state.goal, shallowEqual);
+
+  const personalGoals = useMemo(() => {
+    const challenge = goals.find(ch => ch.challenge_no === CHALLENGE_MST_NO);
+    return challenge ? challenge.personalGoals : [];
+  }, [goals, CHALLENGE_MST_NO]);
+
   const useItem = ({item_no}: {item_no: number}) =>
     CallApi({
       endpoint: `item/${data.CHALLENGE_USER_NO}?item_no=${item_no}`,
@@ -82,7 +107,7 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
   });
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
 
   if (!user) {
@@ -93,21 +118,29 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
     <View style={{paddingTop: 16}}>
       <View style={{gap: 9}}>
         <RowContainer gap={9}>
-          <UserProfile>
+          <UserProfile IS_ME={user.IS_ME}>
             <Image
               source={profileImage[user.CHARACTER_NO - 1]}
               style={{width: '100%', height: '100%', resizeMode: 'contain'}}
             />
           </UserProfile>
-          <View style={{gap: 8, flex: 1}}>
+          <View style={{flex: 1}}>
             <RowContainer gap={8}>
-              <UserStatues>
-                <MaterialIcons
-                  name="directions-run"
-                  color={theme.primary1}
+              <UserStatues IS_ME={user.IS_ME}>
+                <MaterialCommunityIcons
+                  name={
+                    user.STATUS === UserStatusType.SLEEPING
+                      ? 'sleep'
+                      : user.STATUS === UserStatusType.WALKING
+                      ? 'walk'
+                      : 'run-fast'
+                  }
+                  color={user.IS_ME ? theme.primary1 : theme.secondary1}
                   size={16}
                 />
-                <NotoSansKR size={10} color="primary1">
+                <NotoSansKR
+                  size={10}
+                  color={user.IS_ME ? 'primary1' : 'secondary1'}>
                   {user.STATUS}
                 </NotoSansKR>
               </UserStatues>
@@ -117,24 +150,28 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
             <View style={{flex: 1}}>
               <Slider
                 value={data.PROGRESS / 100}
-                minimumTrackTintColor={theme.primary1}
-                maximumTrackTintColor={theme.primary2}
-                thumbTintColor={theme.primary1}
+                minimumTrackTintColor={
+                  user.IS_ME ? theme.primary1 : theme.secondary1
+                }
+                maximumTrackTintColor={theme.gray7}
+                thumbTintColor={user.IS_ME ? theme.primary1 : theme.secondary1}
                 disabled
                 // onValueChange={values => setMyValue(values[0])}
               />
             </View>
           </View>
         </RowContainer>
-        <ButtonContainer color="primary2">
-          <NotoSansKR size={13} color="primary1">
+
+        <ButtonContainer color={user.IS_ME ? 'primary1' : 'secondary1'}>
+          <NotoSansKR size={13} color="white">
             "{user.COMMENT}"
           </NotoSansKR>
         </ButtonContainer>
-        {user.ITEM && user.ITEM.length > 0 ? (
+        {user.ITEM && !user.IS_ME ? (
           <RowContainer gap={18}>
             <View style={{flex: 1}}>
-              <ButtonComponent
+              <ButtonContainer
+                color={user.IS_ME ? 'primary1' : 'secondary1'}
                 disabled={user.ITEM[0].COUNT === 0}
                 onPress={() => {
                   mutate({item_no: 1});
@@ -149,11 +186,12 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
                     폭탄 터트리기 X {user.ITEM[0].COUNT}
                   </NotoSansKR>
                 </RowContainer>
-              </ButtonComponent>
+              </ButtonContainer>
             </View>
 
             <View style={{flex: 1}}>
-              <ButtonComponent
+              <ButtonContainer
+                color={user.IS_ME ? 'primary1' : 'secondary1'}
                 disabled={user.ITEM[1].COUNT === 0}
                 onPress={() => {
                   mutate({item_no: 2});
@@ -168,20 +206,27 @@ export const CharacterModal = ({data}: {data: ChallengeUserType}) => {
                     망치 사용하기 X {user.ITEM[1].COUNT}
                   </NotoSansKR>
                 </RowContainer>
-              </ButtonComponent>
+              </ButtonContainer>
             </View>
           </RowContainer>
         ) : (
-          <RowContainer gap={8}>
-            <MaterialIcons
-              name="speaker-notes"
-              color={theme.primary1}
-              size={20}
-            />
-            <NotoSansKR size={13} color={'gray3'}>
-              달리기 1km 오늘도 화이ㅣ이이팅
-            </NotoSansKR>
-          </RowContainer>
+          personalGoals?.map(goal => {
+            return (
+              <RowContainer
+                gap={8}
+                key={goal.id}
+                style={{alignItems: 'center'}}>
+                <MaterialCommunityIcons
+                  name="clipboard-list"
+                  color={theme.primary1}
+                  size={26}
+                />
+                <NotoSansKR size={13} color={'gray3'}>
+                  {goal.title}
+                </NotoSansKR>
+              </RowContainer>
+            );
+          })
         )}
       </View>
     </View>

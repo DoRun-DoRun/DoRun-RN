@@ -1,21 +1,22 @@
-import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 import {
   ButtonComponent,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   TossFace,
-  convertUTCToKoKR,
+  convertUTCToKoKRDay,
   useApi,
 } from '../Component';
 import {ModalHeadText} from './CustomModal';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {InviteAcceptType} from '../../store/data';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useModal} from './ModalProvider';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const ChallengeTimeBox = styled.View`
   border-radius: 100px;
@@ -57,24 +58,30 @@ interface participantsType {
 
 export const ChallengeListModal = ({
   challenge_mst_no,
+  count_challenge,
 }: {
   challenge_mst_no: number;
+  count_challenge: number;
 }) => {
   const queryClient = useQueryClient();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const {hideModal} = useModal();
   const CallApi = useApi();
-  const [isSecondSectionVisible, setSecondSectionVisible] = useState(true);
 
   const GetInviteChallenge = async () => {
     try {
       const response = await CallApi({
         endpoint: `challenge/invite/${challenge_mst_no}`,
         method: 'GET',
+        accessToken: accessToken!,
       });
       return response;
     } catch (error) {
-      console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: '올바르지 않은 접근입니다',
+      });
+      hideModal();
     }
   };
   const {data, isLoading} = useQuery('GetInviteChallenge', GetInviteChallenge);
@@ -94,7 +101,13 @@ export const ChallengeListModal = ({
     changeChallengeStatus,
     {
       onSuccess: response => {
-        console.log('Success:', response);
+        Toast.show({
+          type: 'success',
+          text1:
+            response.status === InviteAcceptType.ACCEPTED
+              ? '챌린지 초대를 수락했어요.'
+              : '챌린지를 거절했어요 ',
+        });
         queryClient.invalidateQueries('getChallenge');
         hideModal();
       },
@@ -105,7 +118,7 @@ export const ChallengeListModal = ({
   );
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   return (
     <View style={{gap: 24}}>
@@ -121,50 +134,50 @@ export const ChallengeListModal = ({
           <NotoSansKR size={20}>{data?.CHALLENGE_MST_NM}</NotoSansKR>
         </RowContainer>
 
-        <TouchableOpacity
-          onPress={() => setSecondSectionVisible(!isSecondSectionVisible)}>
-          <RowContainer seperate>
-            <NotoSansKR size={18}>챌린지 참여 인원</NotoSansKR>
-            <OcticonIcons name="chevron-down" size={28} />
-          </RowContainer>
-        </TouchableOpacity>
+        <NotoSansKR size={18}>챌린지 참여 인원</NotoSansKR>
 
-        {isSecondSectionVisible && (
-          <View style={{gap: 8}}>
-            {data?.PARTICIPANTS.map((user: participantsType) => {
-              return (
-                <StatusComponent
-                  key={user.UID}
-                  username={user.USER_NM}
-                  status={
-                    user.ACCEPT_STATUS === InviteAcceptType.ACCEPTED
-                      ? true
-                      : user.ACCEPT_STATUS === InviteAcceptType.PENDING
-                      ? false
-                      : null
-                  }
-                />
-              );
-            })}
-          </View>
-        )}
+        <View style={{gap: 8}}>
+          {data?.PARTICIPANTS.map((user: participantsType) => {
+            return (
+              <StatusComponent
+                key={user.UID}
+                username={user.USER_NM}
+                status={
+                  user.ACCEPT_STATUS === InviteAcceptType.ACCEPTED
+                    ? true
+                    : user.ACCEPT_STATUS === InviteAcceptType.PENDING
+                    ? false
+                    : null
+                }
+              />
+            );
+          })}
+        </View>
 
         <View style={{gap: 8}}>
           <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
           <ChallengeTimeBox>
             <NotoSansKR size={14} weight="Medium" lineHeight={28}>
-              {convertUTCToKoKR(data?.START_DT) +
+              {convertUTCToKoKRDay(data?.START_DT) +
                 ' ~ ' +
-                convertUTCToKoKR(data?.END_DT)}
+                convertUTCToKoKRDay(data?.END_DT)}
             </NotoSansKR>
           </ChallengeTimeBox>
         </View>
 
         <View style={{gap: 8}}>
           <ButtonComponent
-            onPress={() =>
-              changeChallengeStatusMutation(InviteAcceptType.ACCEPTED)
-            }>
+            onPress={() => {
+              if (count_challenge >= 3) {
+                Toast.show({
+                  type: 'error',
+                  text1: '현재는 챌린지를 3개까지만 진행할 수 있어요',
+                });
+                hideModal();
+              } else {
+                changeChallengeStatusMutation(InviteAcceptType.ACCEPTED);
+              }
+            }}>
             참여하기
           </ButtonComponent>
           <ButtonComponent

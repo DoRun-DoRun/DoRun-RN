@@ -21,6 +21,7 @@
 		8AD96E007AAE4C1F8DA21CE1 /* NotoSansKR-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 10A571346AA64BCAB920309C /* NotoSansKR-Black.ttf */; };
 		91229866EB0641A9B61B1059 /* NotoSansKR-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4726C9ED9CED4430AFE47A09 /* NotoSansKR-Thin.ttf */; };
 		96A4185737664937A038DEB4 /* NotoSansKR-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D536DEA4FE204FEC8DC3A596 /* NotoSansKR-ExtraBold.ttf */; };
+		BC1B8ACD2B3DB95B005255F7 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = BC1B8ACC2B3DB95B005255F7 /* AppCenter-Config.plist */; };
 		BF9676B7ED8546C2AB59995C /* NotoSansKR-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CBAAAC1F1DBB48E6B2A643D3 /* NotoSansKR-Regular.ttf */; };
 		C670CE2AC3DC40A5A588A086 /* NotoSansKR-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5EC3BF35A60493E86ACF0DA /* NotoSansKR-SemiBold.ttf */; };
 		E5C990897949449AD3DF6623 /* libPods-CLife.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D0084489C948E4E2260960 /* libPods-CLife.a */; };
@@ -57,6 +58,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CLife/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		86D0084489C948E4E2260960 /* libPods-CLife.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CLife.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		901B8DA70452746FB48AB8CD /* Pods-CLife-CLifeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CLife-CLifeTests.debug.xcconfig"; path = "Target Support Files/Pods-CLife-CLifeTests/Pods-CLife-CLifeTests.debug.xcconfig"; sourceTree = "<group>"; };
+		BC1B8ACC2B3DB95B005255F7 /* AppCenter-Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "AppCenter-Config.plist"; path = "CLife/AppCenter-Config.plist"; sourceTree = "<group>"; };
 		BCB6AB662B0F59B700103C24 /* CLife.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CLife.entitlements; path = CLife/CLife.entitlements; sourceTree = "<group>"; };
 		BCE89F6286454F79B823D8C6 /* NotoSansKR-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSansKR-Medium.ttf"; path = "../assets/fonts/NotoSansKR-Medium.ttf"; sourceTree = "<group>"; };
 		C5FCDA924A9AE5DE33728B93 /* Pods-CLife.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CLife.release.xcconfig"; path = "Target Support Files/Pods-CLife/Pods-CLife.release.xcconfig"; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 		13B07FAE1A68108700A75B9A /* CLife */ = {
 			isa = PBXGroup;
 			children = (
+				BC1B8ACC2B3DB95B005255F7 /* AppCenter-Config.plist */,
 				BCB6AB662B0F59B700103C24 /* CLife.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -294,6 +297,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				629992D79A024C2CB9A30107 /* TossFaceFontMac.ttf in Resources */,
 				8745ED5A07F940CF9E46B7A1 /* NotoSansKR-Bold.ttf in Resources */,
+				BC1B8ACD2B3DB95B005255F7 /* AppCenter-Config.plist in Resources */,
 				96A4185737664937A038DEB4 /* NotoSansKR-ExtraBold.ttf in Resources */,
 				593E7FF9FA0E426FA9786FE3 /* NotoSansKR-ExtraLight.ttf in Resources */,
 				3A86ECA4FC8C4C6BB8BA6F1F /* NotoSansKR-Light.ttf in Resources */,

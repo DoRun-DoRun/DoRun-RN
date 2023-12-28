@@ -7,8 +7,15 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
 } from 'react-native';
-import {HomeContainer, NotoSansKR, ScrollContainer, useApi} from '../Component';
+import {
+  HomeContainer,
+  LoadingIndicatior,
+  NotoSansKR,
+  ScrollContainer,
+  useApi,
+} from '../Component';
 import {useNavigation} from '@react-navigation/native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
@@ -21,7 +28,8 @@ import LottieView from 'lottie-react-native';
 import {
   BackgroundImage,
   Dudus,
-  groupImage,
+  avatarImage,
+  defaultData,
   struggleLottie,
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
@@ -45,6 +53,13 @@ const ChallengeCreateButton = styled.TouchableOpacity`
   left: 50%;
   z-index: 5;
   transform: translateX(-102.5px) translateY(-56px);
+  ${Platform.OS === 'ios'
+    ? `
+    shadow-color: #000;
+    shadow-offset: 2px 2px;
+    shadow-opacity: 0.3;
+    shadow-radius: 2px;`
+    : 'elevation: 3;'}
 `;
 
 export interface ChallengeUserType {
@@ -63,10 +78,11 @@ const RaceTab = () => {
   const CallApi = useApi();
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  // const {index} = useSelector((state: RootState) => state.index);
   const [index, setIndex] = useState(1);
 
   const navigation = useNavigation();
+
+  // const [refreshing, setRefreshing] = useState(false);
 
   const ChallengeUserList = async () => {
     try {
@@ -85,8 +101,12 @@ const RaceTab = () => {
   const {data: challengeListData, isLoading} = useQuery(
     ['ChallengeUserList', index],
     ChallengeUserList,
-    {refetchOnWindowFocus: true},
   );
+
+  // const onRefresh = React.useCallback(() => {
+  //   setRefreshing(true);
+  //   refetch().then(() => setRefreshing(false));
+  // }, [refetch]);
 
   useEffect(() => {
     if (challengeListData && challengeListData.total_page !== 0) {
@@ -121,12 +141,18 @@ const RaceTab = () => {
   }, [challengeListData, dispatch, index, navigation]);
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   return (
     <HomeContainer color="background">
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={refreshing || isFetching}
+          //     onRefresh={onRefresh}
+          //   />
+          // }
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
           {challengeListData.challenge_user.map(
@@ -135,6 +161,7 @@ const RaceTab = () => {
                 <BGComponent
                   key={data.CHALLENGE_USER_NO}
                   data={data}
+                  CHALLENGE_MST_NO={challengeListData.CHALLENGE_MST_NO}
                   BGN={key}
                   setScrollEnabled={setScrollEnabled}
                 />
@@ -160,21 +187,14 @@ const RaceTab = () => {
 };
 
 const DefaultImage = () => {
-  const [randomIndex, setRandomIndex] = useState(0);
-
-  useEffect(() => {
-    // 0부터 2까지의 랜덤한 정수 생성
-    const index = Math.floor(Math.random() * 3);
-    setRandomIndex(index);
-  }, []);
   return (
     <BGImage
-      source={require('../../assets/images/BGABody0.png')}
+      source={require('../../assets/image/background/BG_header.png')}
       aspect-ratio={1}
       resizeMode="stretch"
       height={432}>
       <Image
-        source={groupImage[randomIndex]}
+        source={require('../../assets/image/group/race_image.png')}
         style={{
           width: '80%',
           resizeMode: 'contain',
@@ -191,15 +211,24 @@ interface BGComponentType {
   BGN: number;
   setScrollEnabled: any;
   data: ChallengeUserType;
+  CHALLENGE_MST_NO: number;
 }
 
-const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
+const BGComponent = ({
+  BGN,
+  setScrollEnabled,
+  data,
+  CHALLENGE_MST_NO,
+}: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
   const navigation = useNavigation<NavigationType>();
 
   const handleTouch = () => {
-    showModal(<CharacterModal data={data} />, false);
+    showModal(
+      <CharacterModal data={data} CHALLENGE_MST_NO={CHALLENGE_MST_NO} />,
+      false,
+    );
   };
 
   const pan = useRef(new Animated.ValueXY()).current;
@@ -294,7 +323,7 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
         }}
         {...panResponder.panHandlers}>
         {isDragging ? (
-          <View style={{width: 60, height: 60}}>
+          <View style={{width: 60, height: 70}}>
             <LottieView
               source={struggleLottie[data.CHARACTER_NO - 1]}
               autoPlay
@@ -304,12 +333,60 @@ const BGComponent = ({BGN, setScrollEnabled, data}: BGComponentType) => {
                 justifyContent: 'center',
               }}
             />
+            {!!data.PET_NO && (
+              <FastImage
+                source={avatarImage[data.PET_NO - 1]}
+                resizeMode="contain"
+                style={{
+                  position: 'absolute',
+                  width: 20,
+                  height: 30,
+                  left: -20,
+                  bottom: 5,
+                }}
+              />
+            )}
           </View>
+        ) : data.PROGRESS >= 100 ? (
+          <>
+            <FastImage
+              source={defaultData.Avatar[data.CHARACTER_NO - 1].URL}
+              style={{width: 60, height: 70}}
+            />
+            {!!data.PET_NO && (
+              <FastImage
+                source={avatarImage[data.PET_NO - 1]}
+                resizeMode="contain"
+                style={{
+                  position: 'absolute',
+                  width: 20,
+                  height: 30,
+                  left: -20,
+                  bottom: 5,
+                }}
+              />
+            )}
+          </>
         ) : (
-          <FastImage
-            source={Dudus[data.CHARACTER_NO - 1]}
-            style={{width: 60, height: 60}}
-          />
+          <>
+            <FastImage
+              source={Dudus[data.CHARACTER_NO - 1]}
+              style={{width: 60, height: 70}}
+            />
+            {!!data.PET_NO && (
+              <FastImage
+                source={avatarImage[data.PET_NO - 1]}
+                resizeMode="contain"
+                style={{
+                  position: 'absolute',
+                  width: 20,
+                  height: 30,
+                  left: -20,
+                  bottom: 5,
+                }}
+              />
+            )}
+          </>
         )}
       </Animated.View>
     </>
@@ -325,11 +402,13 @@ const NavigationButton = styled(View)`
   width: 40px;
   height: 40px;
   background-color: ${props => props.theme.white};
-  shadow-color: rgba(0, 0, 0, 0.3);
+  ${Platform.OS === 'ios'
+    ? `shadow-color: rgba(0, 0, 0, 0.3);
   shadow-offset: 1px 2px;
   shadow-opacity: 0.3;
-  shadow-radius: 3px;
-  elevation: 4;
+  shadow-radius: 1.5px;`
+    : 'elevation: 3;'}
+
   border-radius: 20px;
   align-items: center;
   justify-content: center;

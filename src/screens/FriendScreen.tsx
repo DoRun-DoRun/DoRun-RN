@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import {
-  ButtonComponent,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -167,10 +167,6 @@ const SearchBox = () => {
     {enabled: isUidValid}, // 쿼리 실행 조건
   );
 
-  if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
-  }
-
   return (
     <SearchContainer isClicked={isClicked}>
       <RowContainer gap={8}>
@@ -183,7 +179,6 @@ const SearchBox = () => {
           onChangeText={setUidInput}
           style={{flex: 1}}
           placeholder="Friend UID"
-          onBlur={() => setIsClicked(false)}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
@@ -191,7 +186,9 @@ const SearchBox = () => {
       {isClicked && uidInput ? (
         <ExpandedContainer>
           <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {data?.USER_NM ? (
+          {isLoading ? (
+            <LoadingIndicatior />
+          ) : data?.USER_NM ? (
             <InviteFriend
               name={data?.USER_NM}
               UID={data?.UID}
@@ -213,8 +210,6 @@ interface friendAPIType {
 }
 
 const FriendScreen = () => {
-  const [reqeusted, setReqeusted] = useState(true);
-  const theme = useTheme();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
   const FriendListModal = async () => {
@@ -233,11 +228,10 @@ const FriendScreen = () => {
   const {data: friendData, isLoading: friendLoading} = useQuery(
     'FriendListModal',
     FriendListModal,
-    {refetchOnWindowFocus: true},
   );
 
   if (friendLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
 
   return (
@@ -249,33 +243,23 @@ const FriendScreen = () => {
             <SearchBox />
 
             <View style={{gap: 8}}>
-              <RowContainer seperate>
-                <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-                  요청된 친구 초대
-                </NotoSansKR>
-                <TouchableOpacity onPress={() => setReqeusted(!reqeusted)}>
-                  <OcticonIcons
-                    name={reqeusted ? 'chevron-down' : 'chevron-up'}
-                    size={28}
-                    color={theme.gray1}
-                  />
-                </TouchableOpacity>
-              </RowContainer>
-              {reqeusted ? (
-                <View style={{gap: 8}}>
-                  {friendData?.pending.map((data: friendAPIType) => {
-                    return (
-                      <Friend
-                        accessToken={accessToken}
-                        key={data.FRIEND_NO}
-                        name={data.USER_NM}
-                        friendNo={data.FRIEND_NO}
-                        invited
-                      />
-                    );
-                  })}
-                </View>
-              ) : null}
+              <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
+                요청된 친구 초대
+              </NotoSansKR>
+
+              <View style={{gap: 8}}>
+                {friendData?.pending.map((data: friendAPIType) => {
+                  return (
+                    <Friend
+                      accessToken={accessToken}
+                      key={data.FRIEND_NO}
+                      name={data.USER_NM}
+                      friendNo={data.FRIEND_NO}
+                      invited
+                    />
+                  );
+                })}
+              </View>
             </View>
 
             <View style={{gap: 8}}>
@@ -296,7 +280,7 @@ const FriendScreen = () => {
             </View>
           </View>
         </ScrollContainer>
-        <ButtonComponent>카카오톡으로 초대하기</ButtonComponent>
+        {/* <ButtonComponent>카카오톡으로 초대하기</ButtonComponent> */}
       </InnerContainer>
     </HomeContainer>
   );

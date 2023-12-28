@@ -4,6 +4,12 @@ export enum SignType {
   GUEST = 'GUEST',
 }
 
+export enum UserStatusType {
+  SLEEPING = '자는중',
+  WALKING = '걷는중',
+  RUNNING = '뛰는중',
+}
+
 export enum ChallengeStatusType {
   PENDING = 'PENDING',
   PROGRESS = 'PROGRESS',
@@ -96,12 +102,57 @@ export const usedItemImage = {
     require('../assets/lottie/dudu_hammer.gif'),
     require('../assets/lottie/nuts_hammer.gif'),
     require('../assets/lottie/peats_hammer.gif'),
-    // require('../assets/lottie/pachi_hammer.gif'),
+    require('../assets/lottie/pachi_hammer.gif'),
   ],
   bomb: [
     require('../assets/lottie/dudu_bomb.json'),
     require('../assets/lottie/nuts_bomb.json'),
-    // require('../assets/lottie/dudu_boom.json'),
-    // require('../assets/lottie/dudu_boom.json')
+    require('../assets/lottie/peats_boom.json'),
+    require('../assets/lottie/pachi_boom.json'),
+  ],
+};
+
+export const defaultData = {
+  Avatar: [
+    {
+      AVATAR_TYPE: 'CHARACTER',
+      NAME: 'DUDU',
+      URL: require('../assets/image/character/dudu05.png'),
+    },
+    {
+      AVATAR_TYPE: 'CHARACTER',
+      NAME: 'NUTS',
+      URL: require('../assets/image/character/nuts08.png'),
+    },
+    {
+      AVATAR_TYPE: 'CHARACTER',
+      NAME: 'PACHI',
+      URL: require('../assets/image/character/pachi07.png'),
+    },
+    {
+      AVATAR_TYPE: 'CHARACTER',
+      NAME: 'PEATS',
+      URL: require('../assets/image/character/peats06.png'),
+    },
+    {
+      AVATAR_TYPE: 'PET',
+      NAME: 'SEED',
+      URL: require('../assets/image/character/seed01.png'),
+    },
+    {
+      AVATAR_TYPE: 'PET',
+      NAME: 'SEEDS',
+      URL: require('../assets/image/character/seeds01.png'),
+    },
+  ],
+  Item: [
+    {
+      NAME: 'BOMB',
+      URL: require('../assets/image/item/bomb.png'),
+    },
+    {
+      NAME: 'HAMMER',
+      URL: require('../assets/image/item/hammer.png'),
+    },
   ],
 };

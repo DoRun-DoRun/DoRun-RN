@@ -1,26 +1,22 @@
-import React, {useEffect, useRef, useState} from 'react';
-import styled from 'styled-components/native';
-import {launchCamera} from 'react-native-image-picker';
+import React, {useEffect, useRef} from 'react';
+import styled, {useTheme} from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
-import {Pressable, Platform, Modal, useWindowDimensions} from 'react-native';
+import {
+  Pressable,
+  Platform,
+  Modal,
+  useWindowDimensions,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-
-interface ButtonType {
-  children: React.ReactNode;
-  type?: 'primary' | 'secondary' | 'gray';
-  onPress?: () => void;
-  disabled?: boolean;
-}
-
-export const ButtonContainer = styled.TouchableOpacity<{color: string}>`
-  background-color: ${props => props.theme[props.color]};
-  padding: 8px;
-  width: 100%;
-  align-items: center;
-  border-radius: 10px;
-`;
+import axios from 'axios';
+import ImageResizer from 'react-native-image-resizer';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {useModal} from './Modal/ModalProvider';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface FontType {
   size: number;
@@ -33,30 +29,35 @@ interface FontType {
 
 export const NotoSansKR = styled.Text<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  /* 안드로이드에서 font 오류 */
-  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.75 + 'px'};
+    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
   font-size: ${({size}) => size + 'px'};
   text-align: ${({textAlign}) => (textAlign ? textAlign : 'auto')};
 `;
 
 export const InputNotoSansKR = styled.TextInput<FontType>`
+  ${Platform.OS === 'android' && 'include-font-padding: false;'}
+  vertical-align: middle;
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
-  /* 안드로이드에서 font 오류 */
-  /* font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`}; */
+  font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
+  font-weight: normal;
   line-height: ${({lineHeight, size}) =>
     lineHeight ? `${lineHeight}px` : `${size * 1.45}px`};
   font-size: ${({size}) => `${size}px`};
   padding: 0;
-  padding-bottom: 4px;
   margin: 0;
   border-bottom-width: ${({border}) => (border ? '1px' : 0)};
 `;
 
 export const TossFace = styled.Text<{size: number}>`
+  color: black;
   font-size: ${({size}) => size + 'px'};
-  line-height: ${({size}) => size * 2 + 'px'};
+  line-height: ${({size}) =>
+    Platform.select({
+      ios: size * 2,
+      android: size * 2.25,
+    })}px;
   font-family: 'TossFaceFontMac';
 `;
 
@@ -99,37 +100,62 @@ export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
   );
 };
 
+interface ButtonType {
+  children: React.ReactNode;
+  type?: 'primary' | 'secondary' | 'gray' | 'black';
+  onPress?: () => void;
+  disabled?: boolean;
+}
+
+const ButtonContainer = styled.Pressable`
+  padding: 8px;
+  width: 100%;
+  align-items: center;
+  border-radius: 10px;
+`;
+
 export const ButtonComponent = ({
   children,
   type,
   onPress,
   disabled,
 }: ButtonType) => {
+  const theme = useTheme();
   let color = 'white';
-  let backgroundColor = 'primary1';
+  let backgroundColor = 'primary';
 
   if (type === 'secondary') {
     color = 'gray4';
-    backgroundColor = 'white';
+    backgroundColor = theme.white;
   } else if (type === 'gray') {
     color = 'gray4';
-    backgroundColor = 'gray7';
+    backgroundColor = theme.gray7;
+  } else if (type === 'black') {
+    color = 'black';
+    backgroundColor = theme.white;
   }
 
   if (disabled) {
     color = 'white';
-    backgroundColor = 'gray4';
+    backgroundColor = theme.gray4;
   }
 
   return (
-    <ButtonContainer
-      color={backgroundColor}
-      onPress={onPress}
-      disabled={disabled}>
-      <NotoSansKR color={color} size={16} lineHeight={23}>
-        {children}
-      </NotoSansKR>
-    </ButtonContainer>
+    <LinearGradient
+      colors={
+        backgroundColor === 'primary'
+          ? ['#1727C3', '#6377F1', '#9EB7F6']
+          : [backgroundColor, backgroundColor]
+      }
+      start={{x: 1.27, y: 4.29}}
+      end={{x: -0.19, y: -2.08}}
+      style={{borderRadius: 10}}>
+      <ButtonContainer onPress={onPress} disabled={disabled}>
+        <NotoSansKR color={color} size={16} lineHeight={23}>
+          {children}
+        </NotoSansKR>
+      </ButtonContainer>
+    </LinearGradient>
   );
 };
 
@@ -145,80 +171,98 @@ interface API {
   method: 'GET' | 'POST' | 'DELETE' | 'PUT';
   accessToken?: string;
   body?: object;
+  formData?: boolean;
 }
 
 interface Config {
   method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+  url: string;
   headers: {
-    'Content-Type': string;
+    'Content-Type'?: string;
     Authorization?: string;
   };
-  body?: string;
+  data?: object | FormData;
 }
 
 export const useApi = () => {
   const navigation = useNavigation();
+  const {hideModal} = useModal();
 
-  async function CallApi({endpoint, method, accessToken, body}: API) {
-    let url = `https://dorun.site/${endpoint}`;
-    if (Platform.OS === 'android') {
-      url = `http://10.0.2.2:8000/${endpoint}`; //andriod
-    } else {
-      url = `http://127.0.0.1:8000/${endpoint}`; //ios
-    }
-    const config: Config = {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: accessToken ? `Bearer ${accessToken}` : '',
-      },
-      body: body && method !== 'GET' ? JSON.stringify(body) : undefined,
-    };
+  async function CallApi({endpoint, method, accessToken, body, formData}: API) {
+    let baseUrl = 'https://dorun.site';
+
+    // baseUrl =
+    //   Platform.OS === 'android'
+    //     ? 'http://10.0.2.2:8000'
+    //     : 'http://127.0.0.1:8000';
+
+    const url = `${baseUrl}/${endpoint}`;
 
     try {
-      let response = await fetch(url, config);
-      let contentType = response.headers.get('Content-Type');
+      const axiosConfig: Config = {
+        method: method,
+        url: url,
+        headers: {
+          Authorization: accessToken ? `Bearer ${accessToken}` : '',
+        },
+        data: body,
+      };
 
-      if (!response.ok) {
-        let errorBodyText = await response.text(); // 응답을 텍스트로 받기
-        console.log(errorBodyText);
-        // Content-Type이 application/json인지 확인
-        if (contentType && contentType.includes('application/json')) {
-          let errorBody = JSON.parse(errorBodyText); // JSON으로 파싱
-
-          if (errorBody.detail === '토큰이 만료되었습니다.') {
-            navigation.navigate('LoginTab' as never);
-          }
-
-          throw new Error(
-            `API call failed: ${response.status}, Details: ${errorBody.detail}`,
-          );
-        } else {
-          console.error('Invalid Content-Type:', contentType);
-          throw new Error(`Invalid Content-Type: ${contentType}`);
-        }
+      if (formData) {
+        axiosConfig.headers['Content-Type'] = 'multipart/form-data';
       }
 
-      return await response.json();
+      const response = await axios(axiosConfig);
+
+      if (response.status !== 200) {
+        if (response.data?.detail === '토큰이 만료되었습니다.') {
+          navigation.navigate('LoginTab' as never);
+        }
+
+        throw new Error(
+          `API call failed: ${response.status}, Details: ${response.statusText}`,
+        );
+      }
+
+      // console.log(response.data);
+
+      return response.data;
     } catch (error) {
-      console.error('Error Object:', error); // 전체 에러 객체 출력
-      console.error(`Error during API call to ${url}: ${error}`);
-      console.error('Access Token:', accessToken); // 토큰 출력 (운영 환경에서는 제거 필요)
+      // 오류 로깅 개선
+      if (axios.isAxiosError(error)) {
+        console.error('Axios Error:', error.response?.data || error.message);
+      } else {
+        console.error('Non-Axios error:', error);
+      }
+
+      if (navigation.canGoBack()) {
+        Toast.show({
+          type: 'error',
+          text1: '올바르지 않은 접근입니다',
+          text2: axios.isAxiosError(error)
+            ? error.response?.data || error.message
+            : error,
+        });
+        hideModal();
+        navigation.goBack();
+      }
+
       throw error;
     }
   }
+
   return CallApi;
 };
 
 const ViewImageModalBackground = styled.TouchableOpacity`
   background-color: 'rgba(0,0,0,0.6)';
-  flex: 1;
   justify-content: center;
   align-items: center;
 `;
 
-export const ViewImage = ({visible, onClose, res}: any) => {
+export const ModalViewPhoto = ({visible, onClose, res}: any) => {
   const width = useWindowDimensions().width;
+  const height = useWindowDimensions().height;
 
   return (
     <Modal
@@ -228,9 +272,10 @@ export const ViewImage = ({visible, onClose, res}: any) => {
       onRequestClose={onClose}>
       <ViewImageModalBackground onPress={onClose}>
         <ViewImageStyles
-          source={{uri: res?.assets[0]?.uri}}
-          height={width}
-          resizeMode="cover"
+          source={{uri: res?.uri}}
+          width={width}
+          height={height}
+          resizeMode="contain"
         />
       </ViewImageModalBackground>
     </Modal>
@@ -240,54 +285,6 @@ export const ViewImage = ({visible, onClose, res}: any) => {
 const ViewImageStyles = styled.Image<{height: any}>`
   width: ${props => props.height};
 `;
-
-export const PhotoView = () => {
-  const [modalImage, setModalImage] = useState<any>(null);
-  const [imageVisible, setImageVisible] = useState(false);
-
-  const imagePickerOption: any = {
-    mediaType: 'photo',
-    selectionLimit: 0,
-    includeBase64: Platform.OS === 'android',
-  };
-
-  const onPickImage = (res: any) => {
-    if (res.didCancel || !res) {
-      return;
-    }
-    setModalImage(res);
-  };
-
-  // 찍은 사진 확대모달로 보여주기
-  const onViewImage = () => {
-    setImageVisible(true);
-  };
-
-  // 카메라로 사진찍기
-  const onLaunchCamera = () => {
-    launchCamera(imagePickerOption, onPickImage);
-  };
-
-  const onPressToiOS = () => {
-    onLaunchCamera();
-  };
-
-  return (
-    <>
-      <Pressable onPress={onPressToiOS}>
-        <NotoSansKR size={12}>사진 찍기</NotoSansKR>
-      </Pressable>
-      <Pressable onPress={onViewImage}>
-        <NotoSansKR size={12}>찍은 이미지 보기</NotoSansKR>
-        <ViewImage
-          visible={imageVisible}
-          onClose={() => setImageVisible(false)}
-          res={modalImage}
-        />
-      </Pressable>
-    </>
-  );
-};
 
 export const ContentSave = ({children}: {children: React.ReactNode}) => {
   const ref = useRef<ViewShot | null>(null);
@@ -359,10 +356,8 @@ export function convertKoKRToUTC(dateString: string) {
   return utcDate;
 }
 
-export function convertUTCToKoKR(dateString: string) {
-  // 요일명 배열
+export function convertUTCToKoKRDay(dateString: string) {
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-  // UTC 시간대의 Date 객체 생성
   const utcDate = new Date(dateString);
 
   // 한국 시간대로 변환 (UTC+9)
@@ -378,6 +373,21 @@ export function convertUTCToKoKR(dateString: string) {
   return `${year}-${month}-${day} (${weekDay})`;
 }
 
+export function convertUTCToKoKR(dateString: string) {
+  const utcDate = new Date(dateString);
+
+  // 한국 시간대로 변환 (UTC+9)
+  const koreaTimeOffset = 9 * 60; // 9시간을 분 단위로 변환
+  const localTime = new Date(utcDate.getTime() + koreaTimeOffset * 60000); // 밀리초 단위로 변환하여 더함
+
+  // YYYY-MM-DD 형식으로 변환
+  const year = localTime.getFullYear();
+  const month = (localTime.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 1을 더함
+  const day = localTime.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
 export const calculateDaysUntil = (startDateString: string) => {
   const startDate = new Date(startDateString);
   const currentDate = new Date(Date.now());
@@ -388,7 +398,7 @@ export const calculateDaysUntil = (startDateString: string) => {
   return daysUntil;
 };
 
-export const calculateTimeDifference = (endDtString: string) => {
+export const calculateRemainTime = (endDtString: string) => {
   // 현재 UTC 시간
   const currentDateTimeUtc = new Date();
   // 종료 UTC 시간
@@ -411,3 +421,155 @@ export const calculateTimeDifference = (endDtString: string) => {
 
   return `${formattedHours}:${formattedMinutes}`;
 };
+
+export const timeSince = (utcDate: string) => {
+  const now = new Date();
+  const past = new Date(`${utcDate}Z`);
+
+  const msPerMinute = 60 * 1000;
+  const msPerHour = msPerMinute * 60;
+
+  const elapsed = now.getTime() - past.getTime();
+
+  if (elapsed < msPerHour) {
+    return Math.round(elapsed / msPerMinute) + '분 전';
+  } else {
+    return Math.round(elapsed / msPerHour) + '시간 전';
+  }
+};
+
+export const LoadingIndicatior = () => (
+  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <ActivityIndicator size="large" color="#0000ff" />
+  </View>
+);
+
+export const resizeImage = async (uri: string | undefined) => {
+  if (!uri) {
+    console.error('Error: URI is undefined');
+    return null;
+  }
+
+  try {
+    const resizedImage = await ImageResizer.createResizedImage(
+      uri,
+      800,
+      600,
+      'JPEG',
+      80,
+    );
+    return resizedImage;
+  } catch (error) {
+    console.error('Error resizing image: ', error);
+    return null;
+  }
+};
+
+export const formatDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// export const GetTheme = () => {
+//   const theme = useTheme();
+
+//   return {
+//     // arrows
+//     arrowColor: theme.priamry1,
+//     arrowStyle: {padding: 0},
+//     // knob
+//     expandableKnobColor: theme.primary1,
+//     // month
+//     monthTextColor: theme.gray4,
+//     textMonthFontSize: 16,
+//     // day names
+//     textSectionTitleColor: 'black',
+//     textDayHeaderFontSize: 15,
+//     // dates
+//     dayTextColor: 'black',
+//     todayTextColor: theme.primary1,
+//     textDayFontSize: 18,
+//     textDayStyle: {marginTop: Platform.OS === 'android' ? 2 : 4},
+//     // selected date
+//     selectedDayBackgroundColor: theme.primary1,
+//     selectedDayTextColor: theme.white,
+//     // disabled date
+//     textDisabledColor: theme.gray4,
+//     // dot (marked date)
+//     // dotColor: 'black',
+//     // selectedDotColor: 'white',
+//     // disabledDotColor: disabledColor,
+//     // dotStyle: {marginTop: -2},
+//   };
+// };
+
+import {LocaleConfig} from 'react-native-calendars';
+
+LocaleConfig.locales.kr = {
+  monthNames: [
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
+  ],
+  monthNamesShort: [
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
+  ],
+  dayNames: [
+    '일요일',
+    '월요일',
+    '화요일',
+    '수요일',
+    '목요일',
+    '금요일',
+    '토요일',
+  ],
+  dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+  today: '오늘',
+};
+LocaleConfig.defaultLocale = 'kr';
+
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+
+const requestCameraPermission = async () => {
+  let permission;
+  if (Platform.OS === 'ios') {
+    permission = PERMISSIONS.IOS.CAMERA;
+  } else {
+    permission = PERMISSIONS.ANDROID.CAMERA;
+  }
+
+  const result = await check(permission);
+  if (result === RESULTS.GRANTED) {
+    console.log('카메라 권한이 이미 허용되어 있습니다.');
+    return true;
+  } else {
+    console.log(result);
+  }
+
+  const requestResult = await request(permission);
+  return requestResult === RESULTS.GRANTED;
+};
+
+export default requestCameraPermission;

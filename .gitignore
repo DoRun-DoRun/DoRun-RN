@@ -21,6 +21,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 ios/.xcode.env.local
+ios/CLife/AppCenter-Config.plist
 
 # Android/IntelliJ
 #
@@ -33,6 +34,7 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+android/app/src/main/assets/appcenter-config.json
 
 # node.js
 #

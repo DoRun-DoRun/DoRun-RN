@@ -6,21 +6,23 @@ import styled, {useTheme} from 'styled-components/native';
 import {
   HomeContainer,
   InnerContainer,
+  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   TossFace,
+  timeSince,
   useApi,
 } from '../Component';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {useMutation, useQuery} from 'react-query';
-import {RouteType} from '../App';
+import {DailyNoteRouteType} from '../App';
 import {groupImage} from '../../store/data';
 import {useNavigation} from '@react-navigation/native';
 import {RootState} from '../../store/RootReducer';
 import {useSelector} from 'react-redux';
 
 // DailyNoteScreen 컴포넌트
-export const DailyNoteScreen = ({route}: {route: RouteType}) => {
+export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   const {daily_no} = route.params;
   const CallApi = useApi();
 
@@ -48,7 +50,7 @@ export const DailyNoteScreen = ({route}: {route: RouteType}) => {
   const {data, isLoading} = useQuery('getDiary', getDiary);
 
   if (isLoading) {
-    return <NotoSansKR size={16}>로딩중</NotoSansKR>;
+    return <LoadingIndicatior />;
   }
   if (!data || data.dairy!) {
     return <NotoSansKR size={16}>에러</NotoSansKR>;
@@ -61,17 +63,17 @@ export const DailyNoteScreen = ({route}: {route: RouteType}) => {
           <RowContainer>
             <NotoSansKR size={18}>[{data.user}]</NotoSansKR>
             <NotoSansKR size={14} color="gray4">
-              &nbsp;· 12시간전
+              &nbsp;· {timeSince(data.diary.INSERT_DT)}
             </NotoSansKR>
           </RowContainer>
 
           <View style={{gap: 16, alignContent: 'center'}}>
-            {data.diary.IMAGE_FILE_NAME !== '' ? (
+            {data.diary.IMAGE_FILE_NM !== '' ? (
               <Image
                 source={{
                   uri: `https://do-run.s3.amazonaws.com/${data.diary.IMAGE_FILE_NM}`,
                 }}
-                style={{width: '100%', height: 222}}
+                style={{width: '100%', height: 222, borderRadius: 10}}
               />
             ) : (
               <ImageContainer

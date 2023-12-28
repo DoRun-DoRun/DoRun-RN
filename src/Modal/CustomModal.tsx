@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import {Modal, View, Animated, PanResponder} from 'react-native';
+import {Modal, View, Animated, PanResponder, Platform} from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
 import {OverlayContainer} from './OverlayContainer';
@@ -17,6 +17,13 @@ const StyledModalContent = styled(Animated.View)`
   border-radius: 16px;
   padding: 0 16px;
   padding-bottom: 24px;
+  ${Platform.OS === 'ios'
+    ? `
+    shadow-color: #000;
+    shadow-offset: 2px 4px;
+    shadow-opacity: 0.3;
+    shadow-radius: 2px;`
+    : 'elevation: 3;'}
 `;
 
 export const ModalHeadText = ({children}: {children: React.ReactNode}) => {

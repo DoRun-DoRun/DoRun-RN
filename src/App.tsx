@@ -15,6 +15,8 @@ import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
 import {DailyNoteScreen} from './screens/DailyNoteScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Store} from '../store/Store';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -36,12 +38,26 @@ export type NavigationType = NavigationProp<
 >;
 
 // Route 타입
-export type RouteType = RouteProp<RootStackParamList, 'DailyNoteScreen'>;
+export type DailyNoteRouteType = RouteProp<
+  RootStackParamList,
+  'DailyNoteScreen'
+>;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
   const navigation = useNavigation();
+  React.useEffect(() => {
+    const loadGoals = async () => {
+      const storedGoals = await AsyncStorage.getItem('goals');
+      if (storedGoals) {
+        const parsedGoals = JSON.parse(storedGoals);
+        Store.dispatch({type: 'goals/restore', payload: parsedGoals});
+      }
+    };
+
+    loadGoals();
+  }, []);
   return (
     <Stack.Navigator
       screenOptions={{

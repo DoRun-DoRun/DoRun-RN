@@ -1,17 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit';
-
 export interface goalType {
   id: number;
   title: string;
   isComplete: boolean;
 }
 
-const initialState = [
-  {
-    challenge_no: 29,
-    personalGoals: [{id: 1, title: '개인 목표 1', isComplete: false}],
-  },
-];
+export interface ChallengeGoals {
+  challenge_no: number;
+  personalGoals: goalType[];
+}
+
+const initialState: ChallengeGoals[] = [];
 
 const goalsSlice = createSlice({
   name: 'goals',
