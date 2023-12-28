@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  ButtonComponent,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -281,7 +280,7 @@ const FriendScreen = () => {
             </View>
           </View>
         </ScrollContainer>
-        <ButtonComponent>카카오톡으로 초대하기</ButtonComponent>
+        {/* <ButtonComponent>카카오톡으로 초대하기</ButtonComponent> */}
       </InnerContainer>
     </HomeContainer>
   );

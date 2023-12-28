@@ -579,6 +579,7 @@ const ChallengeTab = () => {
             </CenterContainer>
             <CenterContainer>
               <ButtonComponent
+                disabled={detailData.IS_DONE_TODAY || personGoal.length === 0}
                 onPress={() => {
                   showModal(
                     <MyDailyDrayModal
@@ -587,7 +588,11 @@ const ChallengeTab = () => {
                     />,
                   );
                 }}>
-                일기 작성하기
+                {detailData.IS_DONE_TODAY
+                  ? '오늘은 일기를 작성했어요'
+                  : personGoal.length === 0
+                  ? '개인별 목표를 추가해주세요'
+                  : '일기 작성하기'}
               </ButtonComponent>
             </CenterContainer>
             {detailData?.additionalGoal.length !== 0 ? (

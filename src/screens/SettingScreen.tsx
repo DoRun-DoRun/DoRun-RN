@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   ButtonComponent,
   HomeContainer,
@@ -7,19 +7,22 @@ import {
   NotoSansKR,
   useApi,
 } from '../Component';
-import {Animated, Easing, Pressable, View} from 'react-native';
+import {View} from 'react-native';
 import {styled, useTheme} from 'styled-components/native';
 import {Slider} from '@miblanchard/react-native-slider';
 import {useQuery} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 import {useSelector} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 
 const SettingScreen = () => {
-  const [pushAlarm, setPushAlarm] = useState(true);
-  const [marketingAlarm, setMarketingAlarm] = useState(true);
-  const [nightAlarm, setNightAlarm] = useState(true);
-  const [soundEffect, setSoundEffect] = useState(100);
-  const [backgroundMusic, setBackgroundMusic] = useState(100);
+  // const [pushAlarm, setPushAlarm] = useState(true);
+  // const [marketingAlarm, setMarketingAlarm] = useState(true);
+  // const [nightAlarm, setNightAlarm] = useState(true);
+  // const [soundEffect, setSoundEffect] = useState(100);
+  // const [backgroundMusic, setBackgroundMusic] = useState(100);
+
+  const navigation = useNavigation();
 
   const CallApi = useApi();
   const {accessToken} = useSelector((state: RootState) => state.user);
@@ -41,17 +44,17 @@ const SettingScreen = () => {
   if (isLoading) {
     return <LoadingIndicatior />;
   }
-  const OnPushAlarmToggle = () => {
-    setPushAlarm(!pushAlarm);
-  };
+  // const OnPushAlarmToggle = () => {
+  //   setPushAlarm(!pushAlarm);
+  // };
 
-  const OnMarketingAlarmToggle = () => {
-    setMarketingAlarm(!marketingAlarm);
-  };
+  // const OnMarketingAlarmToggle = () => {
+  //   setMarketingAlarm(!marketingAlarm);
+  // };
 
-  const OnNightAlarmToggle = () => {
-    setNightAlarm(!nightAlarm);
-  };
+  // const OnNightAlarmToggle = () => {
+  //   setNightAlarm(!nightAlarm);
+  // };
 
   return (
     <HomeContainer>
@@ -59,7 +62,7 @@ const SettingScreen = () => {
         <View style={{gap: 36}}>
           <NotoSansKR size={20}>환경 설정</NotoSansKR>
 
-          <ObjectList>
+          {/* <ObjectList>
             <ToggleComponent isOn={pushAlarm} onToggle={OnPushAlarmToggle}>
               푸시 알람
             </ToggleComponent>
@@ -84,7 +87,7 @@ const SettingScreen = () => {
               setSliderValue={setBackgroundMusic}>
               배경음악
             </SliderComponent>
-          </ObjectList>
+          </ObjectList> */}
           <ObjectList>
             <ObjectContainer>
               <NotoSansKR size={16} weight="Medium">
@@ -106,8 +109,14 @@ const SettingScreen = () => {
         </View>
       </InnerContainer>
       <View style={{gap: 8, padding: 16}}>
-        <ButtonComponent>고객 센터</ButtonComponent>
-        <ButtonComponent type="secondary">로그아웃</ButtonComponent>
+        {/* <ButtonComponent>고객 센터</ButtonComponent> */}
+        <ButtonComponent
+          // type="secondary"
+          onPress={() => {
+            navigation.navigate('LoginTab' as never);
+          }}>
+          로그아웃
+        </ButtonComponent>
       </View>
     </HomeContainer>
   );
@@ -124,67 +133,67 @@ const ObjectContainer = styled(View)`
   align-items: center;
 `;
 
-const ToggleWheel = styled(Animated.View)`
-  width: 25px;
-  height: 25px;
-  background-color: ${props => props.theme.white};
-  border-radius: 12.5px;
-`;
+// const ToggleWheel = styled(Animated.View)`
+//   width: 25px;
+//   height: 25px;
+//   background-color: ${props => props.theme.white};
+//   border-radius: 12.5px;
+// `;
 
-const Wrap = styled(View)`
-  flex-direction: row;
-  align-items: center;
-`;
+// const Wrap = styled(View)`
+//   flex-direction: row;
+//   align-items: center;
+// `;
 
-const ToggleFrame = styled(View)`
-  width: 50px;
-  height: 30px;
-  padding-left: 2px;
-  border-radius: 15px;
-  justify-content: center;
-`;
+// const ToggleFrame = styled(View)`
+//   width: 50px;
+//   height: 30px;
+//   padding-left: 2px;
+//   border-radius: 15px;
+//   justify-content: center;
+// `;
 
-interface ToggleComponentType {
-  children: React.ReactNode;
-  isOn: Boolean;
-  onToggle: () => void;
-}
+// interface ToggleComponentType {
+//   children: React.ReactNode;
+//   isOn: Boolean;
+//   onToggle: () => void;
+// }
 
-const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
-  const theme = useTheme();
+// const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
+//   const theme = useTheme();
 
-  const aniValue = new Animated.Value(isOn ? 1 : 0);
-  const color = isOn ? theme.primary1 : theme.gray6;
+//   const aniValue = new Animated.Value(isOn ? 1 : 0);
+//   const color = isOn ? theme.primary1 : theme.gray6;
 
-  const moveSwitchToggle = aniValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 20],
-  });
+//   const moveSwitchToggle = aniValue.interpolate({
+//     inputRange: [0, 1],
+//     outputRange: [0, 20],
+//   });
 
-  Animated.timing(aniValue, {
-    toValue: isOn ? 1 : 0,
-    duration: 200,
-    easing: Easing.linear,
-    useNativeDriver: true,
-  }).start();
+//   Animated.timing(aniValue, {
+//     toValue: isOn ? 1 : 0,
+//     duration: 200,
+//     easing: Easing.linear,
+//     useNativeDriver: true,
+//   }).start();
 
-  return (
-    <ObjectContainer>
-      <NotoSansKR size={16} weight="Medium">
-        {children}
-      </NotoSansKR>
-      <Wrap>
-        <Pressable onPress={onToggle}>
-          <ToggleFrame style={{backgroundColor: color}}>
-            <ToggleWheel
-              style={[{transform: [{translateX: moveSwitchToggle}]}]}
-            />
-          </ToggleFrame>
-        </Pressable>
-      </Wrap>
-    </ObjectContainer>
-  );
-};
+//   return (
+//     <ObjectContainer>
+//       <NotoSansKR size={16} weight="Medium">
+//         {children}
+//       </NotoSansKR>
+//       <Wrap>
+//         <Pressable onPress={onToggle}>
+//           <ToggleFrame style={{backgroundColor: color}}>
+//             <ToggleWheel
+//               style={[{transform: [{translateX: moveSwitchToggle}]}]}
+//             />
+//           </ToggleFrame>
+//         </Pressable>
+//       </Wrap>
+//     </ObjectContainer>
+//   );
+// };
 
 interface SliderComponentType {
   children: React.ReactNode;

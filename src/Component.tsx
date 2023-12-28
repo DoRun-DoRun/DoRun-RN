@@ -150,7 +150,7 @@ export const ButtonComponent = ({
       start={{x: 1.27, y: 4.29}}
       end={{x: -0.19, y: -2.08}}
       style={{borderRadius: 10}}>
-      <ButtonContainer onPress={onPress}>
+      <ButtonContainer onPress={onPress} disabled={disabled}>
         <NotoSansKR color={color} size={16} lineHeight={23}>
           {children}
         </NotoSansKR>
@@ -191,10 +191,10 @@ export const useApi = () => {
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     let baseUrl = 'https://dorun.site';
 
-    baseUrl =
-      Platform.OS === 'android'
-        ? 'http://10.0.2.2:8000'
-        : 'http://127.0.0.1:8000';
+    // baseUrl =
+    //   Platform.OS === 'android'
+    //     ? 'http://10.0.2.2:8000'
+    //     : 'http://127.0.0.1:8000';
 
     const url = `${baseUrl}/${endpoint}`;
 

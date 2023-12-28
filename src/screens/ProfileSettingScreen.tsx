@@ -125,7 +125,7 @@ const ProfileSettingScreen = () => {
       <ScrollContainer>
         <InnerContainer gap={24}>
           <NotoSansKR size={20}>프로필 수정</NotoSansKR>
-          <View style={{gap: 8}}>
+          {/* <View style={{gap: 8}}>
             <NotoSansKR size={18} weight="Medium">
               닉네임 변경
             </NotoSansKR>
@@ -139,7 +139,7 @@ const ProfileSettingScreen = () => {
                 <OcticonIcons name="pencil" size={20} color={'black'} />
               </PencilIcon>
             </RowContainer>
-          </View>
+          </View> */}
           <View style={{gap: 16, flex: 1}}>
             <NotoSansKR size={18} weight="Medium">
               캐릭터/펫 변경
