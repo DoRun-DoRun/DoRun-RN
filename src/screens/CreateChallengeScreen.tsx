@@ -14,6 +14,7 @@ import {
   useApi,
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
@@ -23,6 +24,7 @@ import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {Alert} from 'react-native';
+import {Direction} from 'react-native-calendars/src/types';
 
 const SearchContainer = styled.View<{isClicked: boolean}>`
   flex: 1;
@@ -309,7 +311,9 @@ export const formatDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-const CalendarModal = styled.TouchableOpacity`
+const CalendarModal = styled.Modal``;
+
+const CalendarView = styled.TouchableOpacity`
   position: absolute;
   width: 100%;
   height: 100%;
@@ -320,9 +324,9 @@ const CalendarModal = styled.TouchableOpacity`
 `;
 
 const CalendarModalContainer = styled.Pressable`
-  padding-top: 16px;
+  padding-top: 10px;
   background-color: #fff;
-  border-radius: 16px;
+  border-radius: 10px;
   z-index: 2;
 `;
 
@@ -343,43 +347,56 @@ export const CalendarContainer = ({
   calendarData: {start: string; end: string};
 }) => {
   const [markedDates, setMarkedDates] = useState<MarkedDataType>({});
+  const [disabledLeft, setDisabledLeft] = useState(true);
+
   const theme = useTheme();
+  const currentDate = new Date();
 
   useEffect(() => {
     if (calendarData.start !== '' && calendarData.end !== '') {
-      console.log(calendarData);
       const {start, end} = calendarData;
-      const startDate = new Date(start);
-      const endDate = new Date(end);
-      const newMarkedDates = {...markedDates};
+      if (start === end) {
+        setMarkedDates({
+          [start]: {
+            startingDay: true,
+            endingDay: true,
+            color: theme.primary1,
+            textColor: 'white',
+          },
+        });
+      } else {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const newMarkedDates = {...markedDates};
 
-      let day = new Date(startDate);
-      day.setDate(day.getDate() + 1); // 시작 날짜 다음 날부터 순회 시작
+        let day = new Date(startDate);
+        day.setDate(day.getDate() + 1); // 시작 날짜 다음 날부터 순회 시작
 
-      newMarkedDates[start] = {
-        startingDay: true,
-        color: theme.primary1,
-        textColor: 'white',
-      };
-
-      while (day < endDate) {
-        const dayStr = formatDate(day);
-        newMarkedDates[dayStr] = {
-          marked: true,
-          dotColor: 'transparent',
+        newMarkedDates[start] = {
+          startingDay: true,
           color: theme.primary1,
           textColor: 'white',
         };
-        day.setDate(day.getDate() + 1);
+
+        while (day < endDate) {
+          const dayStr = formatDate(day);
+          newMarkedDates[dayStr] = {
+            marked: true,
+            dotColor: 'transparent',
+            color: theme.primary1,
+            textColor: 'white',
+          };
+          day.setDate(day.getDate() + 1);
+        }
+
+        newMarkedDates[end] = {
+          endingDay: true,
+          color: theme.primary1,
+          textColor: 'white',
+        };
+
+        setMarkedDates(newMarkedDates);
       }
-
-      newMarkedDates[end] = {
-        endingDay: true,
-        color: theme.primary1,
-        textColor: 'white',
-      };
-
-      setMarkedDates(newMarkedDates);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -453,39 +470,68 @@ export const CalendarContainer = ({
   const sendCalendarData = () => {
     setCalendarOpen(false);
     const keys = Object.keys(markedDates);
-
-    setCalendarData({
-      start: keys![0],
-      end: keys.length <= 1 ? keys![0] : keys![1],
-    });
+    console.log(keys);
+    if (keys.length !== 0) {
+      setCalendarData({
+        start: keys![0],
+        end: keys.length === 1 ? keys![0] : keys![1],
+      });
+    }
   };
 
   return (
-    <CalendarModal onPress={() => setCalendarOpen(false)}>
-      <CalendarModalContainer onPress={e => e.stopPropagation()}>
-        <Calendar
-          style={{padding: 16}}
-          minDate={formatDate(new Date())}
-          onDayPress={onDayPress}
-          markingType={'period'}
-          markedDates={markedDates}
-        />
-        <CalendarRowContainer gap={16}>
-          <TouchableOpacity
-            style={{padding: 10}}
-            onPress={() => setCalendarOpen(false)}>
-            <NotoSansKR size={14} color="primary1">
-              Cancel
-            </NotoSansKR>
-          </TouchableOpacity>
+    <CalendarModal transparent={true}>
+      <CalendarView onPress={() => setCalendarOpen(false)}>
+        <CalendarModalContainer onPress={e => e.stopPropagation()}>
+          <Calendar
+            onMonthChange={e =>
+              e.month !== currentDate.getMonth() + 1
+                ? setDisabledLeft(false)
+                : setDisabledLeft(true)
+            }
+            allowShadow
+            renderArrow={(direction: Direction) =>
+              direction === 'left' ? (
+                !disabledLeft && (
+                  <MaterialIcons
+                    name="arrow-back"
+                    size={20}
+                    color={theme.primary1}
+                  />
+                )
+              ) : (
+                <MaterialIcons
+                  name="arrow-forward"
+                  size={20}
+                  color={theme.primary1}
+                />
+              )
+            }
+            disableArrowLeft={disabledLeft}
+            monthFormat="yy년 MM월"
+            style={{padding: 16, gap: 8}}
+            minDate={formatDate(new Date())}
+            onDayPress={onDayPress}
+            markingType={'period'}
+            markedDates={markedDates}
+          />
+          <CalendarRowContainer gap={16}>
+            <TouchableOpacity
+              style={{padding: 10}}
+              onPress={() => setCalendarOpen(false)}>
+              <NotoSansKR size={14} color="primary1">
+                취소
+              </NotoSansKR>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={{padding: 10}} onPress={sendCalendarData}>
-            <NotoSansKR size={14} color="primary1">
-              Ok
-            </NotoSansKR>
-          </TouchableOpacity>
-        </CalendarRowContainer>
-      </CalendarModalContainer>
+            <TouchableOpacity style={{padding: 10}} onPress={sendCalendarData}>
+              <NotoSansKR size={14} color="primary1">
+                선택하기
+              </NotoSansKR>
+            </TouchableOpacity>
+          </CalendarRowContainer>
+        </CalendarModalContainer>
+      </CalendarView>
     </CalendarModal>
   );
 };
@@ -709,13 +755,13 @@ const CreateChallengeScreen = () => {
         onClose={() => setEmojiOpen(false)}
       />
 
-      {calendarOpen ? (
+      {calendarOpen && (
         <CalendarContainer
           calendarData={calendarData}
           setCalendarOpen={setCalendarOpen}
           setCalendarData={setCalendarData}
         />
-      ) : null}
+      )}
     </HomeContainer>
   );
 };

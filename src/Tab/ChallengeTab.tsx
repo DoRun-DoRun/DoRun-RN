@@ -376,7 +376,12 @@ const ChallengeTab = () => {
     }
   };
 
-  const {data: detailData, isLoading: detailLoading} = useQuery(
+  const {
+    data: detailData,
+    isLoading: detailLoading,
+    refetch: refetchDetail,
+    isFetching: isFetchingDetail,
+  } = useQuery(
     ['getChallengeDetail', selectedChallengeMstNo],
     getChallengeDetail,
     {
@@ -388,8 +393,10 @@ const ChallengeTab = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    refetch().then(() => setRefreshing(false));
-  }, [refetch]);
+    Promise.all([refetch(), refetchDetail()]).then(() => {
+      setRefreshing(false);
+    });
+  }, [refetch, refetchDetail]);
 
   if (listLoading || detailLoading) {
     return <LoadingIndicatior />;
@@ -470,7 +477,7 @@ const ChallengeTab = () => {
     <ScrollView
       refreshControl={
         <RefreshControl
-          refreshing={refreshing || isFetching}
+          refreshing={refreshing || isFetching || isFetchingDetail}
           onRefresh={onRefresh}
         />
       }>

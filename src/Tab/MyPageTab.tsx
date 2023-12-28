@@ -9,10 +9,11 @@ import {
   ScrollContainer,
   TossFace,
   convertKoKRToUTC,
+  formatDate,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {Dimensions, Image, TouchableOpacity, View} from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useQuery} from 'react-query';
@@ -20,6 +21,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import LinearGradient from 'react-native-linear-gradient';
 import {profileImage} from '../../store/data';
+import {Direction} from 'react-native-calendars/src/types';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
@@ -178,6 +180,7 @@ const History = () => {
   const theme = useTheme();
   const [date, setDate] = useState(formattedDate);
   const [index, setIndex] = useState(1);
+  const [disabledRight, setDisabledRight] = useState(true);
 
   const ChallengeHistory = async () => {
     try {
@@ -198,13 +201,44 @@ const History = () => {
     ChallengeHistory,
   );
 
+  const width = Dimensions.get('screen').width;
+
   return (
     <>
-      <View style={{marginHorizontal: -16}}>
-        <CalendarProvider date={date} onDateChanged={e => setDate(e)}>
-          <ExpandableCalendar firstDay={1} onDayPress={() => setIndex(1)} />
-        </CalendarProvider>
-      </View>
+      <CalendarProvider
+        date={date}
+        onMonthChange={e =>
+          e.month !== currentDate.getMonth() + 1
+            ? setDisabledRight(false)
+            : setDisabledRight(true)
+        }>
+        <ExpandableCalendar
+          style={{borderRadius: 10, padding: 10}}
+          renderArrow={(direction: Direction) =>
+            direction === 'left' ? (
+              <MaterialIcons
+                name="arrow-back"
+                size={20}
+                color={theme.primary1}
+              />
+            ) : (
+              !disabledRight && (
+                <MaterialIcons
+                  name="arrow-forward"
+                  size={20}
+                  color={theme.primary1}
+                />
+              )
+            )
+          }
+          disableArrowRight={disabledRight}
+          monthFormat="yy년 MM월"
+          calendarWidth={width - 52}
+          allowShadow
+          onDayPress={e => setDate(e.dateString)}
+          maxDate={formatDate(new Date())}
+        />
+      </CalendarProvider>
 
       {isLoading ? (
         <LoadingIndicatior />
