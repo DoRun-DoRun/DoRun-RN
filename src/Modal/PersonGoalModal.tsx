@@ -33,11 +33,12 @@ export const PersonGoalEditModal = ({
         size={16}
         value={inputText}
         onChangeText={setInputText}
+        placeholder="개인별 목표를 입력하세요"
         border
       />
       <View style={{gap: 8}}>
         <ButtonComponent
-          type="secondary"
+          type="black"
           onPress={() => {
             dispatch(
               updateGoalTitle({
@@ -51,7 +52,7 @@ export const PersonGoalEditModal = ({
           수정하기
         </ButtonComponent>
         <ButtonComponent
-          type="secondary"
+          type="black"
           onPress={() => {
             dispatch(removeGoal({goalId: id, challenge_no: challenge_no}));
             hideModal();
@@ -81,7 +82,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
       />
       <View style={{gap: 8}}>
         <ButtonComponent
-          type="secondary"
+          type="black"
           onPress={() => {
             dispatch(
               addPersonalGoal({
@@ -94,7 +95,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
           생성하기
         </ButtonComponent>
         <ButtonComponent
-          type="secondary"
+          type="black"
           onPress={() => {
             hideModal();
           }}>

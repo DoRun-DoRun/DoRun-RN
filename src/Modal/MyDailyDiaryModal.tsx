@@ -157,6 +157,7 @@ export const MyDailyDrayModal = ({
         />
         {modalImage || inputText ? (
           <ButtonComponent
+            type="primary"
             disabled={loadingImage}
             onPress={() => {
               modalImage ? uploadImage() : createDiary({file_name: ''});

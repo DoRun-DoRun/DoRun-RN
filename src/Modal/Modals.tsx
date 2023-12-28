@@ -125,11 +125,11 @@ const ImageDummy = styled(View)`
   width: 248px;
   height: 264px;
   background: ${props => props.theme.gray6};
-  shadow-color: #000;
+  /* shadow-color: #000;
   shadow-offset: 0px 2px;
   shadow-opacity: 0.25;
   shadow-radius: 3.84;
-  elevation: 3;
+  elevation: 3; */
 `;
 
 const ImageContainer = styled(View)`

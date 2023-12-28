@@ -1,6 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import {Image, TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  Image,
+  Platform,
+  Pressable,
+  RefreshControl,
+  TouchableOpacity,
+} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -68,13 +74,15 @@ const ChallengeInfo = ({
     border-color: ${props =>
       isSelected ? props.theme.primary1 : props.theme.white};
     box-sizing: border-box;
-    /* shadow-color: #000;
-    shadow-offset: 2px 2px;
-    shadow-opacity: 0.3;
-    shadow-radius: 4px;
-    elevation: 5; */
     margin: 8px 0;
     gap: 40px;
+    ${Platform.OS === 'ios'
+      ? `
+      shadow-color: #000;
+      shadow-offset: 2px 2px;
+      shadow-opacity: 0.3;
+      shadow-radius: 2px;`
+      : 'elevation: 3;'}
   `;
 
   return (
@@ -322,10 +330,12 @@ const ChallengeTab = () => {
       throw err;
     }
   };
-  const {data: listData, isLoading: listLoading} = useQuery(
-    'getChallenge',
-    getChallenge,
-  );
+  const {
+    data: listData,
+    isLoading: listLoading,
+    refetch,
+    isFetching,
+  } = useQuery('getChallenge', getChallenge);
 
   useEffect(() => {
     if (listData?.progress_challenges?.length > 0) {
@@ -355,6 +365,13 @@ const ChallengeTab = () => {
       enabled: !!selectedChallengeMstNo,
     },
   );
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refetch().then(() => setRefreshing(false));
+  }, [refetch]);
 
   if (listLoading || detailLoading) {
     return <LoadingIndicatior />;
@@ -432,13 +449,19 @@ const ChallengeTab = () => {
   });
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing || isFetching}
+          onRefresh={onRefresh}
+        />
+      }>
       <HomeContainer style={{gap: 32}}>
         <TopContainer>
           <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
           <RowScrollContainer gap={8}>
             {listData.progress_challenges?.map((challenge: ChallengeInfo) => (
-              <TouchableOpacity
+              <Pressable
                 key={challenge.CHALLENGE_MST_NO}
                 onPress={() => {
                   dispatch(
@@ -457,7 +480,7 @@ const ChallengeTab = () => {
                       : `${Number(challenge.PROGRESS.toFixed(2))}% 진행됨`
                   }
                 />
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </RowScrollContainer>
 
@@ -479,7 +502,9 @@ const ChallengeTab = () => {
                   <ChallengeSubInfo
                     headerEmoji={challenge.HEADER_EMOJI}
                     mainText={challenge.CHALLENGE_MST_NM}
-                    subText={leftDay === 0 ? '내일시작' : `${leftDay}일후 시작`}
+                    subText={
+                      leftDay === 0 ? '내일시작' : `${leftDay}일 뒤 시작`
+                    }
                   />
                 </TouchableOpacity>
               );

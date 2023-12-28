@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
+  RefreshControl,
 } from 'react-native';
 import {
   HomeContainer,
@@ -27,6 +29,7 @@ import LottieView from 'lottie-react-native';
 import {
   BackgroundImage,
   Dudus,
+  avatarImage,
   defaultData,
   struggleLottie,
 } from '../../store/data';
@@ -51,6 +54,13 @@ const ChallengeCreateButton = styled.TouchableOpacity`
   left: 50%;
   z-index: 5;
   transform: translateX(-102.5px) translateY(-56px);
+  ${Platform.OS === 'ios'
+    ? `
+    shadow-color: #000;
+    shadow-offset: 2px 2px;
+    shadow-opacity: 0.3;
+    shadow-radius: 2px;`
+    : 'elevation: 3;'}
 `;
 
 export interface ChallengeUserType {
@@ -73,6 +83,8 @@ const RaceTab = () => {
 
   const navigation = useNavigation();
 
+  const [refreshing, setRefreshing] = useState(false);
+
   const ChallengeUserList = async () => {
     try {
       const response = await CallApi({
@@ -87,10 +99,17 @@ const RaceTab = () => {
     }
   };
 
-  const {data: challengeListData, isLoading} = useQuery(
-    ['ChallengeUserList', index],
-    ChallengeUserList,
-  );
+  const {
+    data: challengeListData,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useQuery(['ChallengeUserList', index], ChallengeUserList);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refetch().then(() => setRefreshing(false));
+  }, [refetch]);
 
   useEffect(() => {
     if (challengeListData && challengeListData.total_page !== 0) {
@@ -131,6 +150,12 @@ const RaceTab = () => {
     <HomeContainer color="background">
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || isFetching}
+              onRefresh={onRefresh}
+            />
+          }
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
           {challengeListData.challenge_user.map(
@@ -311,17 +336,60 @@ const BGComponent = ({
                 justifyContent: 'center',
               }}
             />
+            {!!data.PET_NO && (
+              <FastImage
+                source={avatarImage[data.PET_NO - 1]}
+                resizeMode="contain"
+                style={{
+                  position: 'absolute',
+                  width: 20,
+                  height: 30,
+                  left: -20,
+                  bottom: 5,
+                }}
+              />
+            )}
           </View>
         ) : data.PROGRESS >= 100 ? (
-          <FastImage
-            source={defaultData.Avatar[data.CHARACTER_NO - 1].URL}
-            style={{width: 60, height: 70}}
-          />
+          <>
+            <FastImage
+              source={defaultData.Avatar[data.CHARACTER_NO - 1].URL}
+              style={{width: 60, height: 70}}
+            />
+            {!!data.PET_NO && (
+              <FastImage
+                source={avatarImage[data.PET_NO - 1]}
+                resizeMode="contain"
+                style={{
+                  position: 'absolute',
+                  width: 20,
+                  height: 30,
+                  left: -20,
+                  bottom: 5,
+                }}
+              />
+            )}
+          </>
         ) : (
-          <FastImage
-            source={Dudus[data.CHARACTER_NO - 1]}
-            style={{width: 60, height: 70}}
-          />
+          <>
+            <FastImage
+              source={Dudus[data.CHARACTER_NO - 1]}
+              style={{width: 60, height: 70}}
+            />
+            {!!data.PET_NO && (
+              <FastImage
+                source={avatarImage[data.PET_NO - 1]}
+                resizeMode="contain"
+                style={{
+                  position: 'absolute',
+                  width: 20,
+                  height: 30,
+                  left: -20,
+                  bottom: 5,
+                }}
+              />
+            )}
+          </>
         )}
       </Animated.View>
     </>
@@ -337,11 +405,13 @@ const NavigationButton = styled(View)`
   width: 40px;
   height: 40px;
   background-color: ${props => props.theme.white};
-  shadow-color: rgba(0, 0, 0, 0.3);
+  ${Platform.OS === 'ios'
+    ? `shadow-color: rgba(0, 0, 0, 0.3);
   shadow-offset: 1px 2px;
   shadow-opacity: 0.3;
-  shadow-radius: 3px;
-  elevation: 4;
+  shadow-radius: 1.5px;`
+    : 'elevation: 3;'}
+
   border-radius: 20px;
   align-items: center;
   justify-content: center;

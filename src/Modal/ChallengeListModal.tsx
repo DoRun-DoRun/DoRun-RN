@@ -100,10 +100,13 @@ export const ChallengeListModal = ({
   const {mutate: changeChallengeStatusMutation} = useMutation(
     changeChallengeStatus,
     {
-      onSuccess: () => {
+      onSuccess: response => {
         Toast.show({
           type: 'success',
-          text1: '챌린지가 참여 성공.',
+          text1:
+            response.status === InviteAcceptType.ACCEPTED
+              ? '챌린지 초대를 수락했어요.'
+              : '챌린지를 거절했어요 ',
         });
         queryClient.invalidateQueries('getChallenge');
         hideModal();

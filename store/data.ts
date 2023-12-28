@@ -4,6 +4,12 @@ export enum SignType {
   GUEST = 'GUEST',
 }
 
+export enum UserStatusType {
+  SLEEPING = '자는중',
+  WALKING = '걷는중',
+  RUNNING = '뛰는중',
+}
+
 export enum ChallengeStatusType {
   PENDING = 'PENDING',
   PROGRESS = 'PROGRESS',
@@ -96,13 +102,13 @@ export const usedItemImage = {
     require('../assets/lottie/dudu_hammer.gif'),
     require('../assets/lottie/nuts_hammer.gif'),
     require('../assets/lottie/peats_hammer.gif'),
-    // require('../assets/lottie/pachi_hammer.gif'),
+    require('../assets/lottie/pachi_hammer.gif'),
   ],
   bomb: [
     require('../assets/lottie/dudu_bomb.json'),
     require('../assets/lottie/nuts_bomb.json'),
-    // require('../assets/lottie/dudu_boom.json'),
-    // require('../assets/lottie/dudu_boom.json')
+    require('../assets/lottie/peats_boom.json'),
+    require('../assets/lottie/pachi_boom.json'),
   ],
 };
 

@@ -1,23 +1,32 @@
 import React, {useMemo} from 'react';
 import {Image, View} from 'react-native';
 import {
-  ButtonContainer,
   LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Slider} from '@miblanchard/react-native-slider';
 import {ChallengeUserType} from '../Tab/RaceTab';
 import {useMutation, useQuery} from 'react-query';
 import {shallowEqual, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {profileImage} from '../../store/data';
+import {UserStatusType, profileImage} from '../../store/data';
 import {useModal} from './ModalProvider';
 import {UsedItemModal} from './Modals';
+
+const ButtonContainer = styled.TouchableOpacity<{
+  color: string;
+}>`
+  background-color: ${props =>
+    props.disabled ? props.theme.gray4 : props.theme[props.color]};
+  padding: 8px;
+  width: 100%;
+  align-items: center;
+  border-radius: 10px;
+`;
 
 const UserProfile = styled.View<{IS_ME: boolean}>`
   width: 64px;
@@ -118,8 +127,14 @@ export const CharacterModal = ({
           <View style={{flex: 1}}>
             <RowContainer gap={8}>
               <UserStatues IS_ME={user.IS_ME}>
-                <MaterialIcons
-                  name="directions-run"
+                <MaterialCommunityIcons
+                  name={
+                    user.STATUS === UserStatusType.SLEEPING
+                      ? 'sleep'
+                      : user.STATUS === UserStatusType.WALKING
+                      ? 'walk'
+                      : 'run-fast'
+                  }
                   color={user.IS_ME ? theme.primary1 : theme.secondary1}
                   size={16}
                 />
@@ -197,11 +212,14 @@ export const CharacterModal = ({
         ) : (
           personalGoals?.map(goal => {
             return (
-              <RowContainer gap={8} key={goal.id}>
-                <MaterialIcons
-                  name="speaker-notes"
+              <RowContainer
+                gap={8}
+                key={goal.id}
+                style={{alignItems: 'center'}}>
+                <MaterialCommunityIcons
+                  name="clipboard-list"
                   color={theme.primary1}
-                  size={20}
+                  size={26}
                 />
                 <NotoSansKR size={13} color={'gray3'}>
                   {goal.title}

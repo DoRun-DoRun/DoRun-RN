@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import styled from 'styled-components/native';
+import styled, {useTheme} from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
@@ -16,6 +16,7 @@ import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useModal} from './Modal/ModalProvider';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface FontType {
   size: number;
@@ -36,7 +37,7 @@ export const NotoSansKR = styled.Text<FontType>`
 `;
 
 export const InputNotoSansKR = styled.TextInput<FontType>`
-  include-font-padding: false;
+  ${Platform.OS === 'android' && 'include-font-padding: false;'}
   vertical-align: middle;
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
   font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
@@ -101,17 +102,12 @@ export const RowScrollContainer = ({children, gap}: ScrollContainerType) => {
 
 interface ButtonType {
   children: React.ReactNode;
-  type?: 'primary' | 'secondary' | 'gray';
+  type?: 'primary' | 'secondary' | 'gray' | 'black';
   onPress?: () => void;
   disabled?: boolean;
 }
 
-export const ButtonContainer = styled.TouchableOpacity<{
-  color: string;
-  disabled?: boolean;
-}>`
-  background-color: ${props =>
-    props.disabled ? props.theme.gray4 : props.theme[props.color]};
+const ButtonContainer = styled.Pressable`
   padding: 8px;
   width: 100%;
   align-items: center;
@@ -124,31 +120,42 @@ export const ButtonComponent = ({
   onPress,
   disabled,
 }: ButtonType) => {
+  const theme = useTheme();
   let color = 'white';
-  let backgroundColor = 'primary1';
+  let backgroundColor = 'primary';
 
   if (type === 'secondary') {
     color = 'gray4';
-    backgroundColor = 'white';
+    backgroundColor = theme.white;
   } else if (type === 'gray') {
     color = 'gray4';
-    backgroundColor = 'gray7';
+    backgroundColor = theme.gray7;
+  } else if (type === 'black') {
+    color = 'black';
+    backgroundColor = theme.white;
   }
 
   if (disabled) {
     color = 'white';
-    backgroundColor = 'gray4';
+    backgroundColor = theme.gray4;
   }
 
   return (
-    <ButtonContainer
-      color={backgroundColor}
-      onPress={onPress}
-      disabled={disabled}>
-      <NotoSansKR color={color} size={16} lineHeight={23}>
-        {children}
-      </NotoSansKR>
-    </ButtonContainer>
+    <LinearGradient
+      colors={
+        backgroundColor === 'primary'
+          ? ['#1727C3', '#6377F1', '#9EB7F6']
+          : [backgroundColor, backgroundColor]
+      }
+      start={{x: 1.27, y: 4.29}}
+      end={{x: -0.19, y: -2.08}}
+      style={{borderRadius: 10}}>
+      <ButtonContainer onPress={onPress}>
+        <NotoSansKR color={color} size={16} lineHeight={23}>
+          {children}
+        </NotoSansKR>
+      </ButtonContainer>
+    </LinearGradient>
   );
 };
 
@@ -217,7 +224,7 @@ export const useApi = () => {
         );
       }
 
-      console.log(response.data);
+      // console.log(response.data);
 
       return response.data;
     } catch (error) {

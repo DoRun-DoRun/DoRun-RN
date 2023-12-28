@@ -73,7 +73,7 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
                 source={{
                   uri: `https://do-run.s3.amazonaws.com/${data.diary.IMAGE_FILE_NM}`,
                 }}
-                style={{width: '100%', height: 222}}
+                style={{width: '100%', height: 222, borderRadius: 10}}
               />
             ) : (
               <ImageContainer

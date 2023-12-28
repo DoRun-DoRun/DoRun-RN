@@ -9,7 +9,7 @@ import {
   ScrollContainer,
   useApi,
 } from '../Component';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {Image, Platform, TouchableOpacity, View} from 'react-native';
 import {styled} from 'styled-components/native';
 import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
@@ -25,7 +25,7 @@ const TextContainer = styled.TextInput`
 
 const SelectedContainer = styled.View`
   flex: 1;
-  background-color: ${props => props.theme.primary1};
+  background-color: ${props => props.theme.primary2};
   margin: 0 -16px;
   padding: 24px 16px;
   align-items: center;
@@ -42,12 +42,21 @@ const SelectedButton = styled.TouchableOpacity`
 const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
   width: 88px;
   height: 104px;
+  margin: 8px 0;
   border-radius: 10px;
   border-width: ${props => (props.isEquip ? '2px' : 0)};
+  border-color: ${props => props.theme.primary1};
   opacity: ${props => (props.isOwned ? 1 : 0.5)};
   background: ${props => props.theme.white};
   justify-content: center;
   align-items: center;
+  ${Platform.OS === 'ios'
+    ? `
+    shadow-color: #000;
+    shadow-offset: 2px 2px;
+    shadow-opacity: 0.3;
+    shadow-radius: 2px;`
+    : 'elevation: 3'}
 `;
 
 const PencilIcon = styled.TouchableOpacity`
@@ -61,6 +70,7 @@ const ProfileSettingScreen = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
   const [userName, setUserName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(1);
+  const [selectedPet, setSelectedPet] = useState<null | number>(null);
 
   const SettingProfile = async () => {
     try {
@@ -156,6 +166,19 @@ const ProfileSettingScreen = () => {
                   source={avatarImage[selectedCharacter - 1]}
                   style={{width: '70%', height: '70%', resizeMode: 'contain'}}
                 />
+                {!!selectedPet && (
+                  <Image
+                    source={avatarImage[selectedPet - 1]}
+                    style={{
+                      right: 0,
+                      top: 0,
+                      position: 'absolute',
+                      width: '30%',
+                      height: '30%',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                )}
               </View>
 
               <RowScrollContainer gap={8}>
@@ -163,8 +186,14 @@ const ProfileSettingScreen = () => {
                   <TouchableOpacity
                     key={avatar.AVATAR_NO}
                     onPress={() => {
-                      if (avatar.IS_OWNED) {
+                      if (
+                        avatar.IS_OWNED &&
+                        avatar.AVATAR_TYPE === 'CHARACTER'
+                      ) {
                         setSelectedCharacter(avatar.AVATAR_NO);
+                      }
+                      if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
+                        setSelectedPet(avatar.AVATAR_NO);
                       }
                     }}>
                     <CharecterSlot

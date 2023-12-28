@@ -24,6 +24,7 @@ import {profileImage} from '../../store/data';
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
   padding: 16px;
+  padding-right: 36px;
   border-radius: 10px;
 `;
 
@@ -117,7 +118,7 @@ const DailyPicContiner = styled.View`
 `;
 
 const DailyPic = styled.Image`
-  width: 300px;
+  width: 100%;
   height: 300px;
   border-radius: 10px;
   background-color: ${props => props.theme.gray7};
@@ -135,11 +136,6 @@ const DailyDiary = styled(LinearGradient).attrs({
 })`
   border-radius: 10px;
   padding: 16px;
-  /* shadow-color: rgba(0, 0, 0, 0.15);
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.15;
-  shadow-radius: 30px;
-  elevation: 4; */
 `;
 
 const DailyTodo = styled(LinearGradient).attrs({
@@ -363,13 +359,17 @@ const MyPageTab = () => {
               <UserIcon>
                 <Image
                   source={profileImage[data.USER_CHARACTER_NO - 1]}
-                  style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    resizeMode: 'contain',
+                  }}
                 />
               </UserIcon>
 
-              <View>
+              <View style={{flex: 1}}>
                 <UserName size={16}>{data.USER_NM}</UserName>
-                <RowContainer gap={16}>
+                <RowContainer gap={16} seperate>
                   <UserStats status="완료" count={data.COMPLETE} />
                   <Divider />
                   <UserStats status="진행중" count={data.PROGRESS} />
