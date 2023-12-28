@@ -8,25 +8,19 @@ import {NavigationContainer} from '@react-navigation/native';
 import {light} from './src/style/theme';
 import {ThemeProvider} from 'styled-components/native';
 import {QueryClient, QueryClientProvider} from 'react-query';
+import CodePush from 'react-native-code-push';
 
 const queryClient = new QueryClient();
 import {ModalProvider} from './src/Modal/ModalProvider';
 import CustomModal from './src/Modal/CustomModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 
-export default function Main() {
-  React.useEffect(() => {
-    const loadGoals = async () => {
-      const storedGoals = await AsyncStorage.getItem('goals');
-      if (storedGoals) {
-        const parsedGoals = JSON.parse(storedGoals);
-        Store.dispatch({type: 'goals/restore', payload: parsedGoals});
-      }
-    };
-
-    loadGoals();
-  }, []);
+const codePushOptions = {
+  checkFrequency: CodePush.CheckFrequency.ON_APP_START,
+  installMode: CodePush.InstallMode.IMMEDIATE,
+  mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
+};
+function Main() {
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider store={Store}>
@@ -44,4 +38,4 @@ export default function Main() {
   );
 }
 
-AppRegistry.registerComponent(appName, () => Main);
+AppRegistry.registerComponent(appName, () => CodePush(codePushOptions)(Main));
