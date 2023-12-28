@@ -549,3 +549,27 @@ LocaleConfig.locales.kr = {
   today: '오늘',
 };
 LocaleConfig.defaultLocale = 'kr';
+
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+
+const requestCameraPermission = async () => {
+  let permission;
+  if (Platform.OS === 'ios') {
+    permission = PERMISSIONS.IOS.CAMERA;
+  } else {
+    permission = PERMISSIONS.ANDROID.CAMERA;
+  }
+
+  const result = await check(permission);
+  if (result === RESULTS.GRANTED) {
+    console.log('카메라 권한이 이미 허용되어 있습니다.');
+    return true;
+  } else {
+    console.log(result);
+  }
+
+  const requestResult = await request(permission);
+  return requestResult === RESULTS.GRANTED;
+};
+
+export default requestCameraPermission;

@@ -537,6 +537,8 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
+  - RNPermissions (4.0.1):
+    - React-Core
   - RNScreens (3.29.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -629,6 +631,7 @@ DEPENDENCIES:
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -757,6 +760,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNShare:
@@ -833,6 +838,7 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: e99eaf3c4c01ad8ecb6125dd6f0cfd98871685b5
   RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
+  RNPermissions: d8870452b9ecd4ae8e5481dce540e0216dd08299
   RNScreens: 3c5b9f4a9dcde752466854b6109b79c0e205dad3
   RNShare: 859ff710211285676b0bcedd156c12437ea1d564
   RNVectorIcons: 64e6a523ac30a3241efa9baf1ffbcc5e76ff747a
@@ -842,6 +848,6 @@ SPEC CHECKSUMS:
   Yoga: 11d7931afb89721f39cf553a78767b81c7fbea1f
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 81ba25cdecb2e64caa29c68897bc5eb4c1f0910a
+PODFILE CHECKSUM: 464428dfea2e600073be075ed49d8d44cd8116f4
 
 COCOAPODS: 1.14.3
