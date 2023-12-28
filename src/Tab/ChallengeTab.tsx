@@ -40,6 +40,8 @@ import {challengeDataType} from '../../store/async/asyncStore';
 import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {AdditionalGoalModal} from '../Modal/AdditionalGoalModal';
+import {ImageZoomModal} from '../Modal/Modals';
 
 const Profile = styled.View`
   width: 40px;
@@ -217,37 +219,52 @@ const PlusContainers = ({title}: {title: String}) => {
   );
 };
 
-const ListItem = ({
-  name,
-  body,
-  time,
-}: {
-  name: String;
-  body: String;
-  time: String;
-}) => {
+const ListItem = ({data}: {data: AdditionalInfo}) => {
   const SomeTargetContainer = styled(RowContainer)`
     border-bottom-color: white;
     border-bottom-width: 1px;
     padding: 6px 0;
   `;
+  const {showModal} = useModal();
 
   return (
     <SomeTargetContainer seperate>
       <RowContainer gap={32}>
         <NotoSansKR size={14} weight="Regular" color="white">
-          {name}
+          {data.CHALLENGE_USER_NN}
         </NotoSansKR>
         <NotoSansKR size={14} weight="Regular" color="white">
-          {body}
+          {data.ADDITIONAL_NM}
         </NotoSansKR>
       </RowContainer>
 
       <RowContainer gap={8}>
         <NotoSansKR size={14} weight="Regular" color="yellow">
-          {time}
+          {data.IS_DONE ? '목표 완료!' : calculateRemainTime(data.END_DT)}
         </NotoSansKR>
-        <MaterialIcons name="queue" size={28} color={'white'} />
+
+        {data.IS_MINE && !data.IS_DONE && (
+          <TouchableOpacity
+            onPress={() => {
+              showModal(
+                <AdditionalGoalModal
+                  additional_goal_no={data.ADDITIONAL_NO}
+                  additional_goal_nm={data.ADDITIONAL_NM}
+                />,
+              );
+            }}>
+            <MaterialIcons name="photo-camera" size={28} color={'white'} />
+          </TouchableOpacity>
+        )}
+
+        {data.IS_DONE && (
+          <TouchableOpacity
+            onPress={() => {
+              showModal(<ImageZoomModal file_name={data.IMAGE_FILE_NM} />);
+            }}>
+            <MaterialIcons name="photo" size={28} color={'white'} />
+          </TouchableOpacity>
+        )}
       </RowContainer>
     </SomeTargetContainer>
   );
@@ -293,6 +310,7 @@ interface AdditionalInfo {
   END_DT: string;
   CHALLENGE_USER_NO: number;
   CHALLENGE_USER_NN: string;
+  IS_MINE: boolean;
 }
 
 const getPersonalGoalsByChallengeNo = ({
@@ -579,14 +597,7 @@ const ChallengeTab = () => {
                 </RowContainer>
                 <View>
                   {detailData?.additionalGoal.map((data: AdditionalInfo) => {
-                    return (
-                      <ListItem
-                        key={data.ADDITIONAL_NO}
-                        name={data.CHALLENGE_USER_NN}
-                        body={data.ADDITIONAL_NM}
-                        time={calculateRemainTime(data.END_DT)}
-                      />
-                    );
+                    return <ListItem key={data.ADDITIONAL_NO} data={data} />;
                   })}
                 </View>
               </FootContainer>

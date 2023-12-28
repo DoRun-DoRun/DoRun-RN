@@ -8,7 +8,6 @@ import {
   View,
   Dimensions,
   Platform,
-  RefreshControl,
 } from 'react-native';
 import {
   HomeContainer,
@@ -83,7 +82,7 @@ const RaceTab = () => {
 
   const navigation = useNavigation();
 
-  const [refreshing, setRefreshing] = useState(false);
+  // const [refreshing, setRefreshing] = useState(false);
 
   const ChallengeUserList = async () => {
     try {
@@ -99,17 +98,15 @@ const RaceTab = () => {
     }
   };
 
-  const {
-    data: challengeListData,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useQuery(['ChallengeUserList', index], ChallengeUserList);
+  const {data: challengeListData, isLoading} = useQuery(
+    ['ChallengeUserList', index],
+    ChallengeUserList,
+  );
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    refetch().then(() => setRefreshing(false));
-  }, [refetch]);
+  // const onRefresh = React.useCallback(() => {
+  //   setRefreshing(true);
+  //   refetch().then(() => setRefreshing(false));
+  // }, [refetch]);
 
   useEffect(() => {
     if (challengeListData && challengeListData.total_page !== 0) {
@@ -150,12 +147,12 @@ const RaceTab = () => {
     <HomeContainer color="background">
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing || isFetching}
-              onRefresh={onRefresh}
-            />
-          }
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={refreshing || isFetching}
+          //     onRefresh={onRefresh}
+          //   />
+          // }
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
           {challengeListData.challenge_user.map(

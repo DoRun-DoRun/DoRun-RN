@@ -1,6 +1,6 @@
 import React from 'react';
-import {Dimensions, View} from 'react-native';
-import {ButtonComponent, NotoSansKR} from '../Component';
+import {Dimensions, Image, View} from 'react-native';
+import {ButtonComponent, GetImage, NotoSansKR} from '../Component';
 import styled from 'styled-components';
 import {ModalHeadBorder} from './CustomModal';
 import LottieView from 'lottie-react-native';
@@ -29,11 +29,15 @@ export const ShareModal = () => {
   );
 };
 
-export const ImageZoomModal = () => {
+export const ImageZoomModal = ({file_name}: {file_name: string}) => {
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
-      <ZoomImageDummy />
+      <Image
+        source={{uri: GetImage(file_name)}}
+        style={{width: '100%', height: 300, borderRadius: 10}}
+        resizeMode="cover"
+      />
     </View>
   );
 };
