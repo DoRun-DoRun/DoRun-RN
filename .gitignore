@@ -35,6 +35,7 @@ local.properties
 *.keystore
 !debug.keystore
 android/app/src/main/assets/appcenter-config.json
+android/gradle.properties
 
 # node.js
 #
@@ -66,3 +67,6 @@ yarn-error.log
 
 # testing
 /coverage
+
+DoRun_DoRun_hin6150
+android/gradle.properties
