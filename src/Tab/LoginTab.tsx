@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
-import {HomeContainer, NotoSansKR, useApi} from '../Component';
+import {NotoSansKR, useApi} from '../Component';
 import {styled} from 'styled-components/native';
-import {Platform} from 'react-native';
+import {Platform, View} from 'react-native';
 import {useMutation} from 'react-query';
 import {setAccessToken, setUser} from '../../store/slice/UserSlice';
 import {loadUser, userDataType} from '../../store/async/asyncStore';
@@ -184,7 +184,7 @@ const LoginTab = () => {
   }, [dispatch, navigation]);
 
   return (
-    <HomeContainer>
+    <View style={{flex: 1}}>
       <BackgroundImage source={require('../../assets/image/background.png')} />
       <LoginContainer>
         <Title source={require('../../assets/image/title.png')} />
@@ -244,7 +244,7 @@ const LoginTab = () => {
           </NotoSansKR>
         </LoginButton>
       </LoginContainer>
-    </HomeContainer>
+    </View>
   );
 };
 
@@ -252,7 +252,7 @@ const BackgroundImage = styled.ImageBackground`
   position: absolute;
   width: 100%;
   height: 100%;
-  resize: contain;
+  resize: contian;
   flex: 1;
   bottom: 0;
 `;

@@ -36,7 +36,9 @@ export const NotoSansKR = styled.Text<FontType>`
   text-align: ${({textAlign}) => (textAlign ? textAlign : 'auto')};
 `;
 
-export const InputNotoSansKR = styled.TextInput<FontType>`
+export const InputNotoSansKR = styled.TextInput.attrs(({theme}) => ({
+  placeholderTextColor: theme.gray4,
+}))<FontType>`
   ${Platform.OS === 'android' && 'include-font-padding: false;'}
   vertical-align: middle;
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
@@ -73,6 +75,7 @@ export const HomeContainer = styled.SafeAreaView<{color?: string}>`
   position: relative;
   flex: 1;
   background-color: ${({color, theme}) => (color ? theme[color] : theme.white)};
+  padding-top: 0;
 `;
 
 export const ScrollContainer = styled.ScrollView.attrs({

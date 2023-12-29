@@ -4,7 +4,6 @@ import {
   InnerContainer,
   LoadingIndicatior,
   NotoSansKR,
-  RowContainer,
   RowScrollContainer,
   ScrollContainer,
   useApi,
@@ -14,14 +13,14 @@ import {styled} from 'styled-components/native';
 import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/RootReducer';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
+// import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {Avatar, avatarImage} from '../../store/data';
 
-const TextContainer = styled.TextInput`
-  flex: 1;
-  padding: 6px 8px;
-  border-bottom-width: 1px;
-`;
+// const TextContainer = styled.TextInput`
+//   flex: 1;
+//   padding: 6px 8px;
+//   border-bottom-width: 1px;
+// `;
 
 const SelectedContainer = styled.View`
   flex: 1;
@@ -32,14 +31,17 @@ const SelectedContainer = styled.View`
 `;
 
 const SelectedButton = styled.TouchableOpacity`
-  width: 72px;
   padding: 8px 10px;
   color: ${props => props.theme.primary1};
   background-color: #fff;
   border-radius: 10px;
+  align-items: center;
 `;
 
-const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
+const CharecterSlot = styled.View<{
+  isEquip: boolean;
+  isOwned: boolean;
+}>`
   width: 88px;
   height: 104px;
   margin: 8px 0;
@@ -59,16 +61,16 @@ const CharecterSlot = styled.View<{isEquip: boolean; isOwned: boolean}>`
     : 'elevation: 3'}
 `;
 
-const PencilIcon = styled.TouchableOpacity`
-  position: absolute;
-  right: 8px;
-`;
+// const PencilIcon = styled.TouchableOpacity`
+//   position: absolute;
+//   right: 8px;
+// `;
 
 const ProfileSettingScreen = () => {
   const CallApi = useApi();
   const queryClient = useQueryClient();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  const [userName, setUserName] = useState('');
+  // const [userName, setUserName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(1);
   const [selectedPet, setSelectedPet] = useState<null | number>(null);
 
@@ -79,11 +81,14 @@ const ProfileSettingScreen = () => {
         method: 'GET',
         accessToken: accessToken!,
       });
-      setUserName(response.USER_NM);
+      // setUserName(response.USER_NM);
       for (const avatar of response.avatars) {
         if (avatar.IS_EQUIP) {
-          setSelectedCharacter(avatar.AVATAR_NO);
-          break; // 착용 중인 아바타를 찾았으므로 루프 종료
+          if (avatar.AVATAR_TYPE === 'CHARACTER') {
+            setSelectedCharacter(avatar.AVATAR_NO);
+          } else {
+            setSelectedPet(avatar.AVATAR_NO);
+          }
         }
       }
       return response;
@@ -149,6 +154,9 @@ const ProfileSettingScreen = () => {
                 disabled={loadingSetCharacter}
                 onPress={() => {
                   setCharacter(selectedCharacter);
+                  if (selectedPet) {
+                    setCharacter(selectedPet);
+                  }
                 }}>
                 <NotoSansKR size={14} color="primary1" weight="Medium">
                   {loadingSetCharacter ? '변경 중' : '선택하기'}
@@ -173,8 +181,8 @@ const ProfileSettingScreen = () => {
                       right: 0,
                       top: 0,
                       position: 'absolute',
-                      width: '30%',
-                      height: '30%',
+                      width: '24%',
+                      height: '24%',
                       resizeMode: 'contain',
                     }}
                   />
@@ -199,7 +207,16 @@ const ProfileSettingScreen = () => {
                     <CharecterSlot
                       isEquip={avatar.IS_EQUIP}
                       isOwned={avatar.IS_OWNED}>
-                      <Image source={avatarImage[avatar.AVATAR_NO - 1]} />
+                      <Image
+                        source={avatarImage[avatar.AVATAR_NO - 1]}
+                        style={
+                          avatar.AVATAR_TYPE === 'PET' && {
+                            width: '50%',
+                            height: '50%',
+                          }
+                        }
+                        resizeMode="contain"
+                      />
                     </CharecterSlot>
                   </TouchableOpacity>
                 ))}

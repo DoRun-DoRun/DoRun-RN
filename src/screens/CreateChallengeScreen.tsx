@@ -123,7 +123,7 @@ export const SearchBox = ({
   const [uidInput, setUidInput] = useState('');
 
   const CallApi = useApi();
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, UID} = useSelector((state: RootState) => state.user);
 
   const FriendList = async () => {
     try {
@@ -174,7 +174,7 @@ export const SearchBox = ({
           value={uidInput}
           onChangeText={text => setUidInput(text)}
           style={{flex: 1}}
-          placeholder="Friend UID"
+          placeholder={`친구 UID를 입력해요. 내 UID는 ${UID}에요`}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>

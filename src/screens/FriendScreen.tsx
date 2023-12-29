@@ -143,7 +143,7 @@ const InviteFriend = ({name, UID, setUidInput}: InviteFriendType) => {
   );
 };
 
-const SearchBox = () => {
+const SearchBox = ({UID}: {UID: number}) => {
   const [isClicked, setIsClicked] = useState(false);
   const [uidInput, setUidInput] = useState('');
   const CallApi = useApi();
@@ -178,7 +178,7 @@ const SearchBox = () => {
           maxLength={7}
           onChangeText={setUidInput}
           style={{flex: 1}}
-          placeholder="Friend UID"
+          placeholder={`친구 UID를 입력해요. 내 UID는 ${UID}에요`}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
@@ -210,7 +210,7 @@ interface friendAPIType {
 }
 
 const FriendScreen = () => {
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, UID} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
   const FriendListModal = async () => {
     try {
@@ -240,7 +240,7 @@ const FriendScreen = () => {
         <ScrollContainer style={{flex: 1}}>
           <View style={{gap: 24}}>
             <NotoSansKR size={20}>친구 목록</NotoSansKR>
-            <SearchBox />
+            <SearchBox UID={UID!} />
 
             <View style={{gap: 8}}>
               <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
