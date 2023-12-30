@@ -101,14 +101,14 @@ export const usedItemImage = {
   hammer: [
     require('../assets/lottie/dudu_hammer.gif'),
     require('../assets/lottie/nuts_hammer.gif'),
-    require('../assets/lottie/peats_hammer.gif'),
     require('../assets/lottie/pachi_hammer.gif'),
+    require('../assets/lottie/peats_hammer.gif'),
   ],
   bomb: [
     require('../assets/lottie/dudu_bomb.json'),
     require('../assets/lottie/nuts_bomb.json'),
-    require('../assets/lottie/peats_boom.json'),
     require('../assets/lottie/pachi_boom.json'),
+    require('../assets/lottie/peats_boom.json'),
   ],
 };
 

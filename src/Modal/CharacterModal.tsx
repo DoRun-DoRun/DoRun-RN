@@ -10,7 +10,7 @@ import styled, {useTheme} from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Slider} from '@miblanchard/react-native-slider';
 import {ChallengeUserType} from '../Tab/RaceTab';
-import {useMutation, useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {shallowEqual, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {UserStatusType, profileImage} from '../../store/data';
@@ -60,6 +60,7 @@ export const CharacterModal = ({
   const theme = useTheme();
   const {showModal} = useModal();
   const {accessToken} = useSelector((state: RootState) => state.user);
+  const queryClient = useQueryClient();
 
   const goals = useSelector((state: RootState) => state.goal, shallowEqual);
 
@@ -92,12 +93,15 @@ export const CharacterModal = ({
 
   const {mutate} = useMutation(useItem, {
     onSuccess: response => {
-      console.log('Success:', response);
+      console.log(response);
+      queryClient.invalidateQueries('getChallenge');
+      queryClient.invalidateQueries('getChallengeDetail');
+      queryClient.invalidateQueries('ChallengeUserList');
       showModal(
         <UsedItemModal
           item_no={response.item_no}
           user_name={user.USER_NM}
-          character_no={data.CHARACTER_NO}
+          character_no={response.character_no}
         />,
       );
     },
@@ -217,7 +221,7 @@ export const CharacterModal = ({
                 key={goal.id}
                 style={{alignItems: 'center'}}>
                 <MaterialCommunityIcons
-                  name="clipboard-list"
+                  name="text-box-check-outline"
                   color={theme.primary1}
                   size={26}
                 />

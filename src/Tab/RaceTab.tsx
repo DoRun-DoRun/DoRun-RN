@@ -8,6 +8,7 @@ import {
   View,
   Dimensions,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import {
   HomeContainer,
@@ -82,7 +83,7 @@ const RaceTab = () => {
 
   const navigation = useNavigation();
 
-  // const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const ChallengeUserList = async () => {
     try {
@@ -98,15 +99,17 @@ const RaceTab = () => {
     }
   };
 
-  const {data: challengeListData, isLoading} = useQuery(
-    ['ChallengeUserList', index],
-    ChallengeUserList,
-  );
+  const {
+    data: challengeListData,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useQuery(['ChallengeUserList', index], ChallengeUserList);
 
-  // const onRefresh = React.useCallback(() => {
-  //   setRefreshing(true);
-  //   refetch().then(() => setRefreshing(false));
-  // }, [refetch]);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refetch().then(() => setRefreshing(false));
+  }, [refetch]);
 
   useEffect(() => {
     if (challengeListData && challengeListData.total_page !== 0) {
@@ -137,6 +140,10 @@ const RaceTab = () => {
               )
             : undefined,
       });
+    } else {
+      navigation.setOptions({
+        title: '두런두런',
+      });
     }
   }, [challengeListData, dispatch, index, navigation]);
 
@@ -147,12 +154,12 @@ const RaceTab = () => {
     <HomeContainer color="background">
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
-          // refreshControl={
-          //   <RefreshControl
-          //     refreshing={refreshing || isFetching}
-          //     onRefresh={onRefresh}
-          //   />
-          // }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || isFetching}
+              onRefresh={onRefresh}
+            />
+          }
           scrollEnabled={scrollEnabled}
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
           {challengeListData.challenge_user.map(
@@ -170,15 +177,24 @@ const RaceTab = () => {
           )}
         </ScrollContainer>
       ) : (
-        <View style={{flex: 1, justifyContent: 'flex-end'}}>
-          <ChallengeCreateButton
-            onPress={() => {
-              navigation.navigate('CreateChallengeScreen' as never);
-            }}>
-            <NotoSansKR size={16}>챌린지를 생성해주세요!</NotoSansKR>
-          </ChallengeCreateButton>
-          <DefaultImage />
-        </View>
+        <ScrollContainer
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || isFetching}
+              onRefresh={onRefresh}
+            />
+          }>
+          <View style={{flex: 1, justifyContent: 'flex-end'}}>
+            <ChallengeCreateButton
+              onPress={() => {
+                navigation.navigate('CreateChallengeScreen' as never);
+              }}>
+              <NotoSansKR size={16}>진행중인 챌린지가 없어요!</NotoSansKR>
+            </ChallengeCreateButton>
+            <DefaultImage />
+          </View>
+        </ScrollContainer>
       )}
 
       <Navigation />
@@ -189,10 +205,10 @@ const RaceTab = () => {
 const DefaultImage = () => {
   return (
     <BGImage
-      source={require('../../assets/image/background/BG_header.png')}
+      source={require('../../assets/image/background/default_image.png')}
       aspect-ratio={1}
-      resizeMode="stretch"
-      height={432}>
+      resizeMode="cover"
+      height={420}>
       <Image
         source={require('../../assets/image/group/race_image.png')}
         style={{
@@ -393,7 +409,7 @@ const BGComponent = ({
   );
 };
 
-const BGImage = styled.ImageBackground<{height: number}>`
+const BGImage = styled.ImageBackground<{height?: number}>`
   height: ${props => props.height}px;
   width: 100%;
 `;

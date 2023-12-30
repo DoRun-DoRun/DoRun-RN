@@ -16,6 +16,8 @@ import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 // import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {Avatar, avatarImage} from '../../store/data';
+import {useNavigation} from '@react-navigation/native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 // const TextContainer = styled.TextInput`
 //   flex: 1;
@@ -32,14 +34,14 @@ const SelectedContainer = styled.View`
 `;
 
 const SelectedButton = styled.TouchableOpacity`
-  padding: 8px 10px;
+  padding: 8px 16px;
   color: ${props => props.theme.primary1};
   background-color: #fff;
   border-radius: 10px;
   align-items: center;
 `;
 
-const CharecterSlot = styled.TouchableHighlight<{
+const CharecterSlot = styled.TouchableOpacity<{
   isEquip: boolean;
   isOwned: boolean;
 }>`
@@ -52,6 +54,7 @@ const CharecterSlot = styled.TouchableHighlight<{
   background: ${props => props.theme.white};
   justify-content: center;
   align-items: center;
+  margin: 4px 2px;
   ${Platform.OS === 'ios'
     ? `
     shadow-color: #000;
@@ -95,6 +98,7 @@ const ProfileSettingScreen = () => {
   // const [userName, setUserName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(1);
   const [selectedPet, setSelectedPet] = useState<null | number>(null);
+  const navigation = useNavigation();
 
   const SettingProfile = async () => {
     try {
@@ -119,12 +123,13 @@ const ProfileSettingScreen = () => {
     }
   };
 
-  const SetAvatar = async (avatar_no: number) => {
+  const SetAvatar = async (avatar_no: number[]) => {
     try {
       const response = await CallApi({
-        endpoint: `user/avatar?avatar_no=${avatar_no}`,
+        endpoint: 'user/avatar',
         method: 'PUT',
         accessToken: accessToken!,
+        body: avatar_no,
       });
       return response;
     } catch (err) {
@@ -138,6 +143,13 @@ const ProfileSettingScreen = () => {
       onSuccess: () => {
         // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
         queryClient.invalidateQueries('SettingProfile');
+        queryClient.invalidateQueries('ChallengeUserList');
+        queryClient.invalidateQueries('userData');
+        Toast.show({
+          type: 'success',
+          text1: '내 정보를 업데이트 했어요.',
+        });
+        navigation.goBack();
       },
     },
   );
@@ -175,13 +187,14 @@ const ProfileSettingScreen = () => {
               <SelectedButton
                 disabled={loadingSetCharacter}
                 onPress={() => {
-                  setCharacter(selectedCharacter);
                   if (selectedPet) {
-                    setCharacter(selectedPet);
+                    setCharacter([selectedCharacter, selectedPet]);
+                  } else {
+                    setCharacter([selectedCharacter]);
                   }
                 }}>
                 <NotoSansKR size={14} color="primary1" weight="Medium">
-                  {loadingSetCharacter ? '변경 중' : '선택하기'}
+                  {loadingSetCharacter ? '변경 중' : '변경하기'}
                 </NotoSansKR>
               </SelectedButton>
               <View

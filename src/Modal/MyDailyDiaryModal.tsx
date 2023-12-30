@@ -12,7 +12,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ModalHeadText} from './CustomModal';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {useMutation} from 'react-query';
+import {useMutation, useQueryClient} from 'react-query';
 import {goalType} from '../../store/slice/GoalSlice';
 import useCamera from '../Hook/UseCamera';
 import {useModal} from './ModalProvider';
@@ -33,6 +33,7 @@ export const MyDailyDrayModal = ({
   personGoal: goalType[];
 }) => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const CallApi = useApi();
   const {onLaunchCamera, onViewPhoto, deletePhoto, modalImage, imageVisible} =
     useCamera();
@@ -59,7 +60,9 @@ export const MyDailyDrayModal = ({
     CreateDiary,
     {
       onSuccess: res => {
-        console.log('요청성공', res);
+        queryClient.invalidateQueries('challenge_history');
+        queryClient.invalidateQueries('ChallengeUserList');
+
         showModal(
           <DailyModal item_no={res.item_no} item_type={res.item_type} />,
         );
@@ -91,7 +94,6 @@ export const MyDailyDrayModal = ({
     UploadImage,
     {
       onSuccess: async data => {
-        console.log('요청성공', data);
         createDiary({file_name: data.fileName});
       },
     },

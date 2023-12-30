@@ -71,7 +71,6 @@ export const AdditionalGoalModal = ({
     UploadImage,
     {
       onSuccess: async data => {
-        console.log('요청성공', data);
         DoneAdditionalGoal({file_name: data.fileName});
       },
     },

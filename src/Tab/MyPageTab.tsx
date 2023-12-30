@@ -180,7 +180,8 @@ const History = () => {
   const theme = useTheme();
   const [date, setDate] = useState(formattedDate);
   const [index, setIndex] = useState(1);
-  const [disabledRight, setDisabledRight] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [disabledRight, setDisabledRight] = useState(false);
 
   const ChallengeHistory = async () => {
     try {
@@ -207,11 +208,12 @@ const History = () => {
     <>
       <CalendarProvider
         date={date}
-        onMonthChange={e =>
-          e.month !== currentDate.getMonth() + 1
-            ? setDisabledRight(false)
-            : setDisabledRight(true)
-        }>
+        // onMonthChange={e =>
+        //   e.month > currentDate.getMonth() + 1
+        //     ? setDisabledRight(false)
+        //     : setDisabledRight(true)
+        // }
+      >
         <ExpandableCalendar
           style={{borderRadius: 10, padding: 10}}
           renderArrow={(direction: Direction) =>
@@ -384,7 +386,7 @@ const MyPageTab = () => {
 
   return (
     <HomeContainer>
-      <ScrollContainer>
+      <ScrollContainer contentContainerStyle={{flexGrow: 1}}>
         <InnerContainer gap={24}>
           {isLoading ? (
             <LoadingIndicatior />

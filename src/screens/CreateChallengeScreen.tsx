@@ -11,6 +11,7 @@ import {
   ScrollContainer,
   TossFace,
   convertKoKRToUTC,
+  getDayOfWeek,
   useApi,
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
@@ -174,7 +175,7 @@ export const SearchBox = ({
           value={uidInput}
           onChangeText={text => setUidInput(text)}
           style={{flex: 1}}
-          placeholder={`친구 UID 검색 (내 UID: ${UID})`}
+          placeholder={`검색할 UID를 입력하세요. (내 UID: ${UID})`}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
@@ -226,9 +227,9 @@ export const SearchBox = ({
   );
 };
 
-const DatePicker = styled.TouchableOpacity`
+export const DatePicker = styled.TouchableOpacity`
   border: 1px solid ${props => props.theme.gray5};
-  padding: 4px 16px;
+  padding: 8px 16px;
   justify-content: center;
   align-items: center;
   border-radius: 100px;
@@ -472,7 +473,6 @@ export const CalendarContainer = ({
   const sendCalendarData = () => {
     setCalendarOpen(false);
     const keys = Object.keys(markedDates);
-    console.log(keys);
     if (keys.length !== 0) {
       setCalendarData({
         start: keys![0],
@@ -561,7 +561,6 @@ const CreateChallengeScreen = () => {
   const [inviteListData, setInviteListData] = useState<InviteList[]>([
     {UserName: validUserName, UID: validUID, accept: true},
   ]);
-
   const CallApi = useApi();
 
   const createChallenge = () =>
@@ -597,7 +596,6 @@ const CreateChallengeScreen = () => {
 
   const {mutate: ChallengeStartMutate} = useMutation(createChallenge, {
     onSuccess: response => {
-      console.log(response);
       ChallengeStart(response.CHALLENGE_MST_NO);
     },
     onError: error => {
@@ -607,7 +605,9 @@ const CreateChallengeScreen = () => {
 
   const challengeStart = (selectedChallengeMstNo: number) =>
     CallApi({
-      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}`,
+      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}&start_dt=${convertKoKRToUTC(
+        formatDate(new Date()),
+      ).toISOString()}`,
       method: 'POST',
       accessToken: accessToken!,
     });
@@ -638,7 +638,12 @@ const CreateChallengeScreen = () => {
           </NotoSansKR>
 
           <RowContainer gap={16}>
-            <TouchableOpacity onPress={() => setEmojiOpen(true)}>
+            <TouchableOpacity
+              onPress={() => setEmojiOpen(true)}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
               {selectedEmoji ? (
                 <TossFace size={40}>{selectedEmoji?.emoji}</TossFace>
               ) : (
@@ -646,6 +651,8 @@ const CreateChallengeScreen = () => {
               )}
             </TouchableOpacity>
             <InputNotoSansKR
+              maxLength={14}
+              style={{height: 40}}
               size={20}
               placeholder="챌린지 목표"
               onChangeText={setChallengeName}
@@ -653,14 +660,17 @@ const CreateChallengeScreen = () => {
             />
           </RowContainer>
 
-          <RowContainer gap={8}>
+          <View style={{gap: 16}}>
+            <NotoSansKR size={18}>챌린지 초대하기</NotoSansKR>
             <SearchBox
               isClicked={searchOpen}
               setIsClicked={setSearchOpen}
               setInviteListData={setInviteListData}
             />
-            {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
-          </RowContainer>
+          </View>
+          {/* <RowContainer gap={8}>
+            {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
+          </RowContainer> */}
 
           <View style={{gap: 16}}>
             <RowContainer style={{justifyContent: 'space-between'}}>
@@ -691,7 +701,11 @@ const CreateChallengeScreen = () => {
               }}>
               {calendarData.end && calendarData.start ? (
                 <NotoSansKR size={14} weight="Medium" color="gray2">
-                  {calendarData.start + ' ~ ' + calendarData.end}
+                  {`${calendarData.start} (${getDayOfWeek(
+                    calendarData.start,
+                  )}) ~ ${calendarData.end} (${getDayOfWeek(
+                    calendarData.end,
+                  )})`}
                 </NotoSansKR>
               ) : (
                 <NotoSansKR size={14} weight="Medium" color="gray4">

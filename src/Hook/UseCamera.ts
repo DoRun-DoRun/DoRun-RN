@@ -25,7 +25,6 @@ const useCamera = () => {
         if (res.didCancel || !res.assets || !res.assets[0].uri) {
           return;
         }
-        console.log(res.assets[0].uri);
         const resizedImage = await resizeImage(res.assets[0].uri);
         if (resizedImage) {
           setModalImage({
@@ -42,7 +41,6 @@ const useCamera = () => {
       // }
       launchCamera(imagePickerOption, onPickImage);
     } else {
-      console.log('카메라 접근이 거부되었습니다.');
       Toast.show({
         type: 'error',
         text1: '카메라 권한이 필요해요',

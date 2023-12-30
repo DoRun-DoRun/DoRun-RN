@@ -12,10 +12,10 @@ import {
   TossFace,
   convertKoKRToUTC,
   convertUTCToKoKR,
+  getDayOfWeek,
   useApi,
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
-import {styled} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {useDispatch, useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
@@ -23,20 +23,13 @@ import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
 import {
   CalendarContainer,
+  DatePicker,
   InviteList,
   SearchBox,
   formatDate,
 } from './CreateChallengeScreen';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
-
-const DatePicker = styled.TouchableOpacity`
-  border: 1px solid ${props => props.theme.gray5};
-  padding: 4px 16px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 100px;
-`;
 
 interface participantsDataType {
   UID: number;
@@ -96,12 +89,11 @@ const EditChallengeScreen = () => {
     });
 
   const {mutate: ChallengeEditMutate} = useMutation(editChallenge, {
-    onSuccess: response => {
+    onSuccess: () => {
       Toast.show({
         type: 'success',
         text1: '챌린지 정보가 수정되었어요.',
       });
-      console.log('Success:', response);
       queryClient.invalidateQueries('getChallenge');
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
@@ -124,7 +116,9 @@ const EditChallengeScreen = () => {
 
   const challengeStart = () =>
     CallApi({
-      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}`,
+      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}&start_dt=${convertKoKRToUTC(
+        formatDate(new Date()),
+      ).toISOString()}`,
       method: 'POST',
       accessToken: accessToken!,
     });
@@ -154,8 +148,7 @@ const EditChallengeScreen = () => {
     });
 
   const {mutate: ChallengeDeleteMutation} = useMutation(challengeDelete, {
-    onSuccess: response => {
-      console.log('Success:', response);
+    onSuccess: () => {
       dispatch(setSelectedChallengeMstNo(null));
 
       // 상태 업데이트가 반영된 후 쿼리 무효화
@@ -212,7 +205,7 @@ const EditChallengeScreen = () => {
               ? challengeData.IS_OWNER === false
                 ? '대기중인 챌린지 정보에요'
                 : '챌린지 내용을 수정할 수 있어요'
-              : '진행중인 챌린지 정보에에요'}
+              : '진행중인 챌린지 정보에요'}
           </NotoSansKR>
 
           <RowContainer gap={16}>
@@ -230,6 +223,7 @@ const EditChallengeScreen = () => {
             </TouchableOpacity>
             <View style={{flex: 1}}>
               <InputNotoSansKR
+                maxLength={14}
                 size={20}
                 placeholder="챌린지 목표"
                 onChangeText={setChallengeName}
@@ -244,11 +238,14 @@ const EditChallengeScreen = () => {
 
           {challengeData.CHALLENGE_STATUS === 'PENDING' &&
             challengeData.IS_OWNER !== false && (
-              <SearchBox
-                isClicked={searchOpen}
-                setIsClicked={setSearchOpen}
-                setInviteListData={setInviteListData}
-              />
+              <View style={{gap: 16}}>
+                <NotoSansKR size={18}>챌린지 초대하기</NotoSansKR>
+                <SearchBox
+                  isClicked={searchOpen}
+                  setIsClicked={setSearchOpen}
+                  setInviteListData={setInviteListData}
+                />
+              </View>
             )}
 
           {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
@@ -282,7 +279,11 @@ const EditChallengeScreen = () => {
               }}>
               {calendarData.end && calendarData.start ? (
                 <NotoSansKR size={14} weight="Medium" color="gray2">
-                  {calendarData.start + ' ~ ' + calendarData.end}
+                  {`${calendarData.start} (${getDayOfWeek(
+                    calendarData.start,
+                  )}) ~ ${calendarData.end} (${getDayOfWeek(
+                    calendarData.end,
+                  )})`}
                 </NotoSansKR>
               ) : (
                 <NotoSansKR size={14} weight="Medium" color="gray4">

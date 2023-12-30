@@ -16,6 +16,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {InviteAcceptType} from '../../store/data';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 // const FrinedCharacter = styled.View`
 //   width: 32px;
@@ -44,8 +45,7 @@ const Friend = ({accessToken, name, friendNo, invited}: FriendType) => {
     });
 
   const {mutate: changeFriendMutation} = useMutation(changeFriend, {
-    onSuccess: response => {
-      console.log('Success:', response);
+    onSuccess: () => {
       queryClient.invalidateQueries('FriendListModal');
     },
     onError: error => {
@@ -116,8 +116,11 @@ const InviteFriend = ({name, UID, setUidInput}: InviteFriendType) => {
     });
 
   const {mutate} = useMutation(inviteFriend, {
-    onSuccess: response => {
-      console.log('Success:', response);
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '친구요청을 보냈어요.',
+      });
       setUidInput('');
     },
     onError: error => {

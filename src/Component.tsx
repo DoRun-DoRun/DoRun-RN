@@ -40,12 +40,13 @@ export const InputNotoSansKR = styled.TextInput.attrs(({theme}) => ({
   placeholderTextColor: theme.gray4,
 }))<FontType>`
   ${Platform.OS === 'android' && 'include-font-padding: false;'}
-  vertical-align: middle;
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
   font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
-  font-weight: normal;
-  line-height: ${({lineHeight, size}) =>
-    lineHeight ? `${lineHeight}px` : `${size * 1.45}px`};
+  line-height: ${({size}) =>
+    Platform.select({
+      ios: '0px',
+      android: `${size * 1.7}px`,
+    })};
   font-size: ${({size}) => `${size}px`};
   padding: 0;
   margin: 0;
@@ -54,12 +55,12 @@ export const InputNotoSansKR = styled.TextInput.attrs(({theme}) => ({
 
 export const TossFace = styled.Text<{size: number}>`
   color: black;
-  font-size: ${({size}) => size + 'px'};
+  font-size: ${({size}) => `${size}px`};
   line-height: ${({size}) =>
     Platform.select({
-      ios: size * 2,
-      android: size * 2.25,
-    })}px;
+      ios: '0px',
+      android: `${size * 1.7}px`,
+    })};
   font-family: 'TossFaceFontMac';
 `;
 
@@ -231,10 +232,10 @@ export const useApi = () => {
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     let baseUrl = 'https://dorun.site';
 
-    // baseUrl =
-    //   Platform.OS === 'android'
-    //     ? 'http://10.0.2.2:8000'
-    //     : 'http://127.0.0.1:8000';
+    baseUrl =
+      Platform.OS === 'android'
+        ? 'http://10.0.2.2:8000'
+        : 'http://127.0.0.1:8000';
 
     const url = `${baseUrl}/${endpoint}`;
 
@@ -512,6 +513,12 @@ export const formatDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
+export const getDayOfWeek = (dateString: string) => {
+  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+  const date = new Date(dateString);
+  return daysOfWeek[date.getDay()];
+};
+
 // export const GetTheme = () => {
 //   const theme = useTheme();
 
@@ -602,7 +609,7 @@ const requestCameraPermission = async () => {
 
   const result = await check(permission);
   if (result === RESULTS.GRANTED) {
-    console.log('카메라 권한이 이미 허용되어 있습니다.');
+    // console.log('카메라 권한이 이미 허용되어 있습니다.');
     return true;
   } else {
     console.log(result);

@@ -106,8 +106,7 @@ const FaceBtn = ({daily_no}: {daily_no: number}) => {
     });
 
   const {mutate} = useMutation(postEmoji, {
-    onSuccess: response => {
-      console.log('Success:', response);
+    onSuccess: () => {
       navigation.goBack();
     },
     onError: error => {

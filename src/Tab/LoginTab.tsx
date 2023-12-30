@@ -162,7 +162,7 @@ const LoginTab = () => {
       };
 
       dispatch(setUser(userData));
-      console.log('Success:', userData);
+      // console.log('Success:', userData);
       navigation.navigate('MainTab' as never);
     },
     onError: () => {
@@ -218,7 +218,7 @@ const LoginTab = () => {
         <LoginButton
           onPress={async () => {
             if (isLoading) {
-              console.log('Guest login is already in progress.');
+              // console.log('Guest login is already in progress.');
               return;
             } else {
               const userData = await loadUser();

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>ko-kr</string>
+	<string>ko</string>
 	<key>CFBundleDisplayName</key>
 	<string>두런두런</string>
 	<key>CFBundleExecutable</key>
