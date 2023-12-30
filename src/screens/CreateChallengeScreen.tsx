@@ -174,7 +174,7 @@ export const SearchBox = ({
           value={uidInput}
           onChangeText={text => setUidInput(text)}
           style={{flex: 1}}
-          placeholder={`친구 UID를 입력해요. 내 UID는 ${UID}에요`}
+          placeholder={`친구 UID 검색 (내 UID: ${UID})`}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
@@ -187,14 +187,16 @@ export const SearchBox = ({
             friendData?.accepted.length > 0 && (
               <ExpandedContainer>
                 <NotoSansKR size={14}>친구 목록</NotoSansKR>
-                {friendData?.accepted.map((data: FriendType, key: number) => (
-                  <InviteFriend
-                    key={key}
-                    name={data.USER_NM}
-                    UID={data.UID}
-                    setInviteListData={setInviteListData}
-                  />
-                ))}
+                {friendData?.accepted
+                  .slice(0, 3)
+                  .map((data: FriendType, key: number) => (
+                    <InviteFriend
+                      key={key}
+                      name={data.USER_NM}
+                      UID={data.UID}
+                      setInviteListData={setInviteListData}
+                    />
+                  ))}
               </ExpandedContainer>
             )
           )}
@@ -258,7 +260,7 @@ export const InviteList = ({
       </NotoSansKR>
       <RowContainer gap={9}>
         <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
-          {accept ? '참여중이에요' : '참여를 기다리고 있어요'}
+          {accept ? '참여 중' : '대기 중'}
         </NotoSansKR>
         {!accept && (
           <TouchableOpacity
@@ -326,14 +328,14 @@ const CalendarView = styled.TouchableOpacity`
 const CalendarModalContainer = styled.Pressable`
   padding-top: 10px;
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   z-index: 2;
 `;
 
 const CalendarRowContainer = styled(RowContainer)`
   justify-content: flex-end;
   border-top-width: 1px;
-  padding: 12px;
+  padding: 8px;
   border-color: ${props => props.theme.primary1};
 `;
 
@@ -492,12 +494,14 @@ export const CalendarContainer = ({
             allowShadow
             renderArrow={(direction: Direction) =>
               direction === 'left' ? (
-                !disabledLeft && (
+                !disabledLeft ? (
                   <MaterialIcons
                     name="arrow-back"
                     size={20}
                     color={theme.primary1}
                   />
+                ) : (
+                  <View style={{width: 20}} />
                 )
               ) : (
                 <MaterialIcons
@@ -509,7 +513,6 @@ export const CalendarContainer = ({
             }
             disableArrowLeft={disabledLeft}
             monthFormat="yy년 MM월"
-            style={{padding: 16, gap: 8}}
             minDate={formatDate(new Date())}
             onDayPress={onDayPress}
             markingType={'period'}

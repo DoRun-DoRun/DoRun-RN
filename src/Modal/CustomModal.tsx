@@ -1,5 +1,12 @@
 import React, {useEffect, useRef} from 'react';
-import {Modal, View, Animated, PanResponder, Platform} from 'react-native';
+import {
+  Modal,
+  View,
+  Animated,
+  PanResponder,
+  Platform,
+  Dimensions,
+} from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
 import {OverlayContainer} from './OverlayContainer';
@@ -9,6 +16,7 @@ const StyledModalContainer = styled.View`
   align-items: center;
   justify-content: flex-end;
   padding: 16px;
+  padding-bottom: 24px;
 `;
 
 const StyledModalContent = styled(Animated.View)`
@@ -70,17 +78,32 @@ const ModalShortDivider = styled(View)`
 const CustomModal = () => {
   const {isVisible, content, hideModal, showOverlay} = useModal();
   const panY = useRef(new Animated.Value(0)).current;
+  const height = Dimensions.get('window').height;
 
   useEffect(() => {
     if (isVisible) {
-      panY.setValue(0);
+      Animated.timing(panY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(panY, {
+        toValue: height * 0.7,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
     }
-  }, [isVisible, panY]);
+  }, [isVisible, panY, height]);
 
   const panResponders = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        return gestureState.dy > 10;
+      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return gestureState.dy > 10;
+      },
       onPanResponderMove: (event, gestureState) => {
         // 오직 아래로 스와이프하는 경우에만 panY를 업데이트
         if (gestureState.dy > 0) {
@@ -88,7 +111,7 @@ const CustomModal = () => {
         }
       },
       onPanResponderRelease: (event, gestureState) => {
-        if (gestureState.dy > 0 && gestureState.vy > 0.6) {
+        if (gestureState.dy > 0 && gestureState.vy > 0.45) {
           hideModal();
         } else {
           resetBottomSheet();
@@ -107,7 +130,7 @@ const CustomModal = () => {
 
   return (
     <Modal
-      animationType={'fade'}
+      animationType={'none'}
       transparent={true}
       visible={isVisible}
       onRequestClose={() => hideModal()}

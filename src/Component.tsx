@@ -110,7 +110,14 @@ interface ButtonType {
   disabled?: boolean;
 }
 
-const ButtonContainer = styled.Pressable`
+const ButtonContainer = styled.TouchableOpacity`
+  padding: 8px;
+  width: 100%;
+  align-items: center;
+  border-radius: 10px;
+`;
+
+const ButtonContainerPress = styled.Pressable`
   padding: 8px;
   width: 100%;
   align-items: center;
@@ -119,13 +126,13 @@ const ButtonContainer = styled.Pressable`
 
 export const ButtonComponent = ({
   children,
-  type,
+  type = 'primary',
   onPress,
-  disabled,
+  disabled = false,
 }: ButtonType) => {
   const theme = useTheme();
   let color = 'white';
-  let backgroundColor = 'primary';
+  let backgroundColor = theme.primary1;
 
   if (type === 'secondary') {
     color = 'gray4';
@@ -146,21 +153,51 @@ export const ButtonComponent = ({
   return (
     <LinearGradient
       colors={
-        backgroundColor === 'primary'
+        type === 'primary' && !disabled
           ? ['#1727C3', '#6377F1', '#9EB7F6']
           : [backgroundColor, backgroundColor]
       }
       start={{x: 1.27, y: 4.29}}
       end={{x: -0.19, y: -2.08}}
       style={{borderRadius: 10}}>
-      <ButtonContainer onPress={onPress} disabled={disabled}>
-        <NotoSansKR color={color} size={16} lineHeight={23}>
-          {children}
-        </NotoSansKR>
-      </ButtonContainer>
+      {Platform.OS === 'ios' ? (
+        <ButtonContainer onPress={onPress} disabled={disabled}>
+          <NotoSansKR color={color} size={16} lineHeight={23}>
+            {children}
+          </NotoSansKR>
+        </ButtonContainer>
+      ) : (
+        <ButtonContainerPress
+          android_ripple={{color: adjustBrightness(backgroundColor, 0.9)}}
+          onPress={onPress}
+          disabled={disabled}>
+          <NotoSansKR color={color} size={16} lineHeight={23}>
+            {children}
+          </NotoSansKR>
+        </ButtonContainerPress>
+      )}
     </LinearGradient>
   );
 };
+
+export function adjustBrightness(hex: string, percent: number) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return (
+    '#' +
+    Math.round(r * percent)
+      .toString(16)
+      .padStart(2, '0') +
+    Math.round(g * percent)
+      .toString(16)
+      .padStart(2, '0') +
+    Math.round(b * percent)
+      .toString(16)
+      .padStart(2, '0')
+  );
+}
 
 export const RowContainer = styled.View<{gap?: number; seperate?: boolean}>`
   flex-direction: row;

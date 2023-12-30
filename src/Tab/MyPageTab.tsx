@@ -221,14 +221,14 @@ const History = () => {
                 size={20}
                 color={theme.primary1}
               />
+            ) : !disabledRight ? (
+              <MaterialIcons
+                name="arrow-forward"
+                size={20}
+                color={theme.primary1}
+              />
             ) : (
-              !disabledRight && (
-                <MaterialIcons
-                  name="arrow-forward"
-                  size={20}
-                  color={theme.primary1}
-                />
-              )
+              <View style={{width: 20}} />
             )
           }
           disableArrowRight={disabledRight}

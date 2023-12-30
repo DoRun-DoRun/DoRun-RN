@@ -178,7 +178,7 @@ const SearchBox = ({UID}: {UID: number}) => {
           maxLength={7}
           onChangeText={setUidInput}
           style={{flex: 1}}
-          placeholder={`친구 UID를 입력해요. 내 UID는 ${UID}에요`}
+          placeholder={`친구 UID 검색 (내 UID: ${UID})`}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>

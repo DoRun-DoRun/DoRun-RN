@@ -21,7 +21,7 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 const ChallengeTimeBox = styled.View`
   border-radius: 100px;
   border: 2px solid lightgray;
-  padding: 4px;
+  padding: 6px;
   align-items: center;
   justify-content: center;
 `;
@@ -37,15 +37,9 @@ const StatusComponent = ({
       <NotoSansKR size={16} weight="Medium">
         {username}
       </NotoSansKR>
-      {status ? (
-        <NotoSansKR size={14} weight="Medium" color="green">
-          참여중이에요
-        </NotoSansKR>
-      ) : (
-        <NotoSansKR size={14} weight="Medium" color="red">
-          참여를 기다리고 있어요
-        </NotoSansKR>
-      )}
+      <NotoSansKR size={14} weight="Medium" color={status ? 'green' : 'red'}>
+        {status ? '참여 중' : '대기 중'}
+      </NotoSansKR>
     </RowContainer>
   );
 };
@@ -157,7 +151,7 @@ export const ChallengeListModal = ({
         <View style={{gap: 8}}>
           <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
           <ChallengeTimeBox>
-            <NotoSansKR size={14} weight="Medium" lineHeight={28}>
+            <NotoSansKR size={14} weight="Medium">
               {convertUTCToKoKRDay(data?.START_DT) +
                 ' ~ ' +
                 convertUTCToKoKRDay(data?.END_DT)}

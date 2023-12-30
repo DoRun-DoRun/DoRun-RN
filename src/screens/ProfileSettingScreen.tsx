@@ -6,9 +6,10 @@ import {
   NotoSansKR,
   RowScrollContainer,
   ScrollContainer,
+  adjustBrightness,
   useApi,
 } from '../Component';
-import {Image, Platform, TouchableOpacity, View} from 'react-native';
+import {Image, Platform, View} from 'react-native';
 import {styled} from 'styled-components/native';
 import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
@@ -38,13 +39,34 @@ const SelectedButton = styled.TouchableOpacity`
   align-items: center;
 `;
 
-const CharecterSlot = styled.View<{
+const CharecterSlot = styled.TouchableHighlight<{
   isEquip: boolean;
   isOwned: boolean;
 }>`
   width: 88px;
   height: 104px;
-  margin: 8px 0;
+  border-radius: 10px;
+  border-width: ${props => (props.isEquip ? '2px' : 0)};
+  border-color: ${props => props.theme.primary1};
+  opacity: ${props => (props.isOwned ? 1 : 0.5)};
+  background: ${props => props.theme.white};
+  justify-content: center;
+  align-items: center;
+  ${Platform.OS === 'ios'
+    ? `
+    shadow-color: #000;
+    shadow-offset: 2px 2px;
+    shadow-opacity: 0.3;
+    shadow-radius: 2px;`
+    : 'elevation: 3'}
+`;
+
+const CharecterSlotAndroid = styled.Pressable<{
+  isEquip: boolean;
+  isOwned: boolean;
+}>`
+  width: 88px;
+  height: 104px;
   border-radius: 10px;
   border-width: ${props => (props.isEquip ? '2px' : 0)};
   border-color: ${props => props.theme.primary1};
@@ -190,21 +212,57 @@ const ProfileSettingScreen = () => {
               </View>
 
               <RowScrollContainer gap={8}>
-                {data.avatars.map((avatar: Avatar) => (
-                  <TouchableOpacity
-                    key={avatar.AVATAR_NO}
-                    onPress={() => {
-                      if (
-                        avatar.IS_OWNED &&
-                        avatar.AVATAR_TYPE === 'CHARACTER'
-                      ) {
-                        setSelectedCharacter(avatar.AVATAR_NO);
-                      }
-                      if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
-                        setSelectedPet(avatar.AVATAR_NO);
-                      }
-                    }}>
+                {data.avatars.map((avatar: Avatar) =>
+                  Platform.OS === 'android' ? (
+                    <View
+                      key={avatar.AVATAR_NO}
+                      style={{
+                        borderRadius: 10,
+                        overflow: 'hidden',
+                      }}>
+                      <CharecterSlotAndroid
+                        android_ripple={{
+                          color: adjustBrightness('white', 0.95),
+                        }}
+                        onPress={() => {
+                          if (
+                            avatar.IS_OWNED &&
+                            avatar.AVATAR_TYPE === 'CHARACTER'
+                          ) {
+                            setSelectedCharacter(avatar.AVATAR_NO);
+                          }
+                          if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
+                            setSelectedPet(avatar.AVATAR_NO);
+                          }
+                        }}
+                        isEquip={avatar.IS_EQUIP}
+                        isOwned={avatar.IS_OWNED}>
+                        <Image
+                          source={avatarImage[avatar.AVATAR_NO - 1]}
+                          style={
+                            avatar.AVATAR_TYPE === 'PET' && {
+                              width: '50%',
+                              height: '50%',
+                            }
+                          }
+                          resizeMode="contain"
+                        />
+                      </CharecterSlotAndroid>
+                    </View>
+                  ) : (
                     <CharecterSlot
+                      key={avatar.AVATAR_NO}
+                      onPress={() => {
+                        if (
+                          avatar.IS_OWNED &&
+                          avatar.AVATAR_TYPE === 'CHARACTER'
+                        ) {
+                          setSelectedCharacter(avatar.AVATAR_NO);
+                        }
+                        if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
+                          setSelectedPet(avatar.AVATAR_NO);
+                        }
+                      }}
                       isEquip={avatar.IS_EQUIP}
                       isOwned={avatar.IS_OWNED}>
                       <Image
@@ -218,8 +276,8 @@ const ProfileSettingScreen = () => {
                         resizeMode="contain"
                       />
                     </CharecterSlot>
-                  </TouchableOpacity>
-                ))}
+                  ),
+                )}
               </RowScrollContainer>
             </SelectedContainer>
           </View>
