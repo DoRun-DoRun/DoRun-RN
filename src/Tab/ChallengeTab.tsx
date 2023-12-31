@@ -302,7 +302,6 @@ const FootContainer = styled.View<{disalbed?: boolean}>`
   /* background-color: #2c2c2c; */
   background-color: ${props =>
     props.disalbed ? props.theme.gray5 : props.theme.gray1};
-  flex: 1;
   padding: 16px;
   text-align: left;
 `;
@@ -586,7 +585,7 @@ const ChallengeTab = () => {
 
         {detailData?.CHALLENGE_STATUS === ChallengeStatusType.PROGRESS ? (
           <>
-            <CenterContainer style={{flex: 1}}>
+            <CenterContainer style={{flexGrow: 1}}>
               <RowContainer seperate>
                 <NotoSansKR size={18}>개인별 목표</NotoSansKR>
               </RowContainer>

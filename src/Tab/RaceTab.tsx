@@ -35,6 +35,7 @@ import {
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
 import {NavigationType} from '../App';
+import {AlertItemModal} from '../Modal/Modals';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -80,6 +81,7 @@ const RaceTab = () => {
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const [index, setIndex] = useState(1);
+  const {showModal} = useModal();
 
   const navigation = useNavigation();
 
@@ -105,11 +107,6 @@ const RaceTab = () => {
     refetch,
     isFetching,
   } = useQuery(['ChallengeUserList', index], ChallengeUserList);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    refetch().then(() => setRefreshing(false));
-  }, [refetch]);
 
   useEffect(() => {
     if (challengeListData && challengeListData.total_page !== 0) {
@@ -147,6 +144,40 @@ const RaceTab = () => {
     }
   }, [challengeListData, dispatch, index, navigation]);
 
+  const ItemLog = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: `item/log/${challengeListData.CHALLENGE_MST_NO}`,
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+
+      if (response.length !== 0) {
+        showModal(<AlertItemModal response={response} />);
+      }
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  const {
+    // data: itemLog,
+    // isLoading: loadingItemLog,
+    refetch: refetchItemLog,
+    isFetching: isFetchingItemLog,
+  } = useQuery(['ItemLog', challengeListData], ItemLog, {
+    enabled: !!challengeListData,
+  });
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    Promise.all([refetch(), refetchItemLog()]).then(() => {
+      setRefreshing(false);
+    });
+  }, [refetch, refetchItemLog]);
+
   if (isLoading) {
     return <LoadingIndicatior />;
   }
@@ -156,7 +187,7 @@ const RaceTab = () => {
         <ScrollContainer
           refreshControl={
             <RefreshControl
-              refreshing={refreshing || isFetching}
+              refreshing={refreshing || isFetching || isFetchingItemLog}
               onRefresh={onRefresh}
             />
           }

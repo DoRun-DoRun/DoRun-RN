@@ -34,6 +34,8 @@ export enum AvatarType {
   PET = 'PET',
 }
 
+export const ItemName = ['폭탄', '망치'];
+
 export interface AvatarName {
   1: 'DUDU';
   2: 'NUTS';
@@ -107,8 +109,8 @@ export const usedItemImage = {
   bomb: [
     require('../assets/lottie/dudu_bomb.json'),
     require('../assets/lottie/nuts_bomb.json'),
-    require('../assets/lottie/pachi_boom.json'),
-    require('../assets/lottie/peats_boom.json'),
+    require('../assets/lottie/pachi_bomb.json'),
+    require('../assets/lottie/peats_bomb.json'),
   ],
 };
 

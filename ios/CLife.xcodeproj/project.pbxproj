@@ -22,6 +22,7 @@
 		91229866EB0641A9B61B1059 /* NotoSansKR-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4726C9ED9CED4430AFE47A09 /* NotoSansKR-Thin.ttf */; };
 		96A4185737664937A038DEB4 /* NotoSansKR-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D536DEA4FE204FEC8DC3A596 /* NotoSansKR-ExtraBold.ttf */; };
 		BC1B8ACD2B3DB95B005255F7 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = BC1B8ACC2B3DB95B005255F7 /* AppCenter-Config.plist */; };
+		BCF0211E2B41F596001D670F /* main_bgm.wav in Resources */ = {isa = PBXBuildFile; fileRef = BCF0211D2B41F596001D670F /* main_bgm.wav */; };
 		BF9676B7ED8546C2AB59995C /* NotoSansKR-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CBAAAC1F1DBB48E6B2A643D3 /* NotoSansKR-Regular.ttf */; };
 		C670CE2AC3DC40A5A588A086 /* NotoSansKR-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5EC3BF35A60493E86ACF0DA /* NotoSansKR-SemiBold.ttf */; };
 		E5C990897949449AD3DF6623 /* libPods-CLife.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D0084489C948E4E2260960 /* libPods-CLife.a */; };
@@ -61,6 +62,7 @@
 		BC1B8ACC2B3DB95B005255F7 /* AppCenter-Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "AppCenter-Config.plist"; path = "CLife/AppCenter-Config.plist"; sourceTree = "<group>"; };
 		BCB6AB662B0F59B700103C24 /* CLife.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CLife.entitlements; path = CLife/CLife.entitlements; sourceTree = "<group>"; };
 		BCE89F6286454F79B823D8C6 /* NotoSansKR-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSansKR-Medium.ttf"; path = "../assets/fonts/NotoSansKR-Medium.ttf"; sourceTree = "<group>"; };
+		BCF0211D2B41F596001D670F /* main_bgm.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = main_bgm.wav; path = ../assets/main_bgm.wav; sourceTree = "<group>"; };
 		C5FCDA924A9AE5DE33728B93 /* Pods-CLife.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CLife.release.xcconfig"; path = "Target Support Files/Pods-CLife/Pods-CLife.release.xcconfig"; sourceTree = "<group>"; };
 		CBAAAC1F1DBB48E6B2A643D3 /* NotoSansKR-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSansKR-Regular.ttf"; path = "../assets/fonts/NotoSansKR-Regular.ttf"; sourceTree = "<group>"; };
 		D536DEA4FE204FEC8DC3A596 /* NotoSansKR-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSansKR-ExtraBold.ttf"; path = "../assets/fonts/NotoSansKR-ExtraBold.ttf"; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				BCF0211D2B41F596001D670F /* main_bgm.wav */,
 				BC8872C02B3702FE00961237 /* Fonts */,
 				13B07FAE1A68108700A75B9A /* CLife */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -297,6 +300,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				BCF0211E2B41F596001D670F /* main_bgm.wav in Resources */,
 				629992D79A024C2CB9A30107 /* TossFaceFontMac.ttf in Resources */,
 				8745ED5A07F940CF9E46B7A1 /* NotoSansKR-Bold.ttf in Resources */,
 				BC1B8ACD2B3DB95B005255F7 /* AppCenter-Config.plist in Resources */,
@@ -556,7 +560,7 @@
 				CODE_SIGN_ENTITLEMENTS = CLife/CLife.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = Q6SSMP72DV;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CLife/Info.plist;
@@ -566,7 +570,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -590,7 +594,7 @@
 				CODE_SIGN_ENTITLEMENTS = CLife/CLife.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = Q6SSMP72DV;
 				INFOPLIST_FILE = CLife/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "두런두런";
@@ -599,7 +603,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -675,6 +679,7 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				Multi_Deployment_config = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -753,6 +758,7 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				Multi_Deployment_config = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",

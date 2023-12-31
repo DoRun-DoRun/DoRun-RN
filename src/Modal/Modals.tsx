@@ -1,10 +1,10 @@
 import React from 'react';
 import {Dimensions, Image, View} from 'react-native';
-import {ButtonComponent, GetImage, NotoSansKR} from '../Component';
+import {ButtonComponent, GetImage, NotoSansKR, timeSince} from '../Component';
 import styled from 'styled-components';
 import {ModalHeadBorder} from './CustomModal';
 import LottieView from 'lottie-react-native';
-import {defaultData, usedItemImage} from '../../store/data';
+import {ItemName, defaultData, usedItemImage} from '../../store/data';
 import FastImage from 'react-native-fast-image';
 
 export const ShareModal = () => {
@@ -42,14 +42,41 @@ export const ImageZoomModal = ({file_name}: {file_name: string}) => {
   );
 };
 
-export const AlertItemModal = () => {
+interface ItemLogType {
+  ITEM_NO: number;
+  ITEM_LOG_NO: number;
+  INSERT_DT: string;
+  send_USER_NM: string;
+  send_CHARACTER_NO: number;
+}
+
+export const AlertItemModal = ({response}: {response: ItemLogType[]}) => {
+  // console.log(response);
+
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
-      <ZoomImageDummy />
+
+      <View style={{width: 240, height: 240}}>
+        {response[0]?.ITEM_NO === 1 ? (
+          <LottieView
+            source={usedItemImage.bomb[response[0]?.send_CHARACTER_NO - 1]}
+            style={{flex: 1}}
+            autoPlay
+          />
+        ) : (
+          <FastImage
+            source={usedItemImage.hammer[response[0]?.send_CHARACTER_NO - 1]}
+            style={{flex: 1}}
+          />
+        )}
+      </View>
+
       <NotoSansKR size={18} weight="Bold" textAlign="center">
-        이런! [닉네임A]님이{'\n'}
-        [아이템]을 사용했어요!
+        이런! [{response[0]?.send_USER_NM}]님이{'\n'}
+        {timeSince(response[0]?.INSERT_DT)}에 [
+        {ItemName[response[0]?.ITEM_NO - 1]}
+        ]을 사용했어요!
       </NotoSansKR>
     </View>
   );
@@ -139,10 +166,4 @@ const ImageDummy = styled(View)`
 const ImageContainer = styled(View)`
   justify-content: center;
   align-items: center;
-`;
-
-const ZoomImageDummy = styled(View)`
-  width: 264px;
-  height: 264px;
-  background: ${props => props.theme.gray6};
 `;

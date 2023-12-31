@@ -98,12 +98,8 @@ const CustomModal = () => {
 
   const panResponders = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => {
-        return gestureState.dy > 10;
-      },
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return gestureState.dy > 10;
-      },
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (event, gestureState) => {
         // 오직 아래로 스와이프하는 경우에만 panY를 업데이트
         if (gestureState.dy > 0) {
@@ -111,14 +107,22 @@ const CustomModal = () => {
         }
       },
       onPanResponderRelease: (event, gestureState) => {
-        if (gestureState.dy > 0 && gestureState.vy > 0.45) {
-          hideModal();
+        if (gestureState.dy > 100 && gestureState.vy > 0.45) {
+          closeModalWithAnimation();
         } else {
           resetBottomSheet();
         }
       },
     }),
   ).current;
+
+  const closeModalWithAnimation = () => {
+    Animated.timing(panY, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => hideModal());
+  };
 
   const resetBottomSheet = () => {
     Animated.timing(panY, {
