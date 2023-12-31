@@ -42,6 +42,7 @@
     "react-native-screens": "^3.25.0",
     "react-native-share": "^10.0.1",
     "react-native-simple-modal": "^9.0.1",
+    "react-native-sound": "^0.11.2",
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.0",
     "react-native-view-shot": "^3.8.0",

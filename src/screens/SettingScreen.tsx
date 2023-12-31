@@ -5,23 +5,26 @@ import {
   InnerContainer,
   LoadingIndicatior,
   NotoSansKR,
+  RowContainer,
   useApi,
 } from '../Component';
 import {View} from 'react-native';
-import {styled, useTheme} from 'styled-components/native';
+import {useTheme} from 'styled-components/native';
 import {Slider} from '@miblanchard/react-native-slider';
 import {useQuery} from 'react-query';
 import {RootState} from '../../store/RootReducer';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
+import {setVolume} from '../../store/slice/MusicSlice';
 
 const SettingScreen = () => {
   // const [pushAlarm, setPushAlarm] = useState(true);
   // const [marketingAlarm, setMarketingAlarm] = useState(true);
   // const [nightAlarm, setNightAlarm] = useState(true);
   // const [soundEffect, setSoundEffect] = useState(100);
-  // const [backgroundMusic, setBackgroundMusic] = useState(100);
+  const {volume} = useSelector((state: RootState) => state.music);
 
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const CallApi = useApi();
@@ -74,38 +77,38 @@ const SettingScreen = () => {
             <ToggleComponent isOn={nightAlarm} onToggle={OnNightAlarmToggle}>
               23시 ~ 09시 푸시 알람
             </ToggleComponent>
-          </ObjectList>
+          </ObjectList>*/}
 
-          <ObjectList>
-            <SliderComponent
+          <View style={{gap: 8}}>
+            {/* <SliderComponent
               sliderValue={soundEffect}
               setSliderValue={setSoundEffect}>
               효과음
-            </SliderComponent>
+            </SliderComponent> */}
             <SliderComponent
-              sliderValue={backgroundMusic}
-              setSliderValue={setBackgroundMusic}>
+              sliderValue={volume}
+              setSliderValue={e => dispatch(setVolume({volume: e}))}>
               배경음악
             </SliderComponent>
-          </ObjectList> */}
-          <ObjectList>
-            <ObjectContainer>
+          </View>
+          <View style={{gap: 8}}>
+            <RowContainer seperate>
               <NotoSansKR size={16} weight="Medium">
                 소셜 로그인 정보
               </NotoSansKR>
               <NotoSansKR size={16} weight="Medium">
                 {data.SIGN_TYPE}
               </NotoSansKR>
-            </ObjectContainer>
-            <ObjectContainer>
+            </RowContainer>
+            <RowContainer seperate>
               <NotoSansKR size={16} weight="Medium">
                 UID
               </NotoSansKR>
               <NotoSansKR size={16} weight="Medium">
                 {data.UID}
               </NotoSansKR>
-            </ObjectContainer>
-          </ObjectList>
+            </RowContainer>
+          </View>
         </View>
       </InnerContainer>
       <View style={{gap: 8, padding: 16}}>
@@ -121,17 +124,6 @@ const SettingScreen = () => {
     </HomeContainer>
   );
 };
-
-const ObjectList = styled(View)`
-  gap: 8px;
-`;
-
-const ObjectContainer = styled(View)`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
 
 // const ToggleWheel = styled(Animated.View)`
 //   width: 25px;
@@ -198,7 +190,7 @@ const ObjectContainer = styled(View)`
 interface SliderComponentType {
   children: React.ReactNode;
   sliderValue: number;
-  setSliderValue: React.Dispatch<React.SetStateAction<number>>;
+  setSliderValue: (value: number) => void;
 }
 
 export const SliderComponent = ({
@@ -209,7 +201,7 @@ export const SliderComponent = ({
   const theme = useTheme();
 
   return (
-    <ObjectContainer>
+    <RowContainer>
       <View style={{width: 240}}>
         <NotoSansKR size={16} weight="Medium">
           {children}
@@ -224,7 +216,7 @@ export const SliderComponent = ({
           onValueChange={values => setSliderValue(values[0])}
         />
       </View>
-    </ObjectContainer>
+    </RowContainer>
   );
 };
 

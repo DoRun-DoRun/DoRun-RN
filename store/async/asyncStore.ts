@@ -15,6 +15,28 @@ export interface challengeDataType {
   personalGoals: goalType[];
 }
 
+export interface settingDataType {
+  backgroundMusic: number;
+}
+
+// export const persistSetting = async (data: settingDataType) => {
+//   try {
+//     const jsonValue = JSON.stringify(data);
+//     await AsyncStorage.setItem('setting', jsonValue);
+//   } catch (e) {
+//     // saving error
+//   }
+// };
+
+// export const loadSetting = async () => {
+//   try {
+//     const jsonValue = await AsyncStorage.getItem('setting');
+//     return jsonValue != null ? JSON.parse(jsonValue) : null;
+//   } catch (e) {
+//     // error reading value
+//   }
+// };
+
 export const persistUser = async (data: userDataType) => {
   try {
     const jsonValue = JSON.stringify(data);

@@ -21,6 +21,7 @@ import {useNavigation} from '@react-navigation/native';
 // import {v4 as uuid} from 'uuid';
 import {SignType} from '../../store/data';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+import {playMusic, stopMusic} from '../../store/slice/MusicSlice';
 
 // const signInWithApple = async () => {
 //   // performs login request
@@ -119,6 +120,14 @@ const LoginTab = () => {
   const CallApi = useApi();
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(playMusic());
+
+    return () => {
+      dispatch(stopMusic());
+    };
+  }, [dispatch]);
 
   const loginGuest = (refreshToken: string) =>
     CallApi({

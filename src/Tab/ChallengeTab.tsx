@@ -589,6 +589,7 @@ const ChallengeTab = () => {
               <RowContainer seperate>
                 <NotoSansKR size={18}>개인별 목표</NotoSansKR>
               </RowContainer>
+
               <View style={{gap: 8}}>
                 {personGoal.map(goal => (
                   <GoalBox
