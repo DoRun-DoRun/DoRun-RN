@@ -42,7 +42,7 @@ export const ImageZoomModal = ({file_name}: {file_name: string}) => {
   );
 };
 
-interface ItemLogType {
+export interface ItemLogType {
   ITEM_NO: number;
   ITEM_LOG_NO: number;
   INSERT_DT: string;
@@ -50,7 +50,7 @@ interface ItemLogType {
   send_CHARACTER_NO: number;
 }
 
-export const AlertItemModal = ({response}: {response: ItemLogType[]}) => {
+export const AlertItemModal = ({response}: {response: ItemLogType}) => {
   // console.log(response);
 
   return (
@@ -58,24 +58,23 @@ export const AlertItemModal = ({response}: {response: ItemLogType[]}) => {
       <ModalHeadBorder />
 
       <View style={{width: 240, height: 240}}>
-        {response[0]?.ITEM_NO === 1 ? (
+        {response?.ITEM_NO === 1 ? (
           <LottieView
-            source={usedItemImage.bomb[response[0]?.send_CHARACTER_NO - 1]}
+            source={usedItemImage.bomb[response?.send_CHARACTER_NO - 1]}
             style={{flex: 1}}
             autoPlay
           />
         ) : (
           <FastImage
-            source={usedItemImage.hammer[response[0]?.send_CHARACTER_NO - 1]}
+            source={usedItemImage.hammer[response?.send_CHARACTER_NO - 1]}
             style={{flex: 1}}
           />
         )}
       </View>
 
       <NotoSansKR size={18} weight="Bold" textAlign="center">
-        이런! [{response[0]?.send_USER_NM}]님이{'\n'}
-        {timeSince(response[0]?.INSERT_DT)}에 [
-        {ItemName[response[0]?.ITEM_NO - 1]}
+        이런! [{response?.send_USER_NM}]님이{'\n'}
+        {timeSince(response?.INSERT_DT)}에 [{ItemName[response?.ITEM_NO - 1]}
         ]을 사용했어요!
       </NotoSansKR>
     </View>

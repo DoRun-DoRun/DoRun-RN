@@ -107,7 +107,7 @@ const CustomModal = () => {
         }
       },
       onPanResponderRelease: (event, gestureState) => {
-        if (gestureState.dy > 100 && gestureState.vy > 0.45) {
+        if (gestureState.dy > 50) {
           closeModalWithAnimation();
         } else {
           resetBottomSheet();
@@ -133,12 +133,7 @@ const CustomModal = () => {
   };
 
   return (
-    <Modal
-      animationType={'none'}
-      transparent={true}
-      visible={isVisible}
-      onRequestClose={() => hideModal()}
-      style={{zIndex: 10}}>
+    <Modal transparent={true} visible={isVisible} style={{zIndex: 10}}>
       <OverlayContainer hideBackground={!showOverlay}>
         <StyledModalContainer style={{marginBottom: !showOverlay ? 48 : 0}}>
           <StyledModalContent

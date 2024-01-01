@@ -5,7 +5,12 @@ type ModalState = {
   isVisible: boolean;
   showOverlay: boolean;
   content: ReactNode | null;
-  showModal: (content: ReactNode, showOverlay?: boolean) => void;
+  onHide?: () => void;
+  showModal: (
+    content: ReactNode,
+    onHide?: () => void,
+    showOverlay?: boolean,
+  ) => void;
   hideModal: () => void;
 };
 
@@ -13,9 +18,25 @@ const useModalStore = create<ModalState>(set => ({
   isVisible: false,
   showOverlay: true,
   content: null,
-  showModal: (content, showOverlay = true) =>
-    set({isVisible: true, content, showOverlay}),
-  hideModal: () => set({isVisible: false, content: null}),
+  onHide: undefined,
+  showModal: (content, onHide, showOverlay = true) =>
+    set({isVisible: true, content, onHide, showOverlay}),
+  hideModal: () => {
+    // 현재 onHide 캡처
+    const currentOnHide = useModalStore.getState().onHide;
+
+    // 상태 업데이트
+    set({
+      isVisible: false,
+      content: null,
+      onHide: undefined,
+    });
+
+    // 상태 업데이트 이후에 onHide 호출
+    if (currentOnHide) {
+      currentOnHide();
+    }
+  },
 }));
 
 const ModalContext = createContext<ModalState | undefined>(undefined);
