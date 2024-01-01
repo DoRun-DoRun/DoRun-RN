@@ -2,8 +2,10 @@ import React, {useState} from 'react';
 import {
   HomeContainer,
   InnerContainer,
+  InputNotoSansKR,
   LoadingIndicatior,
   NotoSansKR,
+  RowContainer,
   RowScrollContainer,
   ScrollContainer,
   adjustBrightness,
@@ -14,16 +16,16 @@ import {styled} from 'styled-components/native';
 import {useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/RootReducer';
-// import OcticonIcons from 'react-native-vector-icons/Octicons';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {Avatar, avatarImage} from '../../store/data';
 import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
-// const TextContainer = styled.TextInput`
-//   flex: 1;
-//   padding: 6px 8px;
-//   border-bottom-width: 1px;
-// `;
+const TextContainer = styled.TextInput`
+  flex: 1;
+  padding: 6px 8px;
+  border-bottom-width: 1px;
+`;
 
 const SelectedContainer = styled.View`
   flex: 1;
@@ -86,16 +88,16 @@ const CharecterSlotAndroid = styled.Pressable<{
     : 'elevation: 3'}
 `;
 
-// const PencilIcon = styled.TouchableOpacity`
-//   position: absolute;
-//   right: 8px;
-// `;
+const PencilIcon = styled.TouchableOpacity`
+  position: absolute;
+  right: 8px;
+`;
 
 const ProfileSettingScreen = () => {
   const CallApi = useApi();
   const queryClient = useQueryClient();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  // const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(1);
   const [selectedPet, setSelectedPet] = useState<null | number>(null);
   const navigation = useNavigation();
@@ -107,7 +109,7 @@ const ProfileSettingScreen = () => {
         method: 'GET',
         accessToken: accessToken!,
       });
-      // setUserName(response.USER_NM);
+      setUserName(response.USER_NM);
       for (const avatar of response.avatars) {
         if (avatar.IS_EQUIP) {
           if (avatar.AVATAR_TYPE === 'CHARACTER') {
@@ -122,6 +124,8 @@ const ProfileSettingScreen = () => {
       throw err;
     }
   };
+
+  const {data, isLoading} = useQuery('SettingProfile', SettingProfile);
 
   const SetAvatar = async (avatar_no: number[]) => {
     try {
@@ -149,11 +153,41 @@ const ProfileSettingScreen = () => {
           type: 'success',
           text1: '내 정보를 업데이트 했어요.',
         });
-        navigation.goBack();
       },
     },
   );
-  const {data, isLoading} = useQuery('SettingProfile', SettingProfile);
+
+  const SetName = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: 'user',
+        method: 'PUT',
+        accessToken: accessToken!,
+        body: {
+          USER_NM: userName,
+        },
+      });
+      return response;
+    } catch (err) {
+      console.log('error', err);
+      throw err;
+    }
+  };
+
+  const {mutate: setName, isLoading: loadingName} = useMutation(SetName, {
+    onSuccess: () => {
+      // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
+      queryClient.invalidateQueries('SettingProfile');
+      queryClient.invalidateQueries('ChallengeUserList');
+      queryClient.invalidateQueries('userData');
+      navigation.goBack();
+      Toast.show({
+        type: 'success',
+        text1: '이름을 변경했어요',
+      });
+    },
+    onError: () => {},
+  });
 
   if (isLoading) {
     return <LoadingIndicatior />;
@@ -164,21 +198,29 @@ const ProfileSettingScreen = () => {
       <ScrollContainer>
         <InnerContainer gap={24}>
           <NotoSansKR size={20}>프로필 수정</NotoSansKR>
-          {/* <View style={{gap: 8}}>
+          <View style={{gap: 8}}>
             <NotoSansKR size={18} weight="Medium">
               닉네임 변경
             </NotoSansKR>
             <RowContainer>
-              <TextContainer
+              <InputNotoSansKR
+                style={{flex: 1}}
+                maxLength={12}
+                size={14}
                 placeholder={data.USER_NM}
                 value={userName}
                 onChangeText={setUserName}
+                border
               />
-              <PencilIcon>
+              <PencilIcon
+                disabled={loadingName}
+                onPress={() => {
+                  setName();
+                }}>
                 <OcticonIcons name="pencil" size={20} color={'black'} />
               </PencilIcon>
             </RowContainer>
-          </View> */}
+          </View>
           <View style={{gap: 16, flex: 1}}>
             <NotoSansKR size={18} weight="Medium">
               캐릭터/펫 변경

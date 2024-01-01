@@ -13,7 +13,6 @@ import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import {useModal} from './Modal/ModalProvider';
 import LinearGradient from 'react-native-linear-gradient';
 
 interface FontType {
@@ -46,7 +45,7 @@ export const InputNotoSansKR = styled.TextInput.attrs(({theme}) => ({
       android: `${size * 1.7}px`,
     })};
   font-size: ${({size}) => `${size}px`};
-  padding: 0;
+  padding: ${({border}) => (border ? '8px' : 0)};
   margin: 0;
   border-bottom-width: ${({border}) => (border ? '1px' : 0)};
 `;
@@ -225,7 +224,6 @@ interface Config {
 
 export const useApi = () => {
   const navigation = useNavigation();
-  const {hideModal} = useModal();
 
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     let baseUrl = 'https://dorun.site';
@@ -255,6 +253,11 @@ export const useApi = () => {
 
       if (response.status !== 200) {
         if (response.data?.detail === '토큰이 만료되었습니다.') {
+          Toast.show({
+            type: 'error',
+            text1: '토큰이 만료되었습니다.',
+          });
+
           navigation.navigate('LoginTab' as never);
         }
 
@@ -269,21 +272,21 @@ export const useApi = () => {
     } catch (error) {
       // 오류 로깅 개선
       if (axios.isAxiosError(error)) {
-        console.error('Axios Error:', error.response?.data || error.message);
+        console.error(
+          'Axios Error:',
+          error.response?.data?.detail || error.message,
+        );
+        Toast.show({
+          type: 'error',
+          text1: error.response?.data?.detail || error.message,
+        });
       } else {
-        console.error('Non-Axios error:', error);
-      }
-
-      if (navigation.canGoBack()) {
         Toast.show({
           type: 'error',
           text1: '올바르지 않은 접근입니다',
-          text2: axios.isAxiosError(error)
-            ? error.response?.data || error.message
-            : error,
         });
-        hideModal();
-        navigation.goBack();
+
+        console.error('Non-Axios error:', error);
       }
 
       throw error;

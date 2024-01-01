@@ -2,12 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {goalType} from '../slice/GoalSlice';
 import {Middleware} from 'redux';
 import {RootState} from '../RootReducer';
+import {SignType} from '../data';
 
 export interface userDataType {
   UID: number | null;
   accessToken: string | null;
   refreshToken: string | null;
   userName: string | null;
+  SIGN_TYPE: SignType | null;
+  USER_EMAIL: string | null;
 }
 
 export interface challengeDataType {

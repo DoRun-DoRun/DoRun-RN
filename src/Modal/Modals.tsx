@@ -83,7 +83,7 @@ const ShareModalComponent = ({
                 <NotoSansKR size={16} weight="Medium">
                   {user.progress > 80
                     ? `${user.progress + 20}점으로 완주 했어요!`
-                    : '99점으로 열심히 달리고 있어요!'}
+                    : '99점! 다음에는 더 열심히 :)'}
                 </NotoSansKR>
               </RowContainer>
             );
@@ -221,8 +221,8 @@ export const DailyModal = ({
       <ModalHeadBorder />
       {item_type === 'Nothing' ? (
         <NotoSansKR size={18} textAlign="center">
-          오늘도 수고했어요.{'\n'}
-          내일도 화이팅!
+          수고했어요.{'\n'}
+          앞으로도 화이팅!
         </NotoSansKR>
       ) : (
         <>
@@ -234,7 +234,7 @@ export const DailyModal = ({
             />
           </View>
           <NotoSansKR size={18} textAlign="center">
-            오늘도 수고했어요.{'\n'}
+            축하드려요{'\n'}
             보상으로 [{defaultData[item_type][item_no - 1].NAME}]을 받았어요!
           </NotoSansKR>
         </>

@@ -8,6 +8,8 @@ const initialState: userDataType = {
   accessToken: null,
   refreshToken: null,
   UID: null,
+  SIGN_TYPE: null,
+  USER_EMAIL: null,
 };
 
 /**
