@@ -43,6 +43,8 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {AdditionalGoalModal} from '../Modal/AdditionalGoalModal';
 import {
   AlertItemModal,
+  ChallengeLogType,
+  DailyModal,
   ImageZoomModal,
   ItemLogType,
   ShareModal,
@@ -468,7 +470,9 @@ const ChallengeTab = () => {
     }
   }, [modalQueue, removeModalFromQueue, showModal]);
 
-  const [challengeModalQueue, setChallengeModalQueue] = useState([]);
+  const [challengeModalQueue, setChallengeModalQueue] = useState<
+    ChallengeLogType[]
+  >([]);
 
   const ChallengeLog = async () => {
     try {
@@ -489,22 +493,29 @@ const ChallengeTab = () => {
   const {refetch: refetchChallengeLog, isFetching: isFetchingChallengeLog} =
     useQuery('ChallengeLog', ChallengeLog);
 
-  // const updateChallengeLog = () =>
-  //   CallApi({
-  //     endpoint: `challenge/log/${completeModalQueue[0].ITEM_LOG_NO}`,
-  //     method: 'PUT',
-  //     accessToken: accessToken!,
-  //   });
+  const updateChallengeLog = () =>
+    CallApi({
+      endpoint: `challenge/log/${challengeModalQueue[0].CHALLENGE_USER_NO}`,
+      method: 'PUT',
+      accessToken: accessToken!,
+    });
 
-  // const {mutate} = useMutation(updateChallengeLog, {
-  //   onSuccess: () => {},
-  //   onError: error => {
-  //     console.error('Error:', error);
-  //   },
-  // });
+  const {mutate: mutateUpdateChallengeLog} = useMutation(updateChallengeLog, {
+    onSuccess: response => {
+      showModal(
+        <DailyModal
+          item_no={response.AVATAR_NO}
+          item_type={response.AVATAR_TYPE}
+        />,
+        removeChallengeModalFromQueue,
+      );
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
 
   const removeChallengeModalFromQueue = useCallback(() => {
-    // mutate();
     setChallengeModalQueue(prevQueue => {
       const [, ...remainingQueue] = prevQueue;
       return remainingQueue;
@@ -513,12 +524,11 @@ const ChallengeTab = () => {
 
   useEffect(() => {
     if (challengeModalQueue.length > 0) {
-      showModal(
-        <ShareModal response={challengeModalQueue[0]} />,
-        removeChallengeModalFromQueue,
+      showModal(<ShareModal response={challengeModalQueue[0]} />, () =>
+        mutateUpdateChallengeLog(),
       );
     }
-  }, [challengeModalQueue, removeChallengeModalFromQueue, showModal]);
+  }, [challengeModalQueue, mutateUpdateChallengeLog, showModal]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);

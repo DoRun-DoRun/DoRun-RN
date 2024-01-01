@@ -27,6 +27,7 @@ interface ParticipantsType {
 export interface ChallengeLogType {
   CHALLENGE_MST_NM: string;
   CHALLENGE_MST_NO: number;
+  CHALLENGE_USER_NO: number;
   START_DT: string;
   END_DT: string;
   participants: ParticipantsType[];
@@ -94,7 +95,7 @@ const ShareModalComponent = ({
         <Image
           source={groupImage[randomIndex]}
           resizeMode="cover"
-          style={{width: '90%', height: 135}}
+          style={{width: '90%', height: 150}}
         />
         <View style={{alignItems: 'center'}}>
           <NotoSansKR size={16}>{randomText.text}</NotoSansKR>
