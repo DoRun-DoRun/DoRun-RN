@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
   Platform,
@@ -27,7 +27,7 @@ import {ScrollView} from 'react-native';
 import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery} from 'react-query';
 import {ChallengeStatusType} from '../../store/data';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
@@ -41,7 +41,7 @@ import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {AdditionalGoalModal} from '../Modal/AdditionalGoalModal';
-import {ImageZoomModal} from '../Modal/Modals';
+import {AlertItemModal, ImageZoomModal, ItemLogType} from '../Modal/Modals';
 
 const Profile = styled.View`
   width: 40px;
@@ -406,6 +406,62 @@ const ChallengeTab = () => {
 
   const [refreshing, setRefreshing] = useState(false);
 
+  const [modalQueue, setModalQueue] = useState<ItemLogType[]>([]);
+
+  const ItemLog = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: `item/log/${selectedChallengeMstNo}`,
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      setModalQueue(response);
+
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  const {refetch: refetchItemLog, isFetching: isFetchingItemLog} = useQuery(
+    ['ItemLog', selectedChallengeMstNo],
+    ItemLog,
+    {
+      enabled: !!selectedChallengeMstNo,
+    },
+  );
+  const updateItemLog = () =>
+    CallApi({
+      endpoint: `item/log/${modalQueue[0].ITEM_LOG_NO}`,
+      method: 'PUT',
+      accessToken: accessToken!,
+    });
+
+  const {mutate} = useMutation(updateItemLog, {
+    onSuccess: () => {},
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
+  const removeModalFromQueue = useCallback(() => {
+    mutate();
+    setModalQueue(prevQueue => {
+      const [, ...remainingQueue] = prevQueue;
+      return remainingQueue;
+    });
+  }, [mutate]);
+
+  useEffect(() => {
+    if (modalQueue.length > 0) {
+      showModal(
+        <AlertItemModal response={modalQueue[0]} />,
+        removeModalFromQueue,
+      );
+    }
+  }, [modalQueue, removeModalFromQueue, showModal]);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     if (!selectedChallengeMstNo) {
@@ -413,11 +469,11 @@ const ChallengeTab = () => {
         setRefreshing(false);
       });
     } else {
-      Promise.all([refetch(), refetchDetail()]).then(() => {
+      Promise.all([refetch(), refetchDetail(), refetchItemLog()]).then(() => {
         setRefreshing(false);
       });
     }
-  }, [refetch, refetchDetail, selectedChallengeMstNo]);
+  }, [refetch, refetchDetail, refetchItemLog, selectedChallengeMstNo]);
 
   if (listLoading || detailLoading) {
     return <LoadingIndicatior />;
@@ -429,7 +485,9 @@ const ChallengeTab = () => {
         contentContainerStyle={{flexGrow: 1}}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing || isFetching || isFetchingDetail}
+            refreshing={
+              refreshing || isFetching || isFetchingDetail || isFetchingItemLog
+            }
             onRefresh={onRefresh}
           />
         }>

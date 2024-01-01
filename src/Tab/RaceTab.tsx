@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   PanResponder,
@@ -22,7 +22,7 @@ import OcticonIcons from 'react-native-vector-icons/Octicons';
 import styled from 'styled-components/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {useMutation, useQuery} from 'react-query';
+import {useQuery} from 'react-query';
 import {useModal} from '../Modal/ModalProvider';
 import {CharacterModal} from '../Modal/CharacterModal';
 import LottieView from 'lottie-react-native';
@@ -35,7 +35,6 @@ import {
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
 import {NavigationType} from '../App';
-import {AlertItemModal, ItemLogType} from '../Modal/Modals';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -78,12 +77,11 @@ export interface ChallengeUserType {
 
 const RaceTab = () => {
   const [scrollEnabled, setScrollEnabled] = useState(true);
-  const [modalQueue, setModalQueue] = useState<ItemLogType[]>([]);
+
   const CallApi = useApi();
   const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const [index, setIndex] = useState(1);
-  const {showModal} = useModal();
 
   const navigation = useNavigation();
 
@@ -146,69 +144,12 @@ const RaceTab = () => {
     }
   }, [challengeListData, dispatch, index, navigation]);
 
-  const ItemLog = async () => {
-    try {
-      const response = await CallApi({
-        endpoint: `item/log/${challengeListData.CHALLENGE_MST_NO}`,
-        method: 'GET',
-        accessToken: accessToken!,
-      });
-      setModalQueue(response);
-
-      return response;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  };
-
-  const {
-    // data: itemLog,
-    // isLoading: loadingItemLog,
-    refetch: refetchItemLog,
-    isFetching: isFetchingItemLog,
-  } = useQuery(['ItemLog', challengeListData], ItemLog, {
-    enabled: !!challengeListData,
-  });
-  const updateItemLog = () =>
-    CallApi({
-      endpoint: `item/log/${modalQueue[0].ITEM_LOG_NO}`,
-      method: 'PUT',
-      accessToken: accessToken!,
-    });
-
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    Promise.all([refetch(), refetchItemLog()]).then(() => {
+    refetch().then(() => {
       setRefreshing(false);
     });
-  }, [refetch, refetchItemLog]);
-
-  const {mutate} = useMutation(updateItemLog, {
-    onSuccess: () => {},
-    onError: error => {
-      console.error('Error:', error);
-    },
-  });
-
-  const removeModalFromQueue = useCallback(() => {
-    mutate();
-    setModalQueue(prevQueue => {
-      const [, ...remainingQueue] = prevQueue;
-      return remainingQueue;
-    });
-  }, [mutate]);
-
-  useEffect(() => {
-    if (modalQueue.length > 0) {
-      showModal(
-        <AlertItemModal response={modalQueue[0]} />,
-        removeModalFromQueue,
-        false,
-      );
-    }
-  }, [modalQueue, removeModalFromQueue, showModal]);
-
+  }, [refetch]);
   if (isLoading) {
     return <LoadingIndicatior />;
   }
@@ -218,7 +159,7 @@ const RaceTab = () => {
         <ScrollContainer
           refreshControl={
             <RefreshControl
-              refreshing={refreshing || isFetching || isFetchingItemLog}
+              refreshing={refreshing || isFetching}
               onRefresh={onRefresh}
             />
           }
