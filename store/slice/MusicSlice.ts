@@ -19,7 +19,6 @@ export const musicSlice = createSlice({
       sound.play();
     },
     stopMusic: () => {
-      console.log('stopSound', sound);
       sound.stop();
     },
     setVolume: (state, action) => {

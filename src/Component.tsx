@@ -1,10 +1,8 @@
 import React, {useEffect, useRef} from 'react';
 import styled, {useTheme} from 'styled-components/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 import {
-  Pressable,
   Platform,
   Modal,
   useWindowDimensions,
@@ -327,7 +325,13 @@ const ViewImageStyles = styled.Image<{height: any}>`
   width: ${props => props.height};
 `;
 
-export const ContentSave = ({children}: {children: React.ReactNode}) => {
+export const ContentSave = ({
+  children,
+  file_name,
+}: {
+  children: React.ReactElement;
+  file_name: string;
+}) => {
   const ref = useRef<ViewShot | null>(null);
 
   useEffect(() => {
@@ -361,23 +365,29 @@ export const ContentSave = ({children}: {children: React.ReactNode}) => {
       console.error('Error sharing:', error);
     }
   };
+  const childrenWithProps = React.cloneElement(children, {onShare});
 
   return (
     <>
-      <Pressable
+      {/* <Pressable
         // 클릭하면 viewRef를 이미지 파일로 변환해서 저장해 줌
         onPress={onShare}
         style={{padding: 10}}>
         <Icon name="share" size={18} color={'#000'} />
-      </Pressable>
+      </Pressable> */}
       <ViewShot
         ref={ref}
-        options={{fileName: 'myContext', format: 'jpg', quality: 0.9}}>
-        {children}
+        options={{
+          fileName: file_name,
+          format: 'jpg',
+          quality: 0.9,
+        }}>
+        {childrenWithProps}
       </ViewShot>
     </>
   );
 };
+
 export const GetImage = (fileName: string) => {
   return `https://do-run.s3.amazonaws.com/${fileName}`;
 };
@@ -396,6 +406,20 @@ export function convertKoKRToUTC(dateString: string) {
 
   return utcDate;
 }
+
+export const isWithin24Hours = (end_dt: string) => {
+  const now = new Date(); // 현재 시간 (UTC 기준)
+  const endDate = new Date(end_dt); // 종료 시간을 Date 객체로 변환
+
+  // 24시간을 밀리초로 변환 (24시간 * 60분 * 60초 * 1000밀리초)
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+
+  // 종료 시간과 현재 시간의 차이를 밀리초로 계산
+  const differenceInMs = endDate.getTime() - now.getTime();
+
+  // 차이가 24시간보다 작거나 같으면 true, 그렇지 않으면 false 반환
+  return differenceInMs <= twentyFourHoursInMs;
+};
 
 export function convertUTCToKoKRDay(dateString: string) {
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];

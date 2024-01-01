@@ -4,6 +4,7 @@ import {
   LoadingIndicatior,
   NotoSansKR,
   RowContainer,
+  isWithin24Hours,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
@@ -16,6 +17,7 @@ import {RootState} from '../../store/RootReducer';
 import {UserStatusType, profileImage} from '../../store/data';
 import {useModal} from './ModalProvider';
 import {UsedItemModal} from './Modals';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const ButtonContainer = styled.TouchableOpacity<{
   color: string;
@@ -83,6 +85,7 @@ export const CharacterModal = ({
         method: 'GET',
         accessToken: accessToken!,
       });
+
       return response;
     } catch (err) {
       console.log(err);
@@ -93,7 +96,6 @@ export const CharacterModal = ({
 
   const {mutate} = useMutation(useItem, {
     onSuccess: response => {
-      console.log(response);
       queryClient.invalidateQueries('getChallenge');
       queryClient.invalidateQueries('getChallengeDetail');
       queryClient.invalidateQueries('ChallengeUserList');
@@ -178,7 +180,12 @@ export const CharacterModal = ({
                 color={user.IS_ME ? 'primary1' : 'secondary1'}
                 disabled={user.ITEM[0].COUNT === 0}
                 onPress={() => {
-                  mutate({item_no: 1});
+                  isWithin24Hours(user.END_DT)
+                    ? Toast.show({
+                        type: 'error',
+                        text1: '종료 24시간 전에는 아이템을 사용할 수 없습니다',
+                      })
+                    : mutate({item_no: 1});
                 }}>
                 <RowContainer gap={4}>
                   <MaterialCommunityIcons
@@ -198,7 +205,12 @@ export const CharacterModal = ({
                 color={user.IS_ME ? 'primary1' : 'secondary1'}
                 disabled={user.ITEM[1].COUNT === 0}
                 onPress={() => {
-                  mutate({item_no: 2});
+                  isWithin24Hours(user.END_DT)
+                    ? Toast.show({
+                        type: 'error',
+                        text1: '종료 24시간 전에는 아이템을 사용할 수 없습니다',
+                      })
+                    : mutate({item_no: 2});
                 }}>
                 <RowContainer gap={4}>
                   <MaterialCommunityIcons

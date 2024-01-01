@@ -1,31 +1,122 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dimensions, Image, View} from 'react-native';
-import {ButtonComponent, GetImage, NotoSansKR, timeSince} from '../Component';
-import styled from 'styled-components';
-import {ModalHeadBorder} from './CustomModal';
+import {
+  ButtonComponent,
+  ContentSave,
+  GetImage,
+  NotoSansKR,
+  RowContainer,
+  convertUTCToKoKRDay,
+  timeSince,
+} from '../Component';
+import {ModalHeadBorder, ModalHeadText} from './CustomModal';
 import LottieView from 'lottie-react-native';
-import {ItemName, defaultData, usedItemImage} from '../../store/data';
+import {
+  ItemName,
+  completeText,
+  defaultData,
+  groupImage,
+  usedItemImage,
+} from '../../store/data';
 import FastImage from 'react-native-fast-image';
 
-export const ShareModal = () => {
-  return (
-    <View style={{gap: 24}}>
-      <ModalHeadBorder />
-      <View style={{gap: 24}}>
-        <NotoSansKR size={18} weight="Bold" textAlign="center">
-          우리가 해냈어요!{'\n'}
-          두런두런이 여러분의 앞길을 응원할게요!
-        </NotoSansKR>
-        <ImageContainer>
-          <ImageDummy />
-        </ImageContainer>
+interface ParticipantsType {
+  USER_NM: string;
+  progress: number;
+}
+export interface ChallengeLogType {
+  CHALLENGE_MST_NM: string;
+  CHALLENGE_MST_NO: number;
+  START_DT: string;
+  END_DT: string;
+  participants: ParticipantsType[];
+}
 
-        <View style={{gap: 8}}>
-          <ButtonComponent>친구한테 자랑하기</ButtonComponent>
-          <ButtonComponent type="secondary">이미지 저장하기</ButtonComponent>
+const ShareModalComponent = ({
+  onShare,
+  response,
+}: {
+  onShare?: any;
+  response: ChallengeLogType;
+}) => {
+  const [randomIndex, setRandomIndex] = useState(0);
+  const [randomText, setRandomText] = useState({text: '', person: ''});
+
+  useEffect(() => {
+    // 0부터 2까지의 랜덤한 정수 생성
+    const index = Math.floor(Math.random() * 2);
+    const textIndex = Math.floor(Math.random() * completeText.length);
+    setRandomIndex(index);
+    const selectedText = completeText[textIndex];
+    const splitText = selectedText.split('-');
+    const textBeforeDash = splitText[0].trim();
+    const textAfterDash = splitText[1].trim();
+    setRandomText({text: textBeforeDash, person: textAfterDash});
+  }, []);
+  return (
+    <View style={{gap: 24, backgroundColor: 'white'}}>
+      <ModalHeadText>
+        <NotoSansKR size={18}>
+          [{response.CHALLENGE_MST_NM}] 챌린지 완료!
+        </NotoSansKR>
+      </ModalHeadText>
+
+      <View style={{gap: 8}}>
+        <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
+        <NotoSansKR size={16} weight="Medium">
+          {`${convertUTCToKoKRDay(response.START_DT)} ~ ${convertUTCToKoKRDay(
+            response.END_DT,
+          )}`}
+        </NotoSansKR>
+      </View>
+
+      <View style={{gap: 8}}>
+        <NotoSansKR size={18}>함께 완주한 친구들</NotoSansKR>
+        <View style={{gap: 4}}>
+          {response.participants.map((user: ParticipantsType, key) => {
+            return (
+              <RowContainer seperate key={key}>
+                <NotoSansKR size={16} weight="Medium">
+                  {user.USER_NM}
+                </NotoSansKR>
+                <NotoSansKR size={16} weight="Medium">
+                  {user.progress > 80
+                    ? `${user.progress + 20}점으로 완주 했어요!`
+                    : '99점으로 열심히 달리고 있어요!'}
+                </NotoSansKR>
+              </RowContainer>
+            );
+          })}
         </View>
       </View>
+
+      <View style={{alignItems: 'center', marginTop: -10}}>
+        <Image
+          source={groupImage[randomIndex]}
+          resizeMode="cover"
+          style={{width: '90%', height: 135}}
+        />
+        <View style={{alignItems: 'center'}}>
+          <NotoSansKR size={16}>{randomText.text}</NotoSansKR>
+          <NotoSansKR size={16}>{randomText.person}</NotoSansKR>
+        </View>
+      </View>
+
+      <View>
+        <ButtonComponent onPress={onShare}>친구한테 자랑하기</ButtonComponent>
+        {/* <ButtonComponent type="secondary" onPress={onShare}>
+            이미지 저장하기
+          </ButtonComponent> */}
+      </View>
     </View>
+  );
+};
+
+export const ShareModal = ({response}: {response: ChallengeLogType}) => {
+  return (
+    <ContentSave file_name={`dorun_${response.CHALLENGE_MST_NO}`}>
+      <ShareModalComponent response={response} />
+    </ContentSave>
   );
 };
 
@@ -72,7 +163,7 @@ export const AlertItemModal = ({response}: {response: ItemLogType}) => {
         )}
       </View>
 
-      <NotoSansKR size={18} weight="Bold" textAlign="center">
+      <NotoSansKR size={18} textAlign="center">
         이런! [{response?.send_USER_NM}]님이{'\n'}
         {timeSince(response?.INSERT_DT)}에 [{ItemName[response?.ITEM_NO - 1]}
         ]을 사용했어요!
@@ -107,7 +198,7 @@ export const UsedItemModal = ({
           />
         )}
       </View>
-      <NotoSansKR size={18} weight="Bold" textAlign="center">
+      <NotoSansKR size={18} textAlign="center">
         [{user_name}]님에게{'\n'}
         {item_no === 1 ? '[폭탄]을' : '[망치]를'}
         사용했어요!
@@ -128,7 +219,7 @@ export const DailyModal = ({
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
       {item_type === 'Nothing' ? (
-        <NotoSansKR size={18} weight="Bold" textAlign="center">
+        <NotoSansKR size={18} textAlign="center">
           오늘도 수고했어요.{'\n'}
           내일도 화이팅!
         </NotoSansKR>
@@ -141,7 +232,7 @@ export const DailyModal = ({
               style={{flex: 1}}
             />
           </View>
-          <NotoSansKR size={18} weight="Bold" textAlign="center">
+          <NotoSansKR size={18} textAlign="center">
             오늘도 수고했어요.{'\n'}
             보상으로 [{defaultData[item_type][item_no - 1].NAME}]을 받았어요!
           </NotoSansKR>
@@ -150,19 +241,3 @@ export const DailyModal = ({
     </View>
   );
 };
-
-const ImageDummy = styled(View)`
-  width: 248px;
-  height: 264px;
-  background: ${props => props.theme.gray6};
-  /* shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84;
-  elevation: 3; */
-`;
-
-const ImageContainer = styled(View)`
-  justify-content: center;
-  align-items: center;
-`;

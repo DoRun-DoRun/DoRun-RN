@@ -41,7 +41,12 @@ import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {AdditionalGoalModal} from '../Modal/AdditionalGoalModal';
-import {AlertItemModal, ImageZoomModal, ItemLogType} from '../Modal/Modals';
+import {
+  AlertItemModal,
+  ImageZoomModal,
+  ItemLogType,
+  ShareModal,
+} from '../Modal/Modals';
 
 const Profile = styled.View`
   width: 40px;
@@ -431,6 +436,7 @@ const ChallengeTab = () => {
       enabled: !!selectedChallengeMstNo,
     },
   );
+
   const updateItemLog = () =>
     CallApi({
       endpoint: `item/log/${modalQueue[0].ITEM_LOG_NO}`,
@@ -462,18 +468,81 @@ const ChallengeTab = () => {
     }
   }, [modalQueue, removeModalFromQueue, showModal]);
 
+  const [challengeModalQueue, setChallengeModalQueue] = useState([]);
+
+  const ChallengeLog = async () => {
+    try {
+      const response = await CallApi({
+        endpoint: 'challenge/log',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      setChallengeModalQueue(response);
+
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  const {refetch: refetchChallengeLog, isFetching: isFetchingChallengeLog} =
+    useQuery('ChallengeLog', ChallengeLog);
+
+  // const updateChallengeLog = () =>
+  //   CallApi({
+  //     endpoint: `challenge/log/${completeModalQueue[0].ITEM_LOG_NO}`,
+  //     method: 'PUT',
+  //     accessToken: accessToken!,
+  //   });
+
+  // const {mutate} = useMutation(updateChallengeLog, {
+  //   onSuccess: () => {},
+  //   onError: error => {
+  //     console.error('Error:', error);
+  //   },
+  // });
+
+  const removeChallengeModalFromQueue = useCallback(() => {
+    // mutate();
+    setChallengeModalQueue(prevQueue => {
+      const [, ...remainingQueue] = prevQueue;
+      return remainingQueue;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (challengeModalQueue.length > 0) {
+      showModal(
+        <ShareModal response={challengeModalQueue[0]} />,
+        removeChallengeModalFromQueue,
+      );
+    }
+  }, [challengeModalQueue, removeChallengeModalFromQueue, showModal]);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     if (!selectedChallengeMstNo) {
-      refetch().then(() => {
+      Promise.all([refetch(), refetchChallengeLog()]).then(() => {
         setRefreshing(false);
       });
     } else {
-      Promise.all([refetch(), refetchDetail(), refetchItemLog()]).then(() => {
+      Promise.all([
+        refetch(),
+        refetchDetail(),
+        refetchItemLog(),
+        refetchChallengeLog(),
+      ]).then(() => {
         setRefreshing(false);
       });
     }
-  }, [refetch, refetchDetail, refetchItemLog, selectedChallengeMstNo]);
+  }, [
+    refetch,
+    refetchChallengeLog,
+    refetchDetail,
+    refetchItemLog,
+    selectedChallengeMstNo,
+  ]);
 
   if (listLoading || detailLoading) {
     return <LoadingIndicatior />;
@@ -486,7 +555,11 @@ const ChallengeTab = () => {
         refreshControl={
           <RefreshControl
             refreshing={
-              refreshing || isFetching || isFetchingDetail || isFetchingItemLog
+              refreshing ||
+              isFetching ||
+              isFetchingDetail ||
+              isFetchingItemLog ||
+              isFetchingChallengeLog
             }
             onRefresh={onRefresh}
           />
@@ -578,6 +651,12 @@ const ChallengeTab = () => {
             {listData.progress_challenges?.map((challenge: ChallengeInfo) => (
               <Pressable
                 key={challenge.CHALLENGE_MST_NO}
+                onLongPress={() => {
+                  dispatch(
+                    setSelectedChallengeMstNo(challenge.CHALLENGE_MST_NO),
+                  );
+                  navigation.navigate('EditChallengeScreen' as never);
+                }}
                 onPress={() => {
                   dispatch(
                     setSelectedChallengeMstNo(challenge.CHALLENGE_MST_NO),
