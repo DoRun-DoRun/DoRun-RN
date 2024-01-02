@@ -6,6 +6,7 @@ import {
   PanResponder,
   Platform,
   Dimensions,
+  KeyboardAvoidingView,
 } from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
@@ -135,15 +136,20 @@ const CustomModal = () => {
   return (
     <Modal transparent={true} visible={isVisible} style={{zIndex: 10}}>
       <OverlayContainer hideBackground={!showOverlay}>
-        <StyledModalContainer style={{marginBottom: !showOverlay ? 48 : 0}}>
-          <StyledModalContent
-            style={{
-              transform: [{translateY: panY}],
-            }}
-            {...panResponders.panHandlers}>
-            {content}
-          </StyledModalContent>
-        </StyledModalContainer>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}>
+          <StyledModalContainer style={{marginBottom: !showOverlay ? 48 : 0}}>
+            <StyledModalContent
+              style={{
+                transform: [{translateY: panY}],
+              }}
+              {...panResponders.panHandlers}>
+              {content}
+            </StyledModalContent>
+          </StyledModalContainer>
+        </KeyboardAvoidingView>
       </OverlayContainer>
     </Modal>
   );
