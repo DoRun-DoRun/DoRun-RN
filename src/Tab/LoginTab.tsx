@@ -21,7 +21,7 @@ import {useNavigation} from '@react-navigation/native';
 // import {v4 as uuid} from 'uuid';
 import {SignType} from '../../store/data';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
-import {playMusic, stopMusic} from '../../store/slice/MusicSlice';
+import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
 
 // const signInWithApple = async () => {
 //   // performs login request
@@ -168,6 +168,8 @@ const LoginTab = () => {
         accessToken: response.access_token,
         refreshToken: response.refresh_token,
         userName: response.USER_NM,
+        SIGN_TYPE: SignType.GUEST,
+        USER_EMAIL: '',
       };
 
       dispatch(setUser(userData));
@@ -179,18 +181,18 @@ const LoginTab = () => {
     },
   });
 
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      const userData = await loadUser();
-      if (userData?.refreshToken) {
-        dispatch(setUser(userData));
-        loginMutation.mutate(userData.refreshToken);
-      }
-    };
+  // useEffect(() => {
+  //   const bootstrapAsync = async () => {
+  //     const userData = await loadUser();
+  //     if (userData?.refreshToken) {
+  //       dispatch(setUser(userData));
+  //       loginMutation.mutate(userData.refreshToken);
+  //     }
+  //   };
 
-    bootstrapAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, navigation]);
+  //   bootstrapAsync();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dispatch, navigation]);
 
   return (
     <View style={{flex: 1}}>
@@ -231,7 +233,7 @@ const LoginTab = () => {
               return;
             } else {
               const userData = await loadUser();
-              await dispatch(setSelectedChallengeMstNo(null));
+              dispatch(setSelectedChallengeMstNo(null));
 
               if (userData?.refreshToken) {
                 dispatch(setUser(userData));

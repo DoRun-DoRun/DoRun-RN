@@ -1,7 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {goalType} from '../slice/GoalSlice';
-import {Middleware} from 'redux';
-import {RootState} from '../RootReducer';
 import {SignType} from '../data';
 
 export interface userDataType {
@@ -18,27 +15,51 @@ export interface challengeDataType {
   personalGoals: goalType[];
 }
 
-export interface settingDataType {
-  backgroundMusic: number;
+export interface goalType {
+  id: number;
+  title: string;
+  isComplete: boolean;
 }
 
-// export const persistSetting = async (data: settingDataType) => {
-//   try {
-//     const jsonValue = JSON.stringify(data);
-//     await AsyncStorage.setItem('setting', jsonValue);
-//   } catch (e) {
-//     // saving error
-//   }
-// };
+export interface settingDataType {
+  volume: number;
+}
 
-// export const loadSetting = async () => {
-//   try {
-//     const jsonValue = await AsyncStorage.getItem('setting');
-//     return jsonValue != null ? JSON.parse(jsonValue) : null;
-//   } catch (e) {
-//     // error reading value
-//   }
-// };
+export const persistSetting = async (data: settingDataType) => {
+  try {
+    const jsonValue = JSON.stringify(data);
+    await AsyncStorage.setItem('setting', jsonValue);
+  } catch (e) {
+    // saving error
+  }
+};
+
+export const loadSetting = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('setting');
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    // error reading value
+  }
+};
+
+export const persistGoals = async (data: challengeDataType[]) => {
+  try {
+    const jsonValue = JSON.stringify(data);
+    await AsyncStorage.setItem('goals', jsonValue);
+  } catch (e) {
+    // saving error
+  }
+};
+
+export const loadGoals = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('goals');
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    // error reading value
+  }
+};
 
 export const persistUser = async (data: userDataType) => {
   try {
@@ -58,10 +79,10 @@ export const loadUser = async () => {
   }
 };
 
-export const asyncStorageMiddleware: Middleware<{}, RootState> =
-  store => next => action => {
-    const result = next(action);
-    const newState = store.getState();
-    AsyncStorage.setItem('goals', JSON.stringify(newState.goal));
-    return result;
-  };
+// export const asyncStorageMiddleware: Middleware<{}, RootState> =
+//   store => next => action => {
+//     const result = next(action);
+//     const newState = store.getState();
+//     AsyncStorage.setItem('goals', JSON.stringify(newState.goal));
+//     return result;
+//   };

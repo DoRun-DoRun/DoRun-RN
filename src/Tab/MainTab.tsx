@@ -13,7 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {playMusic, stopMusic} from '../../store/slice/MusicSlice';
+import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
 
 const Tab = createBottomTabNavigator();
 

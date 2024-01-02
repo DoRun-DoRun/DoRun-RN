@@ -21,12 +21,6 @@ import {Avatar, avatarImage} from '../../store/data';
 import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
-const TextContainer = styled.TextInput`
-  flex: 1;
-  padding: 6px 8px;
-  border-bottom-width: 1px;
-`;
-
 const SelectedContainer = styled.View`
   flex: 1;
   background-color: ${props => props.theme.primary2};

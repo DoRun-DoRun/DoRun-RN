@@ -1,12 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit';
 import RootReducer from './RootReducer';
 // import logger from 'redux-logger';
-import {asyncStorageMiddleware} from './async/asyncStore';
+// import {asyncStorageMiddleware} from './async/asyncStore';
 
 export const Store = configureStore({
   reducer: RootReducer,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware().concat(asyncStorageMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(),
 });
 
 export type RootState = ReturnType<typeof Store.getState>;

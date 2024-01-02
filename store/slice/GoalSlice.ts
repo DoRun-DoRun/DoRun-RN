@@ -1,16 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
-export interface goalType {
-  id: number;
-  title: string;
-  isComplete: boolean;
-}
+import {challengeDataType, persistGoals} from '../async/asyncStore';
 
-export interface ChallengeGoals {
-  challenge_no: number;
-  personalGoals: goalType[];
-}
-
-const initialState: ChallengeGoals[] = [];
+const initialState: challengeDataType[] = [];
 
 const goalsSlice = createSlice({
   name: 'goals',
@@ -29,6 +20,8 @@ const goalsSlice = createSlice({
       }
 
       challenge.personalGoals.push({...newGoal, id: Date.now()}); // ID 생성을 위해 Date.now() 사용
+      persistGoals(state);
+      console.log(state);
     },
 
     toggleGoal: (state, action) => {
@@ -42,6 +35,8 @@ const goalsSlice = createSlice({
           targetGoal.isComplete = !targetGoal.isComplete;
         }
       }
+      persistGoals(state);
+      console.log(state);
     },
     removeGoal: (state, action) => {
       const {challenge_no, goalId} = action.payload;
@@ -51,6 +46,8 @@ const goalsSlice = createSlice({
           goal => goal.id !== goalId,
         );
       }
+      persistGoals(state);
+      console.log(state);
     },
     updateGoalTitle: (state, action) => {
       const {challenge_no, goalId, newTitle} = action.payload;
@@ -63,13 +60,20 @@ const goalsSlice = createSlice({
           targetGoal.title = newTitle;
         }
       }
+      persistGoals(state);
+      console.log(state);
     },
-    restore: (state, action) => {
+    restoreGoal: (state, action) => {
       return action.payload;
     },
   },
 });
 
-export const {addPersonalGoal, toggleGoal, removeGoal, updateGoalTitle} =
-  goalsSlice.actions;
+export const {
+  addPersonalGoal,
+  toggleGoal,
+  removeGoal,
+  updateGoalTitle,
+  restoreGoal,
+} = goalsSlice.actions;
 export default goalsSlice.reducer;

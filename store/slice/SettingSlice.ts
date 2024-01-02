@@ -1,6 +1,7 @@
 // musicSlice.js
 import {createSlice} from '@reduxjs/toolkit';
 import Sound from 'react-native-sound';
+import {persistSetting} from '../async/asyncStore';
 
 const sound = new Sound('main_bgm.wav', Sound.MAIN_BUNDLE, error => {
   if (error) {
@@ -9,8 +10,8 @@ const sound = new Sound('main_bgm.wav', Sound.MAIN_BUNDLE, error => {
   }
 });
 
-export const musicSlice = createSlice({
-  name: 'music',
+export const settingSlice = createSlice({
+  name: 'setting',
   initialState: {volume: 1},
   reducers: {
     playMusic: state => {
@@ -27,10 +28,11 @@ export const musicSlice = createSlice({
         sound.setVolume(volume);
         state.volume = volume;
       }
+      persistSetting(state);
     },
   },
 });
 
-export const {playMusic, stopMusic, setVolume} = musicSlice.actions;
+export const {playMusic, stopMusic, setVolume} = settingSlice.actions;
 
-export default musicSlice.reducer;
+export default settingSlice.reducer;

@@ -15,14 +15,14 @@ import {useQuery} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
-import {setVolume} from '../../store/slice/MusicSlice';
+import {setVolume} from '../../store/slice/SettingSlice';
 
 const SettingScreen = () => {
   // const [pushAlarm, setPushAlarm] = useState(true);
   // const [marketingAlarm, setMarketingAlarm] = useState(true);
   // const [nightAlarm, setNightAlarm] = useState(true);
   // const [soundEffect, setSoundEffect] = useState(100);
-  const {volume} = useSelector((state: RootState) => state.music);
+  const {volume} = useSelector((state: RootState) => state.setting);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -65,7 +65,7 @@ const SettingScreen = () => {
         <View style={{gap: 36}}>
           <NotoSansKR size={20}>환경 설정</NotoSansKR>
 
-          {/* <ObjectList>
+          {/* <View style={{gap: 8}}>
             <ToggleComponent isOn={pushAlarm} onToggle={OnPushAlarmToggle}>
               푸시 알람
             </ToggleComponent>
@@ -77,7 +77,7 @@ const SettingScreen = () => {
             <ToggleComponent isOn={nightAlarm} onToggle={OnNightAlarmToggle}>
               23시 ~ 09시 푸시 알람
             </ToggleComponent>
-          </ObjectList>*/}
+          </View> */}
 
           <View style={{gap: 8}}>
             {/* <SliderComponent
@@ -91,6 +91,7 @@ const SettingScreen = () => {
               배경음악
             </SliderComponent>
           </View>
+
           <View style={{gap: 8}}>
             <RowContainer seperate>
               <NotoSansKR size={16} weight="Medium">
@@ -126,8 +127,8 @@ const SettingScreen = () => {
 };
 
 // const ToggleWheel = styled(Animated.View)`
-//   width: 25px;
-//   height: 25px;
+//   width: 20px;
+//   height: 20px;
 //   background-color: ${props => props.theme.white};
 //   border-radius: 12.5px;
 // `;
@@ -138,10 +139,9 @@ const SettingScreen = () => {
 // `;
 
 // const ToggleFrame = styled(View)`
-//   width: 50px;
-//   height: 30px;
-//   padding-left: 2px;
-//   border-radius: 15px;
+//   width: 48px;
+//   height: 23px;
+//   border-radius: 30px;
 //   justify-content: center;
 // `;
 
@@ -159,7 +159,7 @@ const SettingScreen = () => {
 
 //   const moveSwitchToggle = aniValue.interpolate({
 //     inputRange: [0, 1],
-//     outputRange: [0, 20],
+//     outputRange: [0, 25],
 //   });
 
 //   Animated.timing(aniValue, {
@@ -170,12 +170,12 @@ const SettingScreen = () => {
 //   }).start();
 
 //   return (
-//     <ObjectContainer>
+//     <RowContainer seperate>
 //       <NotoSansKR size={16} weight="Medium">
 //         {children}
 //       </NotoSansKR>
 //       <Wrap>
-//         <Pressable onPress={onToggle}>
+//         <Pressable onPress={onToggle} style={{marginVertical: 2.5}}>
 //           <ToggleFrame style={{backgroundColor: color}}>
 //             <ToggleWheel
 //               style={[{transform: [{translateX: moveSwitchToggle}]}]}
@@ -183,7 +183,7 @@ const SettingScreen = () => {
 //           </ToggleFrame>
 //         </Pressable>
 //       </Wrap>
-//     </ObjectContainer>
+//     </RowContainer>
 //   );
 // };
 

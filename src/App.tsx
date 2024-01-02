@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import CreateChallengeScreen from './screens/CreateChallengeScreen';
 import {MainTab} from './Tab/MainTab';
@@ -15,8 +15,13 @@ import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
 import {DailyNoteScreen} from './screens/DailyNoteScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Store} from '../store/Store';
+import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
+import {useDispatch} from 'react-redux';
+import {restoreGoal} from '../store/slice/GoalSlice';
+import {setAccessToken, setUser} from '../store/slice/UserSlice';
+import {useMutation} from 'react-query';
+import {useApi} from './Component';
+import {setVolume} from '../store/slice/SettingSlice';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -47,17 +52,50 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
   const navigation = useNavigation();
-  React.useEffect(() => {
-    const loadGoals = async () => {
-      const storedGoals = await AsyncStorage.getItem('goals');
-      if (storedGoals) {
-        const parsedGoals = JSON.parse(storedGoals);
-        Store.dispatch({type: 'goals/restore', payload: parsedGoals});
+  const dispatch = useDispatch();
+  const CallApi = useApi();
+
+  const loginGuest = (refreshToken: string) =>
+    CallApi({
+      endpoint: 'user/login',
+      method: 'GET',
+      accessToken: refreshToken,
+    });
+
+  const loginMutation = useMutation(loginGuest, {
+    onSuccess: async data => {
+      const {access_token} = data;
+
+      if (access_token) {
+        dispatch(setAccessToken({accessToken: access_token}));
+        navigation.navigate('MainTab' as never);
+      } else {
+        console.error('Access token is missing in the response');
+      }
+    },
+  });
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      const goalData = await loadGoals();
+      if (goalData) {
+        dispatch(restoreGoal(goalData));
+      }
+      const userData = await loadUser();
+      if (userData?.refreshToken) {
+        dispatch(setUser(userData));
+        loginMutation.mutate(userData.refreshToken);
+      }
+      const settingData = await loadSetting();
+      if (settingData) {
+        dispatch(setVolume(settingData));
       }
     };
 
-    loadGoals();
-  }, []);
+    bootstrapAsync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, navigation]);
+
   return (
     <Stack.Navigator
       screenOptions={{
