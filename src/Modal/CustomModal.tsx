@@ -100,10 +100,10 @@ const CustomModal = () => {
   const panResponders = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => gestureState.dy > 10,
       onPanResponderMove: (event, gestureState) => {
         // 오직 아래로 스와이프하는 경우에만 panY를 업데이트
-        if (gestureState.dy > 0) {
+        if (gestureState.dy > 20) {
           panY.setValue(gestureState.dy);
         }
       },

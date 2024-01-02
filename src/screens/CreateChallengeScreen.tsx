@@ -168,6 +168,7 @@ export const SearchBox = ({
       <RowContainer gap={8}>
         <OcticonIcons name="search" size={16} />
         <InputNotoSansKR
+          style={{flex: 1}}
           keyboardType="number-pad"
           maxLength={7}
           size={14}
