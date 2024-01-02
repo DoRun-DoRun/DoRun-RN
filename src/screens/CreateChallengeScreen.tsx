@@ -27,14 +27,13 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {Alert} from 'react-native';
 import {Direction} from 'react-native-calendars/src/types';
 
-const SearchContainer = styled.View<{isClicked: boolean}>`
-  flex: 1;
+const SearchContainer = styled.View`
   background-color: #fff;
   border: 1px solid ${props => props.theme.gray6};
   padding: 8px;
   border-radius: 10px;
   /* gap: 16px; */
-  z-index: 10;
+  /* z-index: 10; */
 `;
 
 const ExpandedContainer = styled.View`
@@ -48,7 +47,7 @@ export interface InviteFriendType {
   name: string;
   UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
-  setUidInput?: Dispatch<SetStateAction<string>>;
+  setUidInput: Dispatch<SetStateAction<string>>;
 }
 
 export const InviteFriend = ({
@@ -65,23 +64,25 @@ export const InviteFriend = ({
 
       <TouchableOpacity
         onPress={() => {
-          const ToastModal = (message: string) =>
-            Toast.show({
-              type: 'error',
-              text1: '초대 실패',
-              text2: message,
-            });
           setInviteListData(prev => {
             // 이미 초대된 사용자인지 확인
             const existingUser = prev.find(item => item.UID === UID);
             if (existingUser) {
-              ToastModal('이미 초대된 사용자입니다.');
+              Toast.show({
+                type: 'error',
+                text1: '초대 실패',
+                text2: '이미 초대된 사용자입니다.',
+              });
               return prev;
             }
 
             // 초대 가능한 최대 인원수 확인
             if (prev.length >= 6) {
-              ToastModal('최대 6명까지만 초대할 수 있습니다.');
+              Toast.show({
+                type: 'error',
+                text1: '초대 실패',
+                text2: '최대 6명까지만 초대할 수 있습니다.',
+              });
               return prev;
             }
 
@@ -89,9 +90,7 @@ export const InviteFriend = ({
             return [...prev, {UserName: name, UID, accept: false}];
           });
 
-          if (setUidInput) {
-            setUidInput('');
-          }
+          setUidInput('');
         }}>
         <NotoSansKR
           size={14}
@@ -165,7 +164,7 @@ export const SearchBox = ({
   );
 
   return (
-    <SearchContainer isClicked={isClicked}>
+    <SearchContainer>
       <RowContainer gap={8}>
         <OcticonIcons name="search" size={16} />
         <InputNotoSansKR
@@ -173,42 +172,38 @@ export const SearchBox = ({
           maxLength={7}
           size={14}
           value={uidInput}
-          onChangeText={text => setUidInput(text)}
-          style={{flex: 1}}
+          onChangeText={setUidInput}
           placeholder={`검색할 UID를 입력하세요. (내 UID: ${UID})`}
           onFocus={() => setIsClicked(true)}
         />
       </RowContainer>
 
-      {isClicked && !uidInput && (
-        <>
-          {friendLoading ? (
-            <LoadingIndicatior />
-          ) : (
-            friendData?.accepted.length > 0 && (
-              <ExpandedContainer>
-                <NotoSansKR size={14}>친구 목록</NotoSansKR>
-                {friendData?.accepted
-                  .slice(0, 3)
-                  .map((data: FriendType, key: number) => (
-                    <InviteFriend
-                      key={key}
-                      name={data.USER_NM}
-                      UID={data.UID}
-                      setInviteListData={setInviteListData}
-                    />
-                  ))}
-              </ExpandedContainer>
-            )
-          )}
-        </>
-      )}
-
-      {isClicked && uidInput && (
+      {isClicked && (
         <ExpandedContainer>
-          <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {searchLoading ? (
-            <LoadingIndicatior />
+          <NotoSansKR size={14}>
+            {uidInput === '' ? '친구 목록' : '검색 결과'}
+          </NotoSansKR>
+
+          {(searchLoading || friendLoading) && <LoadingIndicatior />}
+
+          {uidInput === '' ? (
+            friendData.accepted.length > 0 ? (
+              friendData.accepted
+                .slice(0, 3)
+                .map((data: FriendType, key: number) => (
+                  <InviteFriend
+                    key={key}
+                    name={data.USER_NM}
+                    UID={data.UID}
+                    setInviteListData={setInviteListData}
+                    setUidInput={setUidInput}
+                  />
+                ))
+            ) : (
+              <NotoSansKR size={14} color="gray5">
+                친구 목록이 없습니다.
+              </NotoSansKR>
+            )
           ) : searchData?.USER_NM ? (
             <InviteFriend
               name={searchData.USER_NM}
