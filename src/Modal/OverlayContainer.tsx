@@ -19,7 +19,7 @@ const FillOverlayOpacity = styled.View`
   right: 0;
   bottom: 0;
   background-color: black;
-  opacity: 0.3;
+  opacity: 0.2;
 `;
 
 export const OverlayContainer = ({

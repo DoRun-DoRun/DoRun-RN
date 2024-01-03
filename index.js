@@ -27,9 +27,9 @@ function Main() {
         <ThemeProvider theme={light}>
           <ModalProvider>
             <NavigationContainer>
-              <CustomModal />
               <App />
               <Toast />
+              <CustomModal />
             </NavigationContainer>
           </ModalProvider>
         </ThemeProvider>

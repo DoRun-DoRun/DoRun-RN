@@ -16,16 +16,14 @@ const StyledModalContainer = styled.View`
   flex: 1;
   align-items: center;
   justify-content: flex-end;
-  padding: 16px;
-  padding-bottom: 24px;
 `;
 
 const StyledModalContent = styled(Animated.View)`
   width: 100%;
   background-color: white;
-  border-radius: 16px;
-  padding: 0 16px;
-  padding-bottom: 24px;
+  border-radius: 16px 16px 0 0;
+  padding: 8px 24px;
+  padding-bottom: 40px;
   ${Platform.OS === 'ios'
     ? `
     shadow-color: #000;
@@ -52,7 +50,7 @@ const ModalHeaderText = styled(View)<{size: number}>`
 const ModalDivider = styled(View)`
   border-bottom-width: 2px;
   border-color: ${props => props.theme.gray5};
-  margin: 0 -16px;
+  margin: 0 -24px;
 `;
 
 export const ModalHeadBorder = () => {

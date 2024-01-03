@@ -362,7 +362,7 @@ const Album = () => {
 const MyPageTab = () => {
   const CallApi = useApi();
   const [selected, setSelected] = useState('history');
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, userName} = useSelector((state: RootState) => state.user);
 
   const UserProfile = async () => {
     try {
@@ -404,7 +404,7 @@ const MyPageTab = () => {
               </UserIcon>
 
               <View style={{flex: 1}}>
-                <UserName size={16}>{data.USER_NM}</UserName>
+                <UserName size={16}>{userName}</UserName>
                 <RowContainer gap={16} seperate>
                   <UserStats status="완료" count={data.COMPLETE} />
                   <Divider />

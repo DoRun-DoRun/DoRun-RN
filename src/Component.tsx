@@ -228,10 +228,10 @@ export const useApi = () => {
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     let baseUrl = 'https://dorun.site';
 
-    // baseUrl =
-    //   Platform.OS === 'android'
-    //     ? 'http://10.0.2.2:8000'
-    //     : 'http://127.0.0.1:8000';
+    baseUrl =
+      Platform.OS === 'android'
+        ? 'http://10.0.2.2:8000'
+        : 'http://127.0.0.1:8000';
 
     const url = `${baseUrl}/${endpoint}`;
 

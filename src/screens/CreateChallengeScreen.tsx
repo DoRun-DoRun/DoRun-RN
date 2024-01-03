@@ -5,7 +5,6 @@ import {
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
-  LoadingIndicatior,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -20,215 +19,21 @@ import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useMutation, useQueryClient} from 'react-query';
 import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {Alert} from 'react-native';
 import {Direction} from 'react-native-calendars/src/types';
-
-const SearchContainer = styled.View`
-  background-color: #fff;
-  border: 1px solid ${props => props.theme.gray6};
-  padding: 8px;
-  border-radius: 10px;
-  /* gap: 16px; */
-  /* z-index: 10; */
-`;
-
-const ExpandedContainer = styled.View`
-  background-color: #fff;
-  padding: 8px;
-  margin-top: 8px;
-  gap: 16px;
-`;
-
-export interface InviteFriendType {
-  name: string;
-  UID: number;
-  setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
-  setUidInput: Dispatch<SetStateAction<string>>;
-}
-
-export const InviteFriend = ({
-  name,
-  UID,
-  setInviteListData,
-  setUidInput,
-}: InviteFriendType) => {
-  return (
-    <RowContainer seperate>
-      <NotoSansKR size={14} weight="Regular">
-        {name}
-      </NotoSansKR>
-
-      <TouchableOpacity
-        onPress={() => {
-          setInviteListData(prev => {
-            // 이미 초대된 사용자인지 확인
-            const existingUser = prev.find(item => item.UID === UID);
-            if (existingUser) {
-              Toast.show({
-                type: 'error',
-                text1: '초대 실패',
-                text2: '이미 초대된 사용자입니다.',
-              });
-              return prev;
-            }
-
-            // 초대 가능한 최대 인원수 확인
-            if (prev.length >= 6) {
-              Toast.show({
-                type: 'error',
-                text1: '초대 실패',
-                text2: '최대 6명까지만 초대할 수 있습니다.',
-              });
-              return prev;
-            }
-
-            // 사용자 추가
-            return [...prev, {UserName: name, UID, accept: false}];
-          });
-
-          setUidInput('');
-        }}>
-        <NotoSansKR
-          size={14}
-          weight="Regular"
-          color="gray3"
-          style={{textDecorationLine: 'underline'}}>
-          초대하기
-        </NotoSansKR>
-      </TouchableOpacity>
-    </RowContainer>
-  );
-};
-
-interface SearchBoxType {
-  isClicked: boolean;
-  setIsClicked: Dispatch<SetStateAction<boolean>>;
-  setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
-}
-
-interface FriendType {
-  UID: number;
-  USER_NM: string;
-}
-
-export const SearchBox = ({
-  isClicked,
-  setIsClicked,
-  setInviteListData,
-}: SearchBoxType) => {
-  const [uidInput, setUidInput] = useState('');
-
-  const CallApi = useApi();
-  const {accessToken, UID} = useSelector((state: RootState) => state.user);
-
-  const FriendList = async () => {
-    try {
-      const response = CallApi({
-        endpoint: 'friend/list',
-        method: 'GET',
-        accessToken: accessToken!,
-      });
-      return response;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  };
-  const {data: friendData, isLoading: friendLoading} = useQuery(
-    'FriendList',
-    FriendList,
-  );
-
-  const SearchList = async () => {
-    try {
-      const response = CallApi({
-        endpoint: `user/search/${uidInput}`,
-        method: 'GET',
-      });
-      return response;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  };
-  const isUidValid = uidInput.length === 7 && /^\d{7}$/.test(uidInput);
-
-  const {data: searchData, isLoading: searchLoading} = useQuery(
-    ['SearchList', uidInput], // 쿼리 키에 uidInput 포함
-    SearchList,
-    {enabled: isUidValid}, // 쿼리 실행 조건
-  );
-
-  return (
-    <SearchContainer>
-      <RowContainer gap={8}>
-        <OcticonIcons name="search" size={16} />
-        <InputNotoSansKR
-          style={{flex: 1}}
-          keyboardType="number-pad"
-          maxLength={7}
-          size={14}
-          value={uidInput}
-          onChangeText={setUidInput}
-          placeholder={`검색할 UID를 입력하세요. (내 UID: ${UID})`}
-          onFocus={() => setIsClicked(true)}
-        />
-      </RowContainer>
-
-      {isClicked && (
-        <ExpandedContainer>
-          <NotoSansKR size={14}>
-            {uidInput === '' ? '친구 목록' : '검색 결과'}
-          </NotoSansKR>
-
-          {(searchLoading || friendLoading) && <LoadingIndicatior />}
-
-          {uidInput === '' ? (
-            friendData.accepted.length > 0 ? (
-              friendData.accepted
-                .slice(0, 3)
-                .map((data: FriendType, key: number) => (
-                  <InviteFriend
-                    key={key}
-                    name={data.USER_NM}
-                    UID={data.UID}
-                    setInviteListData={setInviteListData}
-                    setUidInput={setUidInput}
-                  />
-                ))
-            ) : (
-              <NotoSansKR size={14} color="gray5">
-                친구 목록이 없습니다.
-              </NotoSansKR>
-            )
-          ) : searchData?.USER_NM ? (
-            <InviteFriend
-              name={searchData.USER_NM}
-              UID={searchData.UID}
-              setInviteListData={setInviteListData}
-              setUidInput={setUidInput}
-            />
-          ) : (
-            <NotoSansKR size={14} color="gray5">
-              검색결과가 없습니다.
-            </NotoSansKR>
-          )}
-        </ExpandedContainer>
-      )}
-    </SearchContainer>
-  );
-};
+import {useModal} from '../Modal/ModalProvider';
+import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
 
 export const DatePicker = styled.TouchableOpacity`
   border: 1px solid ${props => props.theme.gray5};
-  padding: 8px 16px;
+  padding: 8px;
   justify-content: center;
   align-items: center;
-  border-radius: 100px;
+  border-radius: 10px;
 `;
 
 export interface InviteList {
@@ -549,7 +354,6 @@ const CreateChallengeScreen = () => {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<EmojiType>();
   const [challengeName, setChallengeName] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   const [calendarData, setCalendarData] = useState({start: '', end: ''});
@@ -558,6 +362,8 @@ const CreateChallengeScreen = () => {
     {UserName: validUserName, UID: validUID, accept: true},
   ]);
   const CallApi = useApi();
+
+  const {showModal} = useModal();
 
   const createChallenge = () =>
     CallApi({
@@ -656,38 +462,6 @@ const CreateChallengeScreen = () => {
             />
           </RowContainer>
 
-          <View style={{gap: 16}}>
-            <NotoSansKR size={18}>챌린지 초대하기</NotoSansKR>
-            <SearchBox
-              isClicked={searchOpen}
-              setIsClicked={setSearchOpen}
-              setInviteListData={setInviteListData}
-            />
-          </View>
-          {/* <RowContainer gap={8}>
-            {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
-          </RowContainer> */}
-
-          <View style={{gap: 16}}>
-            <RowContainer style={{justifyContent: 'space-between'}}>
-              <NotoSansKR size={18} style={{marginBottom: 4}}>
-                챌린지 참여 인원
-              </NotoSansKR>
-            </RowContainer>
-
-            <View style={{gap: 12}}>
-              {inviteListData.map((data, key) => (
-                <InviteList
-                  key={key}
-                  UserName={data.UserName}
-                  UID={data.UID}
-                  accept={data.accept}
-                  setInviteListData={setInviteListData}
-                />
-              ))}
-            </View>
-          </View>
-
           <View style={{gap: 8}}>
             <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
 
@@ -705,11 +479,30 @@ const CreateChallengeScreen = () => {
                 </NotoSansKR>
               ) : (
                 <NotoSansKR size={14} weight="Medium" color="gray4">
-                  날짜를 선택해주세요
+                  시작날짜와 종료날짜를 선택해주세요
                 </NotoSansKR>
               )}
             </DatePicker>
           </View>
+
+          <View style={{gap: 16}}>
+            <View style={{gap: 12}}>
+              <NotoSansKR size={18}>참여중인 인원</NotoSansKR>
+
+              {inviteListData.map((data, key) => (
+                <InviteList
+                  key={key}
+                  UserName={data.UserName}
+                  UID={data.UID}
+                  accept={data.accept}
+                  setInviteListData={setInviteListData}
+                />
+              ))}
+            </View>
+          </View>
+          {/* <RowContainer gap={8}>
+            {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
+          </RowContainer> */}
         </InnerContainer>
       </ScrollContainer>
 
@@ -759,6 +552,15 @@ const CreateChallengeScreen = () => {
             }
           }}>
           챌린지 생성하기
+        </ButtonComponent>
+        <ButtonComponent
+          type="secondary"
+          onPress={() =>
+            showModal(
+              <ChallengeInviteFriend setInviteListData={setInviteListData} />,
+            )
+          }>
+          친구 초대하기
         </ButtonComponent>
       </View>
 

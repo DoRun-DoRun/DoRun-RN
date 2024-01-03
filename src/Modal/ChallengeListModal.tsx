@@ -20,8 +20,8 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const ChallengeTimeBox = styled.View`
   border-radius: 100px;
-  border: 2px solid lightgray;
-  padding: 6px;
+  border: 1px solid ${props => props.theme.gray5};
+  padding: 8px;
   align-items: center;
   justify-content: center;
 `;
@@ -128,6 +128,17 @@ export const ChallengeListModal = ({
           <NotoSansKR size={20}>{data?.CHALLENGE_MST_NM}</NotoSansKR>
         </RowContainer>
 
+        <View style={{gap: 8}}>
+          <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
+          <ChallengeTimeBox>
+            <NotoSansKR size={14} weight="Medium">
+              {convertUTCToKoKRDay(data?.START_DT) +
+                ' ~ ' +
+                convertUTCToKoKRDay(data?.END_DT)}
+            </NotoSansKR>
+          </ChallengeTimeBox>
+        </View>
+
         <NotoSansKR size={18}>챌린지 참여 인원</NotoSansKR>
 
         <View style={{gap: 8}}>
@@ -146,17 +157,6 @@ export const ChallengeListModal = ({
               />
             );
           })}
-        </View>
-
-        <View style={{gap: 8}}>
-          <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
-          <ChallengeTimeBox>
-            <NotoSansKR size={14} weight="Medium">
-              {convertUTCToKoKRDay(data?.START_DT) +
-                ' ~ ' +
-                convertUTCToKoKRDay(data?.END_DT)}
-            </NotoSansKR>
-          </ChallengeTimeBox>
         </View>
 
         <View style={{gap: 8}}>

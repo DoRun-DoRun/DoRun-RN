@@ -12,6 +12,7 @@ import {useModal} from './ModalProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from 'styled-components';
 import {styled} from 'styled-components/native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 interface PersonModalType {
   id: number;
@@ -59,14 +60,18 @@ export const PersonGoalEditModal = ({
         <ButtonComponent
           type="black"
           onPress={() => {
-            dispatch(
-              updateGoalTitle({
-                goalId: id,
-                newTitle: inputText,
-                challenge_no: challenge_no,
-              }),
-            );
-            hideModal();
+            if (inputText === '') {
+              Toast.show({type: 'error', text1: '빈 값은 입력할 수 없습니다.'});
+            } else {
+              dispatch(
+                updateGoalTitle({
+                  goalId: id,
+                  newTitle: inputText,
+                  challenge_no: challenge_no,
+                }),
+              );
+              hideModal();
+            }
           }}>
           수정하기
         </ButtonComponent>
@@ -112,13 +117,17 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
         <ButtonComponent
           type="black"
           onPress={() => {
-            dispatch(
-              addPersonalGoal({
-                challenge_no: challenge_no,
-                newGoal: {title: inputText, isComplete: false},
-              }),
-            );
-            hideModal();
+            if (inputText === '') {
+              Toast.show({type: 'error', text1: '빈 값은 입력할 수 없습니다.'});
+            } else {
+              dispatch(
+                addPersonalGoal({
+                  challenge_no: challenge_no,
+                  newGoal: {title: inputText, isComplete: false},
+                }),
+              );
+              hideModal();
+            }
           }}>
           생성하기
         </ButtonComponent>

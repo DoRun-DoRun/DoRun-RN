@@ -100,7 +100,7 @@ export const AdditionalGoalModal = ({
             </Pressable>
             <View style={{alignItems: 'flex-end'}}>
               <Pressable onPress={deletePhoto}>
-                <NotoSansKR size={10} color="gray4">
+                <NotoSansKR size={12} color="gray4">
                   사진 삭제
                 </NotoSansKR>
               </Pressable>

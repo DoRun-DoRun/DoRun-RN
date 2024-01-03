@@ -39,8 +39,14 @@ import {NavigationType} from '../App';
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
 //   CHALLENGE_MST_NM: string;
-//   challenge_user: [ChallengeUserType];
+//   DIARIES: DiaryType[];
+//   total_page: number;
+//   challenge_user: ChallengeUserType[];
 // }
+
+interface DiaryType {
+  DAILY_COMPLETE_NO: number;
+}
 
 const ChallengeCreateButton = styled.TouchableOpacity`
   position: absolute;
@@ -68,12 +74,42 @@ export interface ChallengeUserType {
   PROGRESS: number;
   CHARACTER_NO: number;
   PET_NO: number;
-  DIARIES: [
-    {
-      DAILY_COMPLETE_NO: number;
-    },
-  ];
+  DIARIES: DiaryType[];
 }
+const DiaryComponent = ({
+  diary,
+  height,
+}: {
+  diary: DiaryType;
+  height: number;
+}) => {
+  const navigation = useNavigation<NavigationType>();
+
+  const windowWidth = Dimensions.get('window').width;
+  const [position, setPosition] = useState({left: 0});
+
+  useEffect(() => {
+    const randomLeft = Math.random() * windowWidth;
+    setPosition({left: randomLeft});
+  }, [windowWidth]);
+
+  return (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate('DailyNoteScreen', {
+          daily_no: diary.DAILY_COMPLETE_NO,
+        })
+      }
+      style={{
+        position: 'absolute',
+        left: position.left,
+        bottom: height,
+        zIndex: 1,
+      }}>
+      <Image source={require('../../assets/image/memo.png')} />
+    </TouchableOpacity>
+  );
+};
 
 const RaceTab = () => {
   const [scrollEnabled, setScrollEnabled] = useState(true);
@@ -241,7 +277,6 @@ const BGComponent = ({
 }: BGComponentType) => {
   const [isDragging, setIsDragging] = useState(false);
   const {showModal} = useModal();
-  const navigation = useNavigation<NavigationType>();
 
   const handleTouch = () => {
     showModal(
@@ -286,7 +321,6 @@ const BGComponent = ({
   }
 
   const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
 
   // const duduInitialX = `${data.PROGRESS * (60 / 100)}%`;
   const duduInitialX =
@@ -295,38 +329,15 @@ const BGComponent = ({
       : windowWidth * (data.PROGRESS / 100);
   const duduInitialY = yPosition + 10;
 
-  // 랜덤 위치를 저장할 상태
-  const [position, setPosition] = useState({left: 0, top: 0});
-
-  useEffect(() => {
-    // 랜덤 위치 설정
-    const randomLeft = Math.random() * windowWidth;
-    const randomTop = Math.random() * windowHeight;
-
-    setPosition({left: randomLeft, top: randomTop});
-  }, [windowHeight, windowWidth]); // 빈 의존성 배열을 사용하여 마운트 시 한 번만 실행
-
   return (
     <>
-      {data.DIARIES.map((diary, index) => {
-        return (
-          <TouchableOpacity
-            key={index}
-            onPress={() => {
-              navigation.navigate('DailyNoteScreen', {
-                daily_no: diary.DAILY_COMPLETE_NO,
-              });
-            }}
-            style={{
-              position: 'absolute',
-              left: position.left,
-              top: position.top,
-              zIndex: 1,
-            }}>
-            <Image source={require('../../assets/image/memo.png')} />
-          </TouchableOpacity>
-        );
-      })}
+      {data.DIARIES.map((diary: DiaryType) => (
+        <DiaryComponent
+          key={diary.DAILY_COMPLETE_NO}
+          diary={diary}
+          height={duduInitialY}
+        />
+      ))}
       <BGImage
         source={BackgroundImage[BGN].url}
         aspect-ratio={1}

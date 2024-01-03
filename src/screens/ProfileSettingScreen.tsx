@@ -13,13 +13,14 @@ import {
 } from '../Component';
 import {Image, Platform, View} from 'react-native';
 import {styled} from 'styled-components/native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {Avatar, avatarImage} from '../../store/data';
 import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {setUserName} from '../../store/slice/UserSlice';
 
 const SelectedContainer = styled.View`
   flex: 1;
@@ -90,8 +91,9 @@ const PencilIcon = styled.TouchableOpacity`
 const ProfileSettingScreen = () => {
   const CallApi = useApi();
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  const [userName, setUserName] = useState('');
+  const [userNameText, setUserNameText] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(1);
   const [selectedPet, setSelectedPet] = useState<null | number>(null);
   const navigation = useNavigation();
@@ -103,7 +105,7 @@ const ProfileSettingScreen = () => {
         method: 'GET',
         accessToken: accessToken!,
       });
-      setUserName(response.USER_NM);
+      setUserNameText(response.USER_NM);
       for (const avatar of response.avatars) {
         if (avatar.IS_EQUIP) {
           if (avatar.AVATAR_TYPE === 'CHARACTER') {
@@ -158,7 +160,7 @@ const ProfileSettingScreen = () => {
         method: 'PUT',
         accessToken: accessToken!,
         body: {
-          USER_NM: userName,
+          USER_NM: userNameText,
         },
       });
       return response;
@@ -170,6 +172,7 @@ const ProfileSettingScreen = () => {
 
   const {mutate: setName, isLoading: loadingName} = useMutation(SetName, {
     onSuccess: () => {
+      dispatch(setUserName({userName: userNameText}));
       // SetAvatar 성공 후 SettingProfile 쿼리를 다시 가져옴
       queryClient.invalidateQueries('SettingProfile');
       queryClient.invalidateQueries('ChallengeUserList');
@@ -202,8 +205,8 @@ const ProfileSettingScreen = () => {
                 maxLength={12}
                 size={14}
                 placeholder={data.USER_NM}
-                value={userName}
-                onChangeText={setUserName}
+                value={userNameText}
+                onChangeText={setUserNameText}
                 border
               />
               <PencilIcon

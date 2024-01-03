@@ -25,11 +25,12 @@ import {
   CalendarContainer,
   DatePicker,
   InviteList,
-  SearchBox,
   formatDate,
 } from './CreateChallengeScreen';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {useModal} from '../Modal/ModalProvider';
+import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
 
 interface participantsDataType {
   UID: number;
@@ -50,12 +51,12 @@ const EditChallengeScreen = () => {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const [challengeName, setChallengeName] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   const [calendarData, setCalendarData] = useState({start: '', end: ''});
 
   const [inviteListData, setInviteListData] = useState<InviteList[]>([]);
+  const {showModal} = useModal();
 
   const CallApi = useApi();
 
@@ -236,38 +237,6 @@ const EditChallengeScreen = () => {
             </View>
           </RowContainer>
 
-          {challengeData.CHALLENGE_STATUS === 'PENDING' &&
-            challengeData.IS_OWNER !== false && (
-              <View style={{gap: 16}}>
-                <NotoSansKR size={18}>챌린지 초대하기</NotoSansKR>
-                <SearchBox
-                  isClicked={searchOpen}
-                  setIsClicked={setSearchOpen}
-                  setInviteListData={setInviteListData}
-                />
-              </View>
-            )}
-
-          {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
-
-          <View style={{gap: 16}}>
-            <NotoSansKR size={18} style={{marginBottom: 4}}>
-              챌린지 참여 인원
-            </NotoSansKR>
-
-            <View style={{gap: 12}}>
-              {inviteListData?.map((data, key) => (
-                <InviteList
-                  key={key}
-                  UserName={data.UserName}
-                  UID={data.UID}
-                  accept={data.accept}
-                  setInviteListData={setInviteListData}
-                />
-              ))}
-            </View>
-          </View>
-
           <View style={{gap: 8}}>
             <NotoSansKR size={18}>챌린지 기간</NotoSansKR>
 
@@ -287,11 +256,27 @@ const EditChallengeScreen = () => {
                 </NotoSansKR>
               ) : (
                 <NotoSansKR size={14} weight="Medium" color="gray4">
-                  날짜를 선택해주세요
+                  시작날짜와 종료날짜를 선택해주세요
                 </NotoSansKR>
               )}
             </DatePicker>
           </View>
+
+          <View style={{gap: 12}}>
+            <NotoSansKR size={18}>참여중인 인원</NotoSansKR>
+
+            {inviteListData?.map((data, key) => (
+              <InviteList
+                key={key}
+                UserName={data.UserName}
+                UID={data.UID}
+                accept={data.accept}
+                setInviteListData={setInviteListData}
+              />
+            ))}
+          </View>
+
+          {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
         </InnerContainer>
       </ScrollContainer>
 
@@ -341,6 +326,15 @@ const EditChallengeScreen = () => {
               );
             }}>
             지금 시작하기
+          </ButtonComponent>
+          <ButtonComponent
+            type="secondary"
+            onPress={() => {
+              showModal(
+                <ChallengeInviteFriend setInviteListData={setInviteListData} />,
+              );
+            }}>
+            친구 초대하기
           </ButtonComponent>
           <RowContainer gap={8}>
             <View style={{flex: 1}}>
