@@ -31,6 +31,7 @@ import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
+import {removeChallenge} from '../../store/slice/GoalSlice';
 
 interface participantsDataType {
   UID: number;
@@ -423,6 +424,7 @@ const EditChallengeScreen = () => {
                     text: '그만두기',
                     onPress: () => {
                       ChallengeDeleteMutation(); // 챌린지 삭제 함수 호출
+                      dispatch(removeChallenge(selectedChallengeMstNo!));
                     },
                     style: 'destructive',
                   },

@@ -8,6 +8,8 @@ const sound = new Sound('main_bgm.wav', Sound.MAIN_BUNDLE, error => {
     console.log('Error loading sound: ' + error);
     return;
   }
+  sound.setNumberOfLoops(-1);
+  sound.play();
 });
 
 export const settingSlice = createSlice({

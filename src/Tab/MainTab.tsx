@@ -11,16 +11,14 @@ import MyPageTab from './MyPageTab';
 import {useTheme} from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
 
 const Tab = createBottomTabNavigator();
 
 export const MainTab = () => {
   const theme = useTheme();
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,
   );
@@ -46,7 +44,6 @@ export const MainTab = () => {
       <Tab.Screen
         name="챌린지 리스트"
         component={ChallengeTab}
-        listeners={{tabPress: () => dispatch(stopMusic())}}
         options={{
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="list-alt" color={color} size={size} />
@@ -66,7 +63,6 @@ export const MainTab = () => {
       <Tab.Screen
         name="두런두런"
         component={RaceTab}
-        listeners={{tabPress: () => dispatch(playMusic())}}
         options={{
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="home" color={color} size={size} />
@@ -80,7 +76,6 @@ export const MainTab = () => {
       <Tab.Screen
         name="마이페이지"
         component={MyPageTab}
-        listeners={{tabPress: () => dispatch(stopMusic())}}
         options={{
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="person" color={color} size={size} />

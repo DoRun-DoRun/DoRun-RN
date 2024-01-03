@@ -16,7 +16,7 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 interface PersonModalType {
   id: number;
-  challenge_no: number;
+  challenge_mst_no: number;
   title: string;
 }
 
@@ -29,7 +29,7 @@ const SearchContainer = styled(RowContainer)`
 
 export const PersonGoalEditModal = ({
   id,
-  challenge_no,
+  challenge_mst_no,
   title,
 }: PersonModalType) => {
   const {hideModal} = useModal();
@@ -67,7 +67,7 @@ export const PersonGoalEditModal = ({
                 updateGoalTitle({
                   goalId: id,
                   newTitle: inputText,
-                  challenge_no: challenge_no,
+                  challenge_mst_no: challenge_mst_no,
                 }),
               );
               hideModal();
@@ -78,7 +78,9 @@ export const PersonGoalEditModal = ({
         <ButtonComponent
           type="black"
           onPress={() => {
-            dispatch(removeGoal({goalId: id, challenge_no: challenge_no}));
+            dispatch(
+              removeGoal({goalId: id, challenge_mst_no: challenge_mst_no}),
+            );
             hideModal();
           }}>
           삭제하기
@@ -88,7 +90,11 @@ export const PersonGoalEditModal = ({
   );
 };
 
-export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
+export const PersonGoalAddModal = ({
+  challenge_mst_no,
+}: {
+  challenge_mst_no: number;
+}) => {
   const {hideModal} = useModal();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -122,7 +128,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
             } else {
               dispatch(
                 addPersonalGoal({
-                  challenge_no: challenge_no,
+                  challenge_mst_no: challenge_mst_no,
                   newGoal: {title: inputText, isComplete: false},
                 }),
               );

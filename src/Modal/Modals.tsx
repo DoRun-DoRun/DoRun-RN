@@ -216,6 +216,7 @@ export const DailyModal = ({
   item_no: number;
 }) => {
   const width = Dimensions.get('window').width;
+  console.log(item_no, item_type);
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />

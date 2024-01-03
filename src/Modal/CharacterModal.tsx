@@ -67,7 +67,9 @@ export const CharacterModal = ({
   const goals = useSelector((state: RootState) => state.goal, shallowEqual);
 
   const personalGoals = useMemo(() => {
-    const challenge = goals.find(ch => ch.challenge_no === CHALLENGE_MST_NO);
+    const challenge = goals.find(
+      ch => ch.challenge_mst_no === CHALLENGE_MST_NO,
+    );
     return challenge ? challenge.personalGoals : [];
   }, [goals, CHALLENGE_MST_NO]);
 

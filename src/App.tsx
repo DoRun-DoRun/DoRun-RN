@@ -77,6 +77,7 @@ function App(): JSX.Element {
 
   useEffect(() => {
     const bootstrapAsync = async () => {
+      // await AsyncStorage.removeItem('goals');
       const goalData = await loadGoals();
       if (goalData) {
         dispatch(restoreGoal(goalData));

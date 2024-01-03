@@ -31,7 +31,6 @@ import {useMutation, useQuery} from 'react-query';
 import {ChallengeStatusType} from '../../store/data';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
-import {toggleGoal} from '../../store/slice/GoalSlice';
 import {
   PersonGoalAddModal,
   PersonGoalEditModal,
@@ -49,6 +48,7 @@ import {
   ItemLogType,
   ShareModal,
 } from '../Modal/Modals';
+import {removeChallenge, toggleGoal} from '../../store/slice/GoalSlice';
 
 const Profile = styled.View`
   width: 40px;
@@ -150,7 +150,7 @@ const ChallengeSubInfo = ({
 
 interface GoalBoxProps {
   goal: goalType;
-  challenge_no: number;
+  challenge_mst_no: number;
 }
 
 const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
@@ -167,7 +167,7 @@ const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
   padding: 12px;
 `;
 
-const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
+const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const {showModal} = useModal();
@@ -183,13 +183,15 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
         showModal(
           <PersonGoalEditModal
             id={goal.id}
-            challenge_no={challenge_no}
+            challenge_mst_no={challenge_mst_no}
             title={goal.title}
           />,
         );
       }}
       onPress={() =>
-        dispatch(toggleGoal({goalId: goal.id, challenge_no: challenge_no}))
+        dispatch(
+          toggleGoal({goalId: goal.id, challenge_mst_no: challenge_mst_no}),
+        )
       }
       bc={backgroundColor}
       border={borderColor}>
@@ -209,7 +211,7 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_no}) => {
             showModal(
               <PersonGoalEditModal
                 id={goal.id}
-                challenge_no={challenge_no}
+                challenge_mst_no={challenge_mst_no}
                 title={goal.title}
               />,
             );
@@ -342,7 +344,7 @@ const getPersonalGoalsByChallengeNo = ({
   challenges: challengeDataType[];
   challengeNo: number;
 }) => {
-  const challenge = challenges.find(ch => ch.challenge_no === challengeNo);
+  const challenge = challenges.find(ch => ch.challenge_mst_no === challengeNo);
   return challenge ? challenge.personalGoals : [];
 };
 
@@ -502,6 +504,7 @@ const ChallengeTab = () => {
 
   const {mutate: mutateUpdateChallengeLog} = useMutation(updateChallengeLog, {
     onSuccess: response => {
+      dispatch(removeChallenge(challengeModalQueue[0].CHALLENGE_MST_NO));
       showModal(
         <DailyModal
           item_no={response.AVATAR_NO}
@@ -738,11 +741,11 @@ const ChallengeTab = () => {
               </RowContainer>
 
               <View style={{gap: 8}}>
-                {personGoal.map(goal => (
+                {personGoal?.map(goal => (
                   <GoalBox
                     key={goal.id}
                     goal={goal}
-                    challenge_no={selectedChallengeMstNo!}
+                    challenge_mst_no={selectedChallengeMstNo!}
                   />
                 ))}
               </View>
@@ -750,7 +753,7 @@ const ChallengeTab = () => {
                 onPress={() => {
                   showModal(
                     <PersonGoalAddModal
-                      challenge_no={selectedChallengeMstNo!}
+                      challenge_mst_no={selectedChallengeMstNo!}
                     />,
                   );
                 }}>
@@ -759,7 +762,7 @@ const ChallengeTab = () => {
             </CenterContainer>
             <CenterContainer>
               <ButtonComponent
-                disabled={detailData.IS_DONE_TODAY || personGoal.length === 0}
+                disabled={detailData.IS_DONE_TODAY || personGoal?.length === 0}
                 onPress={() => {
                   showModal(
                     <MyDailyDrayModal
@@ -770,7 +773,7 @@ const ChallengeTab = () => {
                 }}>
                 {detailData.IS_DONE_TODAY
                   ? '오늘은 일기를 작성했어요'
-                  : personGoal.length === 0
+                  : personGoal?.length === 0
                   ? '개인별 목표를 추가해주세요'
                   : '일기 작성하기'}
               </ButtonComponent>

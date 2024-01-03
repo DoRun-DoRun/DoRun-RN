@@ -11,7 +11,7 @@ export interface userDataType {
 }
 
 export interface challengeDataType {
-  challenge_no: number;
+  challenge_mst_no: number;
   personalGoals: goalType[];
 }
 
