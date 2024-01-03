@@ -31,12 +31,12 @@ import {useMutation, useQuery} from 'react-query';
 import {ChallengeStatusType} from '../../store/data';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
-import {goalType, toggleGoal} from '../../store/slice/GoalSlice';
+import {toggleGoal} from '../../store/slice/GoalSlice';
 import {
   PersonGoalAddModal,
   PersonGoalEditModal,
 } from '../Modal/PersonGoalModal';
-import {challengeDataType} from '../../store/async/asyncStore';
+import {challengeDataType, goalType} from '../../store/async/asyncStore';
 import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';

@@ -60,7 +60,7 @@ export const PersonGoalEditModal = ({
         <ButtonComponent
           type="black"
           onPress={() => {
-            if (inputText === '') {
+            if (inputText.trim().length === 0) {
               Toast.show({type: 'error', text1: '빈 값은 입력할 수 없습니다.'});
             } else {
               dispatch(
@@ -117,7 +117,7 @@ export const PersonGoalAddModal = ({challenge_no}: {challenge_no: number}) => {
         <ButtonComponent
           type="black"
           onPress={() => {
-            if (inputText === '') {
+            if (inputText.trim().length === 0) {
               Toast.show({type: 'error', text1: '빈 값은 입력할 수 없습니다.'});
             } else {
               dispatch(

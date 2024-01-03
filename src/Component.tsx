@@ -394,6 +394,16 @@ export const ContentSave = ({
 export const GetImage = (fileName: string) => {
   return `https://do-run.s3.amazonaws.com/${fileName}`;
 };
+
+export function formatDateToYYYYMM(dateString: string) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // getMonth()는 0부터 시작하므로 1을 더함
+  const formattedMonth = month < 10 ? `0${month}` : month.toString();
+
+  return `${year}년 ${formattedMonth}월`;
+}
+
 export function convertKoKRToUTC(dateString: string) {
   const localDate = new Date(dateString); // 한국 시간대 GMT+9
 

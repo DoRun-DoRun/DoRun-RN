@@ -131,6 +131,7 @@ const EditChallengeScreen = () => {
         text1: '챌린지가 시작되었어요.',
       });
       queryClient.invalidateQueries('getChallenge');
+      queryClient.invalidateQueries('getChallengeDetail');
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
       queryClient.invalidateQueries('userData');
@@ -331,7 +332,10 @@ const EditChallengeScreen = () => {
             type="secondary"
             onPress={() => {
               showModal(
-                <ChallengeInviteFriend setInviteListData={setInviteListData} />,
+                <ChallengeInviteFriend
+                  setInviteListData={setInviteListData}
+                  inviteListData={inviteListData}
+                />,
               );
             }}>
             친구 초대하기

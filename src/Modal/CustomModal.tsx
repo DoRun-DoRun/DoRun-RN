@@ -12,16 +12,18 @@ import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';
 import {OverlayContainer} from './OverlayContainer';
 
-const StyledModalContainer = styled.View`
+const StyledModalContainer = styled.View<{showOverlay: boolean}>`
   flex: 1;
   align-items: center;
   justify-content: flex-end;
+  margin-bottom: ${props => (props.showOverlay ? 0 : '48px')};
+  padding: ${props => (props.showOverlay ? 0 : '8px')};
 `;
 
-const StyledModalContent = styled(Animated.View)`
+const StyledModalContent = styled(Animated.View)<{showOverlay: boolean}>`
   width: 100%;
   background-color: white;
-  border-radius: 16px 16px 0 0;
+  border-radius: ${props => (props.showOverlay ? '16px 16px 0 0' : '16px')};
   padding: 8px 24px;
   padding-bottom: 40px;
   ${Platform.OS === 'ios'
@@ -138,8 +140,9 @@ const CustomModal = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{flex: 1}}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}>
-          <StyledModalContainer style={{marginBottom: !showOverlay ? 48 : 0}}>
+          <StyledModalContainer showOverlay={showOverlay}>
             <StyledModalContent
+              showOverlay={showOverlay}
               style={{
                 transform: [{translateY: panY}],
               }}

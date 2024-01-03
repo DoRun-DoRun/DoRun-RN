@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dispatch, SetStateAction} from 'react';
 import {styled} from 'styled-components/native';
 import {InviteList} from '../screens/CreateChallengeScreen';
@@ -10,7 +10,6 @@ import {
   useApi,
 } from '../Component';
 import {TouchableOpacity, View} from 'react-native';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
@@ -35,6 +34,9 @@ export interface InviteFriendType {
   name: string;
   UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+  inviteListData: InviteList[];
+  localExist: InviteList[];
+  setLocalExist: Dispatch<SetStateAction<InviteList[]>>;
   setUidInput: Dispatch<SetStateAction<string>>;
 }
 
@@ -43,7 +45,16 @@ export const InviteFriend = ({
   UID,
   setInviteListData,
   setUidInput,
+  localExist,
+  setLocalExist,
 }: InviteFriendType) => {
+  const [uidExists, setUidExists] = useState(false);
+
+  useEffect(() => {
+    const exists = localExist.some(invite => invite.UID === UID);
+    setUidExists(exists);
+  }, [UID, localExist, setUidInput]);
+
   return (
     <RowContainer seperate>
       <NotoSansKR size={14} weight="Regular">
@@ -51,33 +62,16 @@ export const InviteFriend = ({
       </NotoSansKR>
 
       <TouchableOpacity
+        disabled={uidExists}
         onPress={() => {
-          setInviteListData(prev => {
-            // 이미 초대된 사용자인지 확인
-            const existingUser = prev.find(item => item.UID === UID);
-            if (existingUser) {
-              Toast.show({
-                type: 'error',
-                text1: '초대 실패',
-                text2: '이미 초대된 사용자입니다.',
-              });
-              return prev;
-            }
-
-            // 초대 가능한 최대 인원수 확인
-            if (prev.length >= 6) {
-              Toast.show({
-                type: 'error',
-                text1: '초대 실패',
-                text2: '최대 6명까지만 초대할 수 있습니다.',
-              });
-              return prev;
-            }
-
-            // 사용자 추가
-            return [...prev, {UserName: name, UID, accept: false}];
-          });
-
+          setInviteListData(prev => [
+            ...prev,
+            {UserName: name, UID, accept: false},
+          ]);
+          setLocalExist(prev => [
+            ...prev,
+            {UserName: name, UID, accept: false},
+          ]);
           setUidInput('');
         }}>
         <NotoSansKR
@@ -85,7 +79,7 @@ export const InviteFriend = ({
           weight="Regular"
           color="gray3"
           style={{textDecorationLine: 'underline'}}>
-          초대하기
+          {uidExists ? '이미 초대된 사용자입니다.' : '초대하기'}
         </NotoSansKR>
       </TouchableOpacity>
     </RowContainer>
@@ -94,6 +88,7 @@ export const InviteFriend = ({
 
 interface SearchBoxType {
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+  inviteListData: InviteList[];
 }
 
 interface FriendType {
@@ -101,8 +96,12 @@ interface FriendType {
   USER_NM: string;
 }
 
-export const SearchBox = ({setInviteListData}: SearchBoxType) => {
+export const SearchBox = ({
+  setInviteListData,
+  inviteListData,
+}: SearchBoxType) => {
   const [uidInput, setUidInput] = useState('');
+  const [localExist, setLocalExist] = useState<InviteList[]>(inviteListData);
 
   const CallApi = useApi();
   const {accessToken, UID} = useSelector((state: RootState) => state.user);
@@ -145,6 +144,12 @@ export const SearchBox = ({setInviteListData}: SearchBoxType) => {
     {enabled: isUidValid}, // 쿼리 실행 조건
   );
 
+  const handleInputChange = (text: string) => {
+    // 입력된 텍스트가 숫자인지 확인
+    const numericValue = text.replace(/[^0-9]/g, '');
+    setUidInput(numericValue);
+  };
+
   return (
     <SearchContainer>
       <RowContainer gap={8}>
@@ -155,7 +160,7 @@ export const SearchBox = ({setInviteListData}: SearchBoxType) => {
           maxLength={7}
           size={14}
           value={uidInput}
-          onChangeText={setUidInput}
+          onChangeText={handleInputChange}
           placeholder={`UID로 검색하기 (내 UID: ${UID})`}
           border
         />
@@ -177,6 +182,9 @@ export const SearchBox = ({setInviteListData}: SearchBoxType) => {
                   key={key}
                   name={data.USER_NM}
                   UID={data.UID}
+                  localExist={localExist}
+                  setLocalExist={setLocalExist}
+                  inviteListData={inviteListData}
                   setInviteListData={setInviteListData}
                   setUidInput={setUidInput}
                 />
@@ -190,6 +198,9 @@ export const SearchBox = ({setInviteListData}: SearchBoxType) => {
           <InviteFriend
             name={searchData.USER_NM}
             UID={searchData.UID}
+            localExist={localExist}
+            setLocalExist={setLocalExist}
+            inviteListData={inviteListData}
             setInviteListData={setInviteListData}
             setUidInput={setUidInput}
           />
@@ -203,12 +214,20 @@ export const SearchBox = ({setInviteListData}: SearchBoxType) => {
   );
 };
 
-export const ChallengeInviteFriend = ({setInviteListData}: SearchBoxType) => {
+export const ChallengeInviteFriend = ({
+  setInviteListData,
+  inviteListData,
+}: SearchBoxType) => {
+  useEffect(() => {}, [inviteListData]);
+
   return (
     <View style={{gap: 24}}>
       <ModalHeadBorder />
-      <NotoSansKR size={18}>친구랑 같이 하나요?</NotoSansKR>
-      <SearchBox setInviteListData={setInviteListData} />
+      <NotoSansKR size={18}>초대할 친구의 UID를 입력하세요</NotoSansKR>
+      <SearchBox
+        setInviteListData={setInviteListData}
+        inviteListData={inviteListData}
+      />
     </View>
   );
 };

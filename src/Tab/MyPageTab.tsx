@@ -10,6 +10,7 @@ import {
   TossFace,
   convertKoKRToUTC,
   formatDate,
+  formatDateToYYYYMM,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components/native';
@@ -215,6 +216,9 @@ const History = () => {
         // }
       >
         <ExpandableCalendar
+          renderHeader={(dateString: string) => (
+            <NotoSansKR size={16}>{formatDateToYYYYMM(dateString)}</NotoSansKR>
+          )}
           style={{borderRadius: 10, padding: 10}}
           renderArrow={(direction: Direction) =>
             direction === 'left' ? (

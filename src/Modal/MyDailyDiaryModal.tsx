@@ -13,10 +13,10 @@ import {ModalHeadText} from './CustomModal';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation, useQueryClient} from 'react-query';
-import {goalType} from '../../store/slice/GoalSlice';
 import useCamera from '../Hook/UseCamera';
 import {useModal} from './ModalProvider';
 import {DailyModal} from './Modals';
+import {goalType} from '../../store/async/asyncStore';
 
 const transformData = (state: goalType[]) => {
   return state.map(goal => ({
@@ -62,6 +62,7 @@ export const MyDailyDrayModal = ({
       onSuccess: res => {
         queryClient.invalidateQueries('challenge_history');
         queryClient.invalidateQueries('ChallengeUserList');
+        queryClient.invalidateQueries('getChallengeDetail');
 
         showModal(
           <DailyModal item_no={res.item_no} item_type={res.item_type} />,

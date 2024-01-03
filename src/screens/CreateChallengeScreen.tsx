@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Modal, TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -10,6 +10,7 @@ import {
   ScrollContainer,
   TossFace,
   convertKoKRToUTC,
+  formatDateToYYYYMM,
   getDayOfWeek,
   useApi,
 } from '../Component';
@@ -115,8 +116,6 @@ export const formatDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-const CalendarModal = styled.Modal``;
-
 const CalendarView = styled.TouchableOpacity`
   position: absolute;
   width: 100%;
@@ -129,6 +128,7 @@ const CalendarView = styled.TouchableOpacity`
 
 const CalendarModalContainer = styled.Pressable`
   padding-top: 10px;
+  margin-bottom: 24px;
   background-color: #fff;
   border-radius: 12px;
   z-index: 2;
@@ -283,7 +283,7 @@ export const CalendarContainer = ({
   };
 
   return (
-    <CalendarModal transparent={true}>
+    <Modal transparent={true}>
       <CalendarView onPress={() => setCalendarOpen(false)}>
         <CalendarModalContainer onPress={e => e.stopPropagation()}>
           <Calendar
@@ -312,8 +312,11 @@ export const CalendarContainer = ({
                 />
               )
             }
+            renderHeader={(date: string) => (
+              <NotoSansKR size={16}>{formatDateToYYYYMM(date)}</NotoSansKR>
+            )}
             disableArrowLeft={disabledLeft}
-            monthFormat="yy년 MM월"
+            // monthFormat="yy년 MM월"
             minDate={formatDate(new Date())}
             onDayPress={onDayPress}
             markingType={'period'}
@@ -336,7 +339,7 @@ export const CalendarContainer = ({
           </CalendarRowContainer>
         </CalendarModalContainer>
       </CalendarView>
-    </CalendarModal>
+    </Modal>
   );
 };
 
@@ -421,6 +424,7 @@ const CreateChallengeScreen = () => {
         text1: '챌린지가 시작되었어요.',
       });
       queryClient.invalidateQueries('getChallenge');
+      queryClient.invalidateQueries('getChallengeDetail');
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
       queryClient.invalidateQueries('userData');
@@ -557,7 +561,10 @@ const CreateChallengeScreen = () => {
           type="secondary"
           onPress={() =>
             showModal(
-              <ChallengeInviteFriend setInviteListData={setInviteListData} />,
+              <ChallengeInviteFriend
+                setInviteListData={setInviteListData}
+                inviteListData={inviteListData}
+              />,
             )
           }>
           친구 초대하기

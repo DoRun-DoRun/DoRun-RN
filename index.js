@@ -28,7 +28,7 @@ function Main() {
           <ModalProvider>
             <NavigationContainer>
               <App />
-              <Toast />
+              <Toast style={{zIndex: -1}} />
               <CustomModal />
             </NavigationContainer>
           </ModalProvider>
