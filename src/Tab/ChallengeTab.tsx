@@ -775,7 +775,7 @@ const ChallengeTab = () => {
                   ? '오늘은 일기를 작성했어요'
                   : personGoal?.length === 0
                   ? '개인별 목표를 추가해주세요'
-                  : '일기 작성하기'}
+                  : '오늘 하루 완료하기'}
               </ButtonComponent>
             </CenterContainer>
             {detailData?.additionalGoal.length !== 0 ? (

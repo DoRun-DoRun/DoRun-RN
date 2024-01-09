@@ -15,6 +15,8 @@ import {RootState} from '../../store/RootReducer';
 import {useQuery} from 'react-query';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {ModalHeadBorder} from './CustomModal';
+import {useModal} from './ModalProvider';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const SearchContainer = styled.View`
   background-color: #fff;
@@ -49,6 +51,7 @@ export const InviteFriend = ({
   setLocalExist,
 }: InviteFriendType) => {
   const [uidExists, setUidExists] = useState(false);
+  const {hideModal} = useModal();
 
   useEffect(() => {
     const exists = localExist.some(invite => invite.UID === UID);
@@ -64,15 +67,23 @@ export const InviteFriend = ({
       <TouchableOpacity
         disabled={uidExists}
         onPress={() => {
-          setInviteListData(prev => [
-            ...prev,
-            {UserName: name, UID, accept: false},
-          ]);
-          setLocalExist(prev => [
-            ...prev,
-            {UserName: name, UID, accept: false},
-          ]);
-          setUidInput('');
+          if (localExist.length >= 6) {
+            hideModal();
+            Toast.show({
+              type: 'error',
+              text1: '최대 6명까지 초대가능합니다.',
+            });
+          } else {
+            setInviteListData(prev => [
+              ...prev,
+              {UserName: name, UID, accept: false},
+            ]);
+            setLocalExist(prev => [
+              ...prev,
+              {UserName: name, UID, accept: false},
+            ]);
+            setUidInput('');
+          }
         }}>
         <NotoSansKR
           size={14}

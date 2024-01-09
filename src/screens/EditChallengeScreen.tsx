@@ -203,13 +203,31 @@ const EditChallengeScreen = () => {
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
-          <NotoSansKR size={20} weight="Bold">
-            {challengeData.CHALLENGE_STATUS === 'PENDING'
-              ? challengeData.IS_OWNER === false
-                ? '대기중인 챌린지 정보에요'
-                : '챌린지 내용을 수정할 수 있어요'
-              : '진행중인 챌린지 정보에요'}
-          </NotoSansKR>
+          {challengeData.CHALLENGE_STATUS === 'PENDING' ? (
+            challengeData.IS_OWNER === false ? (
+              <NotoSansKR size={20}>
+                <NotoSansKR size={20} color="primary1">
+                  대기중
+                </NotoSansKR>
+                인 챌린지 정보에요
+              </NotoSansKR>
+            ) : (
+              <NotoSansKR size={20}>
+                챌린지 내용을
+                <NotoSansKR size={20} color="primary1">
+                  수정
+                </NotoSansKR>
+                할 수 있어요
+              </NotoSansKR>
+            )
+          ) : (
+            <NotoSansKR size={20}>
+              <NotoSansKR size={20} color="primary1">
+                진행중
+              </NotoSansKR>
+              인 챌린지 정보에요
+            </NotoSansKR>
+          )}
 
           <RowContainer gap={16}>
             <TouchableOpacity

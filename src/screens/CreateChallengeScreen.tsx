@@ -439,8 +439,11 @@ const CreateChallengeScreen = () => {
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
-          <NotoSansKR size={20} weight="Bold">
-            도전을 시작해볼까요?
+          <NotoSansKR size={20}>
+            <NotoSansKR size={20} color="primary1">
+              도전
+            </NotoSansKR>
+            을 시작해볼까요?
           </NotoSansKR>
 
           <RowContainer gap={16}>
@@ -504,6 +507,7 @@ const CreateChallengeScreen = () => {
               ))}
             </View>
           </View>
+          {/* <NotoSansKR size={16}>챌린지는 04시에 시작 & 완료되어요</NotoSansKR> */}
           {/* <RowContainer gap={8}>
             {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
           </RowContainer> */}
@@ -542,6 +546,7 @@ const CreateChallengeScreen = () => {
                   {
                     text: '날짜 변경하기',
                     style: 'cancel',
+                    onPress: () => setCalendarOpen(true),
                   },
                   {
                     text: '바로 시작하기',

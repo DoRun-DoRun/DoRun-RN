@@ -9,6 +9,7 @@ import {
   LoadingIndicatior,
   NotoSansKR,
   RowContainer,
+  ScrollContainer,
   TossFace,
   timeSince,
   useApi,
@@ -21,9 +22,14 @@ import {useNavigation} from '@react-navigation/native';
 import {RootState} from '../../store/RootReducer';
 import {useSelector} from 'react-redux';
 
+interface goal {
+  PERSON_NM: string;
+  IS_DONE: boolean;
+}
 // DailyNoteScreen 컴포넌트
 export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   const {daily_no} = route.params;
+  const theme = useTheme();
   const CallApi = useApi();
 
   const getDiary = async () => {
@@ -59,34 +65,69 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   return (
     <HomeContainer>
       <InnerContainer seperate>
-        <View style={{gap: 24}}>
-          <RowContainer>
-            <NotoSansKR size={18}>[{data.user}]</NotoSansKR>
-            <NotoSansKR size={14} color="gray4">
-              &nbsp;· {timeSince(data.diary.INSERT_DT)}
-            </NotoSansKR>
-          </RowContainer>
+        <ScrollContainer>
+          <View style={{gap: 24}}>
+            <RowContainer>
+              <NotoSansKR size={18}>[{data.user}]</NotoSansKR>
+              <NotoSansKR size={14} color="gray4">
+                &nbsp;· {timeSince(data.diary.INSERT_DT)}
+              </NotoSansKR>
+            </RowContainer>
 
-          <View style={{gap: 16, alignContent: 'center'}}>
-            {data.diary.IMAGE_FILE_NM !== '' ? (
-              <Image
-                source={{
-                  uri: `https://do-run.s3.amazonaws.com/${data.diary.IMAGE_FILE_NM}`,
-                }}
-                style={{width: '100%', height: 222, borderRadius: 10}}
-              />
-            ) : (
-              <ImageContainer
-                source={groupImage[randomIndex]}
-                resizeMode="contain"
-              />
-            )}
+            <View style={{gap: 16, alignContent: 'center'}}>
+              {data.diary.IMAGE_FILE_NM !== '' ? (
+                <Image
+                  source={{
+                    uri: `https://do-run.s3.amazonaws.com/${data.diary.IMAGE_FILE_NM}`,
+                  }}
+                  style={{width: '100%', height: 222, borderRadius: 10}}
+                />
+              ) : (
+                <ImageContainer
+                  source={groupImage[randomIndex]}
+                  resizeMode="contain"
+                />
+              )}
+              <NotoSansKR size={16}>오늘 하루 목표</NotoSansKR>
+              <View>
+                {data.goals?.map((goal: goal, key: number) => {
+                  return (
+                    <RowContainer key={key} gap={8}>
+                      {goal.IS_DONE ? (
+                        <MaterialIcons
+                          name="check-box"
+                          color={theme.primary1}
+                          size={20}
+                        />
+                      ) : (
+                        <MaterialIcons
+                          name="check-box-outline-blank"
+                          color={theme.primary1}
+                          size={20}
+                        />
+                      )}
+                      <NotoSansKR
+                        size={14}
+                        weight="Medium"
+                        color={goal.IS_DONE ? 'primary1' : 'gray1'}>
+                        {goal.PERSON_NM}
+                      </NotoSansKR>
+                    </RowContainer>
+                  );
+                })}
+              </View>
 
-            <NotoSansKR size={14} weight="Medium">
-              {data.diary.COMMENT}
-            </NotoSansKR>
+              {data.diary.COMMENT && (
+                <>
+                  <NotoSansKR size={16}>작성한 일기</NotoSansKR>
+                  <NotoSansKR size={14} weight="Medium">
+                    {data.diary.COMMENT}
+                  </NotoSansKR>
+                </>
+              )}
+            </View>
           </View>
-        </View>
+        </ScrollContainer>
         <FaceBtn daily_no={daily_no} />
       </InnerContainer>
     </HomeContainer>

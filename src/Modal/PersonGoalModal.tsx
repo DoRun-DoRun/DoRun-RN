@@ -1,6 +1,11 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {ButtonComponent, InputNotoSansKR, RowContainer} from '../Component';
+import {
+  ButtonComponent,
+  InputNotoSansKR,
+  NotoSansKR,
+  RowContainer,
+} from '../Component';
 import {useDispatch} from 'react-redux';
 import {
   addPersonalGoal,
@@ -12,7 +17,6 @@ import {useModal} from './ModalProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from 'styled-components';
 import {styled} from 'styled-components/native';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 interface PersonModalType {
   id: number;
@@ -35,33 +39,42 @@ export const PersonGoalEditModal = ({
   const {hideModal} = useModal();
   const dispatch = useDispatch();
   const theme = useTheme();
-
+  const [isError, setIsError] = useState(false);
   const [inputText, setInputText] = useState(title);
 
   return (
     <View style={{gap: 24}}>
       <ModalHeadBorder />
-      <SearchContainer gap={8}>
-        <MaterialCommunityIcons
-          name="text-box-check-outline"
-          size={24}
-          color={theme.primary1}
-        />
-        <InputNotoSansKR
-          maxLength={20}
-          style={{flex: 1}}
-          size={16}
-          value={inputText}
-          placeholder="수정할 목표를 입력해주세요."
-          onChangeText={setInputText}
-        />
-      </SearchContainer>
+
+      <View style={{gap: 8}}>
+        {isError && (
+          <NotoSansKR size={12} color="red" weight="Medium">
+            빈 값은 입력할 수 없어요!
+          </NotoSansKR>
+        )}
+        <SearchContainer gap={8}>
+          <MaterialCommunityIcons
+            name="text-box-check-outline"
+            size={24}
+            color={theme.primary1}
+          />
+          <InputNotoSansKR
+            maxLength={20}
+            style={{flex: 1}}
+            size={16}
+            value={inputText}
+            placeholder="수정할 목표를 입력해주세요."
+            onChangeText={setInputText}
+          />
+        </SearchContainer>
+      </View>
+
       <View style={{gap: 8}}>
         <ButtonComponent
           type="black"
           onPress={() => {
             if (inputText.trim().length === 0) {
-              Toast.show({type: 'error', text1: '빈 값은 입력할 수 없습니다.'});
+              setIsError(true);
             } else {
               dispatch(
                 updateGoalTitle({
@@ -98,33 +111,42 @@ export const PersonGoalAddModal = ({
   const {hideModal} = useModal();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const [isError, setIsError] = useState(false);
 
   const [inputText, setInputText] = useState('');
 
   return (
     <View style={{gap: 24}}>
       <ModalHeadBorder />
-      <SearchContainer gap={8}>
-        <MaterialCommunityIcons
-          name="text-box-check-outline"
-          size={24}
-          color={theme.primary1}
-        />
-        <InputNotoSansKR
-          maxLength={20}
-          style={{flex: 1}}
-          size={16}
-          value={inputText}
-          placeholder="새로운 목표를 추가해주세요."
-          onChangeText={setInputText}
-        />
-      </SearchContainer>
+
+      <View style={{gap: 8}}>
+        {isError && (
+          <NotoSansKR size={12} color="red" weight="Medium">
+            빈 값은 입력할 수 없어요!
+          </NotoSansKR>
+        )}
+        <SearchContainer gap={8}>
+          <MaterialCommunityIcons
+            name="text-box-check-outline"
+            size={24}
+            color={theme.primary1}
+          />
+          <InputNotoSansKR
+            maxLength={20}
+            style={{flex: 1}}
+            size={16}
+            value={inputText}
+            placeholder="새로운 목표를 추가해주세요."
+            onChangeText={setInputText}
+          />
+        </SearchContainer>
+      </View>
       <View style={{gap: 8}}>
         <ButtonComponent
           type="black"
           onPress={() => {
             if (inputText.trim().length === 0) {
-              Toast.show({type: 'error', text1: '빈 값은 입력할 수 없습니다.'});
+              setIsError(true);
             } else {
               dispatch(
                 addPersonalGoal({
