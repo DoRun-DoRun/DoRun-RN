@@ -215,7 +215,7 @@ const EditChallengeScreen = () => {
               <NotoSansKR size={20}>
                 챌린지 내용을
                 <NotoSansKR size={20} color="primary1">
-                  수정
+                  수정{' '}
                 </NotoSansKR>
                 할 수 있어요
               </NotoSansKR>

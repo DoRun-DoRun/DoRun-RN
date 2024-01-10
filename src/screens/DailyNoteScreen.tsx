@@ -4,6 +4,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import styled, {useTheme} from 'styled-components/native';
 
 import {
+  GetImage,
   HomeContainer,
   InnerContainer,
   LoadingIndicatior,
@@ -21,6 +22,8 @@ import {groupImage} from '../../store/data';
 import {useNavigation} from '@react-navigation/native';
 import {RootState} from '../../store/RootReducer';
 import {useSelector} from 'react-redux';
+import {ImageZoomModal} from '../Modal/Modals';
+import {useModal} from '../Modal/ModalProvider';
 
 interface goal {
   PERSON_NM: string;
@@ -31,6 +34,7 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   const {daily_no} = route.params;
   const theme = useTheme();
   const CallApi = useApi();
+  const {showModal} = useModal();
 
   const getDiary = async () => {
     try {
@@ -76,12 +80,18 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
 
             <View style={{gap: 16, alignContent: 'center'}}>
               {data.diary.IMAGE_FILE_NM !== '' ? (
-                <Image
-                  source={{
-                    uri: `https://do-run.s3.amazonaws.com/${data.diary.IMAGE_FILE_NM}`,
-                  }}
-                  style={{width: '100%', height: 222, borderRadius: 10}}
-                />
+                <TouchableOpacity
+                  onPress={() => {
+                    showModal(
+                      <ImageZoomModal file_name={data.diary.IMAGE_FILE_NM} />,
+                    );
+                  }}>
+                  <Image
+                    source={{uri: GetImage(data.diary.IMAGE_FILE_NM)}}
+                    resizeMode="contain"
+                    style={{width: '100%', height: 300}}
+                  />
+                </TouchableOpacity>
               ) : (
                 <ImageContainer
                   source={groupImage[randomIndex]}

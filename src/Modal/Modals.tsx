@@ -123,11 +123,11 @@ export const ShareModal = ({response}: {response: ChallengeLogType}) => {
 
 export const ImageZoomModal = ({file_name}: {file_name: string}) => {
   return (
-    <View style={{gap: 24, alignItems: 'center'}}>
+    <View style={{gap: 24, alignItems: 'center', height: '70%'}}>
       <ModalHeadBorder />
       <Image
         source={{uri: GetImage(file_name)}}
-        style={{width: '100%', height: 300, borderRadius: 10}}
+        style={{width: '100%', height: '100%', borderRadius: 10}}
         resizeMode="cover"
       />
     </View>
