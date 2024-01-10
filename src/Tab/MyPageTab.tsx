@@ -23,6 +23,8 @@ import {RootState} from '../../store/RootReducer';
 import LinearGradient from 'react-native-linear-gradient';
 import {profileImage} from '../../store/data';
 import {Direction} from 'react-native-calendars/src/types';
+import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
+import {Platform} from 'react-native';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
@@ -368,6 +370,12 @@ const MyPageTab = () => {
   const [selected, setSelected] = useState('history');
   const {accessToken, userName} = useSelector((state: RootState) => state.user);
 
+  const adUnitId = __DEV__
+    ? TestIds.ADAPTIVE_BANNER
+    : Platform.OS === 'ios'
+    ? 'ca-app-pub-5902646867257909~8665642249' // iOS용 실제 광고 단위 ID
+    : 'ca-app-pub-5902646867257909~6796396497'; // Android용 실제 광고 단위 ID
+
   const UserProfile = async () => {
     try {
       const response = CallApi({
@@ -419,6 +427,12 @@ const MyPageTab = () => {
               </View>
             </ProfileContainer>
           )}
+          <View style={{marginLeft: -16}}>
+            <BannerAd
+              unitId={adUnitId!}
+              size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+            />
+          </View>
 
           <HistoryContainer>
             <CategoryContainer>

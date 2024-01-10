@@ -49,6 +49,7 @@ import {
   ShareModal,
 } from '../Modal/Modals';
 import {removeChallenge, toggleGoal} from '../../store/slice/GoalSlice';
+import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 
 const Profile = styled.View`
   width: 40px;
@@ -350,6 +351,13 @@ const getPersonalGoalsByChallengeNo = ({
 
 const ChallengeTab = () => {
   const CallApi = useApi();
+
+  const adUnitId = __DEV__
+    ? TestIds.ADAPTIVE_BANNER
+    : Platform.OS === 'ios'
+    ? 'ca-app-pub-5902646867257909~8665642249' // iOS용 실제 광고 단위 ID
+    : 'ca-app-pub-5902646867257909~6796396497'; // Android용 실제 광고 단위 ID
+
   const {accessToken} = useSelector((state: RootState) => state.user);
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,
@@ -732,6 +740,12 @@ const ChallengeTab = () => {
             <PlusContainers title="챌린지 시작하기" />
           </TouchableOpacity>
         </TopContainer>
+        <View style={{marginTop: -32}}>
+          <BannerAd
+            unitId={adUnitId!}
+            size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          />
+        </View>
 
         {detailData?.CHALLENGE_STATUS === ChallengeStatusType.PROGRESS ? (
           <>

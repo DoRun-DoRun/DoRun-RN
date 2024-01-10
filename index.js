@@ -20,6 +20,7 @@ const codePushOptions = {
   installMode: CodePush.InstallMode.IMMEDIATE,
   mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
 };
+
 function Main() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -28,7 +29,7 @@ function Main() {
           <ModalProvider>
             <NavigationContainer>
               <App />
-              <Toast style={{zIndex: -1}} />
+              <Toast />
               <CustomModal />
             </NavigationContainer>
           </ModalProvider>

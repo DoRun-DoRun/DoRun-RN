@@ -35,6 +35,7 @@ import {
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
 import {NavigationType} from '../App';
+import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -123,6 +124,12 @@ const RaceTab = () => {
 
   const [refreshing, setRefreshing] = useState(false);
 
+  const adUnitId = __DEV__
+    ? TestIds.ADAPTIVE_BANNER
+    : Platform.OS === 'ios'
+    ? 'ca-app-pub-5902646867257909~8665642249' // iOS용 실제 광고 단위 ID
+    : 'ca-app-pub-5902646867257909~6796396497'; // Android용 실제 광고 단위 ID
+
   const ChallengeUserList = async () => {
     try {
       const response = await CallApi({
@@ -152,7 +159,7 @@ const RaceTab = () => {
           index < challengeListData?.total_page
             ? () => (
                 <TouchableOpacity
-                  style={{marginRight: 16}}
+                  style={{paddingHorizontal: 32}}
                   onPress={() => {
                     setIndex(prev => prev + 1);
                   }}>
@@ -164,7 +171,7 @@ const RaceTab = () => {
           index > 1
             ? () => (
                 <TouchableOpacity
-                  style={{marginLeft: 16}}
+                  style={{paddingHorizontal: 32}}
                   onPress={() => {
                     setIndex(prev => prev - 1);
                   }}>
@@ -191,6 +198,10 @@ const RaceTab = () => {
   }
   return (
     <HomeContainer color="background">
+      <BannerAd
+        unitId={adUnitId!}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
           refreshControl={
@@ -447,7 +458,7 @@ const NavigationButton = styled(View)`
 
 const NavigationContainer = styled(View)`
   position: absolute;
-  top: 20px;
+  top: 80px;
   right: 16px;
   flex-direction: column;
   gap: 12px;

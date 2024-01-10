@@ -23,6 +23,9 @@ import {useMutation} from 'react-query';
 import {useApi} from './Component';
 import {setVolume} from '../store/slice/SettingSlice';
 
+import mobileAds from 'react-native-google-mobile-ads';
+import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
+
 export type RootStackParamList = {
   DailyNoteScreen: {
     daily_no: number;
@@ -50,7 +53,7 @@ export type DailyNoteRouteType = RouteProp<
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function App(): JSX.Element {
+function App() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const CallApi = useApi();
@@ -97,12 +100,28 @@ function App(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigation]);
 
+  const getPermission = async () => {
+    const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+    if (result === RESULTS.DENIED) {
+      console.log('거절');
+      // The permission has not been requested, so request it.
+      await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+    }
+  };
+  getPermission();
+
+  mobileAds()
+    .initialize()
+    .then(adapterStatuses => {
+      console.log(adapterStatuses);
+    });
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerShadowVisible: false,
         headerTitle: '',
-        // eslint-disable-next-line react/no-unstable-nested-components
+
         headerLeft: () => (
           <MaterialIcons
             name="arrow-back"

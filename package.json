@@ -34,6 +34,7 @@
     "react-native-debugger-open": "^0.4.3",
     "react-native-fast-image": "^8.6.3",
     "react-native-fast-shadow": "^0.1.0",
+    "react-native-google-mobile-ads": "^12.9.0",
     "react-native-image-picker": "^7.0.3",
     "react-native-image-resizer": "^1.4.5",
     "react-native-linear-gradient": "^2.8.3",
