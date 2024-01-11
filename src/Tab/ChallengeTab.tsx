@@ -612,24 +612,32 @@ const ChallengeTab = () => {
                 </NotoSansKR>
               </View>
             ) : (
-              listData.invited_challenges?.map((challenge: ChallengeInfo) => (
-                <Pressable
-                  key={challenge.CHALLENGE_MST_NO}
-                  onPress={() =>
-                    showModal(
-                      <ChallengeListModal
-                        count_challenge={listData.progress_challenges?.length}
-                        challenge_mst_no={challenge.CHALLENGE_MST_NO}
-                      />,
-                    )
-                  }>
-                  <ChallengeSubInfo
-                    headerEmoji={challenge.HEADER_EMOJI}
-                    mainText={challenge.CHALLENGE_MST_NM}
-                    subText={calculateDaysUntil(challenge.START_DT).toString()}
-                  />
-                </Pressable>
-              ))
+              <RowScrollContainer gap={8}>
+                {listData.invited_challenges?.map(
+                  (challenge: ChallengeInfo) => (
+                    <Pressable
+                      key={challenge.CHALLENGE_MST_NO}
+                      onPress={() =>
+                        showModal(
+                          <ChallengeListModal
+                            count_challenge={
+                              listData.progress_challenges?.length
+                            }
+                            challenge_mst_no={challenge.CHALLENGE_MST_NO}
+                          />,
+                        )
+                      }>
+                      <ChallengeSubInfo
+                        headerEmoji={challenge.HEADER_EMOJI}
+                        mainText={challenge.CHALLENGE_MST_NM}
+                        subText={calculateDaysUntil(
+                          challenge.START_DT,
+                        ).toString()}
+                      />
+                    </Pressable>
+                  ),
+                )}
+              </RowScrollContainer>
             )}
 
             <TouchableOpacity

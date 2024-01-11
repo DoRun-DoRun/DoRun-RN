@@ -338,6 +338,8 @@ const BGComponent = ({
       : windowWidth * (data.PROGRESS / 100);
   const duduInitialY = yPosition + 10;
 
+  console.log(data);
+
   return (
     <>
       {data.DIARIES.map((diary: DiaryType) => (

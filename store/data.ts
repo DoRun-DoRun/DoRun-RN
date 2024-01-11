@@ -103,14 +103,10 @@ export const groupImage = [
 ];
 
 export const sleepLottie = [
+  require('../assets/lottie/sleep_dudu.json'),
   require('../assets/lottie/sleep_nuts.json'),
-  require('../assets/lottie/sleep_nuts.json'),
-  require('../assets/lottie/sleep_nuts.json'),
-  require('../assets/lottie/sleep_nuts.json'),
-  // require('../assets/lottie/sleep_dudu.json'),
-  // require('../assets/lottie/sleep_nuts.json'),
-  // require('../assets/lottie/sleep_pachi.json'),
-  // require('../assets/lottie/sleep_peats.json'),
+  require('../assets/lottie/sleep_pachi.json'),
+  require('../assets/lottie/sleep_peats.json'),
 ];
 
 export const usedItemImage = {

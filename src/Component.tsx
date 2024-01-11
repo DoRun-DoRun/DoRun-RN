@@ -227,10 +227,10 @@ export const useApi = () => {
 
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     const baseUrl = __DEV__
-      ? 'https://dorun.site'
-      : Platform.OS === 'ios'
-      ? 'http://127.0.0.1:8000' // iOS용 로컬 IP
-      : 'http://10.0.2.2:8000'; // Android용 로컬 서버
+      ? Platform.OS === 'ios'
+        ? 'http://127.0.0.1:8000' // iOS용 로컬 IP
+        : 'http://10.0.2.2:8000' // Android용 로컬 서버
+      : 'https://dorun.site';
 
     const url = `${baseUrl}/${endpoint}`;
 

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
-import {NotoSansKR, useApi} from '../Component';
+import {NotoSansKR, RowContainer, useApi} from '../Component';
 import {styled} from 'styled-components/native';
-import {Platform, View} from 'react-native';
+import {Alert, Platform, TouchableOpacity, View} from 'react-native';
 import {useMutation} from 'react-query';
 import {setAccessToken, setUser} from '../../store/slice/UserSlice';
 import {loadUser, userDataType} from '../../store/async/asyncStore';
@@ -15,85 +15,84 @@ import {useNavigation} from '@react-navigation/native';
 //   login,
 // } from '@react-native-seoul/kakao-login';
 
-// import {appleAuth} from '@invertase/react-native-apple-authentication';
-// import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
+import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 // import 'react-native-get-random-values';
-// import {v4 as uuid} from 'uuid';
+import {v4 as uuid} from 'uuid';
 import {SignType} from '../../store/data';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
-// const signInWithApple = async () => {
-//   // performs login request
-//   if (Platform.OS === 'android') {
-//     // Android 기기에서 실행되는 코드
-//     console.log('This is an Android device');
+const signInWithApple = async () => {
+  // performs login request
+  if (Platform.OS === 'android') {
+    // Android 기기에서 실행되는 코드
+    console.log('This is an Android device');
 
-//     // Generate secure, random values for state and nonce
-//     const rawNonce = uuid();
-//     const state = uuid();
+    // Generate secure, random values for state and nonce
+    const rawNonce = uuid();
+    const state = uuid();
 
-//     // Configure the request
-//     appleAuthAndroid.configure({
-//       // The Service ID you registered with Apple
-//       clientId: 'com.example.CLife',
+    // Configure the request
+    appleAuthAndroid.configure({
+      // The Service ID you registered with Apple
+      clientId: 'com.example.CLife',
 
-//       // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
-//       // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
-//       // redirectUri: 'https://dorun.site/auth/callback',
-//       redirectUri: '',
+      // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
+      // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
+      // redirectUri: 'https://dorun.site/auth/callback',
+      redirectUri: '',
 
-//       // The type of response requested - code, id_token, or both.
-//       responseType: appleAuthAndroid.ResponseType.ALL,
+      // The type of response requested - code, id_token, or both.
+      responseType: appleAuthAndroid.ResponseType.ALL,
 
-//       // The amount of user information requested from Apple.
-//       scope: appleAuthAndroid.Scope.ALL,
+      // The amount of user information requested from Apple.
+      scope: appleAuthAndroid.Scope.ALL,
 
-//       // Random nonce value that will be SHA256 hashed before sending to Apple.
-//       nonce: rawNonce,
+      // Random nonce value that will be SHA256 hashed before sending to Apple.
+      nonce: rawNonce,
 
-//       // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
-//       state,
-//     });
+      // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
+      state,
+    });
 
-//     // Open the browser window for user sign in
-//     const response = await appleAuthAndroid.signIn();
+    // Open the browser window for user sign in
+    const response = await appleAuthAndroid.signIn();
 
-//     Alert.alert('response값', response.toString(), [
-//       {text: '취소', onPress: () => console.log('취소됨')},
-//       {text: '확인', onPress: () => console.log('확인됨')},
-//     ]);
-//   } else {
-//     // 다른 플랫폼(예: iOS)에서 실행되는 코드
-//     console.log('This is not an Android device');
+    Alert.alert('response값', response.toString(), [
+      {text: '취소', onPress: () => console.log('취소됨')},
+      {text: '확인', onPress: () => console.log('확인됨')},
+    ]);
+  } else {
+    // performs login request
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    });
 
-//     const appleAuthRequestResponse = await appleAuth.performRequest({
-//       requestedOperation: appleAuth.Operation.LOGIN,
+    // get current authentication state for user
+    // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+    const credentialState = await appleAuth.getCredentialStateForUser(
+      appleAuthRequestResponse.user,
+    );
 
-//       // Note: it appears putting FULL_NAME first is important, see issue #293
-//       requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-//     });
+    // use credentialState response to ensure the user is authenticated
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      // user is authenticated
 
-//     Alert.alert('response값', appleAuthRequestResponse.toString(), [
-//       {text: '취소', onPress: () => console.log('취소됨')},
-//       {text: '확인', onPress: () => console.log('확인됨')},
-//     ]);
-//     console.log(appleAuthRequestResponse);
+      Toast.show({
+        type: 'success',
+        text1: '로그인 성공',
+      });
 
-//     // get current authentication state for user
-//     // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
-//     const credentialState = await appleAuth.getCredentialStateForUser(
-//       appleAuthRequestResponse.user,
-//     );
-
-//     // console.log(credentialState);
-
-//     // use credentialState response to ensure the user is authenticated
-//     if (credentialState === appleAuth.State.AUTHORIZED) {
-//       // user is authenticated
-//     }
-//   }
-// };
+      console.warn(appleAuthRequestResponse.user);
+      console.warn(appleAuthRequestResponse.identityToken);
+      console.warn(appleAuthRequestResponse.authorizationCode);
+      console.warn(appleAuthRequestResponse.nonce);
+    }
+  }
+};
 
 // const signInWithKakao = async (): Promise<void> => {
 //   try {
@@ -181,6 +180,15 @@ const LoginTab = () => {
     },
   });
 
+  useEffect(() => {
+    // onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
+    // return appleAuth.onCredentialRevoked(async () => {
+    //   console.warn(
+    //     'If this function executes, User Credentials have been Revoked',
+    //   );
+    // });
+  }, []); // passing in an empty array as the second argument ensures this is only ran once when component mounts initially.
+
   // useEffect(() => {
   //   const bootstrapAsync = async () => {
   //     const userData = await loadUser();
@@ -199,11 +207,11 @@ const LoginTab = () => {
       <BackgroundImage source={require('../../assets/image/background.png')} />
       <LoginContainer>
         <Title source={require('../../assets/image/title.png')} />
-        {/* <LoginButton
+        <LoginButton
           kakao
           onPress={() => {
-            signInWithKakao();
-            getKakaoProfile();
+            // signInWithKakao();
+            // getKakaoProfile();
           }}>
           <RowContainer gap={8}>
             <IconImage
@@ -222,25 +230,22 @@ const LoginTab = () => {
               size={20}
             />
             <NotoSansKR size={14} style={{flex: 1, textAlign: 'center'}}>
-              애플로 시작하기
+              Apple로 시작하기
             </NotoSansKR>
           </RowContainer>
-        </LoginButton> */}
-        <LoginButton
-          onPress={async () => {
-            if (isLoading) {
-              // console.log('Guest login is already in progress.');
-              return;
-            } else {
-              const userData = await loadUser();
-              dispatch(setSelectedChallengeMstNo(null));
+        </LoginButton>
 
-              if (userData?.refreshToken) {
-                dispatch(setUser(userData));
-                loginMutation.mutate(userData.refreshToken);
-              } else {
-                create_guest();
-              }
+        <TouchableOpacity
+          disabled={isLoading}
+          onPress={async () => {
+            const userData = await loadUser();
+            dispatch(setSelectedChallengeMstNo(null));
+
+            if (userData?.refreshToken) {
+              dispatch(setUser(userData));
+              loginMutation.mutate(userData.refreshToken);
+            } else {
+              create_guest();
             }
           }}>
           <NotoSansKR
@@ -248,12 +253,12 @@ const LoginTab = () => {
             weight="Medium"
             color="white"
             style={{
-              // textDecorationLine: 'underline',
+              textDecorationLine: 'underline',
               textAlign: 'center',
             }}>
             게스트 계정으로 시작하기
           </NotoSansKR>
-        </LoginButton>
+        </TouchableOpacity>
       </LoginContainer>
     </View>
   );
@@ -273,24 +278,26 @@ const LoginContainer = styled.View`
   justify-content: flex-end;
   align-items: center;
   padding: 32px;
-  gap: 6px;
+  gap: 12px;
+  margin-bottom: 16px;
 `;
 
 const Title = styled.Image`
   margin-bottom: 44px;
 `;
 
-// const IconImage = styled.Image<{size: number}>`
-//   width: ${({size}) => `${size}px`};
-//   height: ${({size}) => `${size}px`};
-// `;
+const IconImage = styled.Image<{size: number}>`
+  width: ${({size}) => `${size}px`};
+  height: ${({size}) => `${size}px`};
+`;
 
 const LoginButton = styled.TouchableOpacity<{kakao?: boolean}>`
+  width: 200px;
   margin-top: 6px;
-  background-color: ${props => props.theme.secondary1};
-  /* background-color: ${({kakao}) => (kakao ? '#fddc3f' : '#fff')}; */
-  /* padding: 8px 16px 8px 12px; */
-  padding: 12px 24px;
+  /* background-color: ${props => props.theme.secondary1}; */
+  background-color: ${({kakao}) => (kakao ? '#fddc3f' : '#fff')};
+  padding: 8px 16px 8px 12px;
+  /* padding: 12px 24px; */
   border-radius: 5px;
   ${Platform.OS === 'ios'
     ? `
