@@ -8,17 +8,24 @@ import {
   RowContainer,
   convertUTCToKoKRDay,
   timeSince,
+  useApi,
 } from '../Component';
 import {ModalHeadBorder, ModalHeadText} from './CustomModal';
 import LottieView from 'lottie-react-native';
 import {
   ItemName,
+  adUnitId,
   completeText,
   defaultData,
   groupImage,
   usedItemImage,
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
+import {RewardedAd, RewardedAdEventType} from 'react-native-google-mobile-ads';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import {useMutation} from 'react-query';
+import {useModal} from './ModalProvider';
 
 interface ParticipantsType {
   USER_NM: string;
@@ -211,12 +218,72 @@ export const UsedItemModal = ({
 export const DailyModal = ({
   item_type,
   item_no,
+  isDaily,
+  challenge_user_no,
 }: {
   item_type: 'Avatar' | 'Item' | 'Nothing';
   item_no: number;
+  isDaily?: boolean;
+  challenge_user_no?: number;
 }) => {
+  const {showModal, hideModal} = useModal();
+  const rewarded = RewardedAd.createForAdRequest(adUnitId!, {
+    keywords: ['fashion', 'clothing'],
+  });
+
   const width = Dimensions.get('window').width;
-  console.log(item_no, item_type);
+  const [loaded, setLoaded] = useState(false);
+  const CallApi = useApi();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+
+  const getItem = () =>
+    CallApi({
+      endpoint: `item?challenge_user=${challenge_user_no}`,
+      method: 'POST',
+      accessToken: accessToken!,
+    });
+
+  const {mutate} = useMutation(getItem, {
+    onSuccess: response => {
+      showModal(
+        <DailyModal
+          item_no={response.AVATAR_NO}
+          item_type={response.AVATAR_TYPE}
+          isDaily
+          challenge_user_no={challenge_user_no}
+        />,
+      );
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
+  useEffect(() => {
+    console.log('ddd');
+    const unsubscribeLoaded = rewarded.addAdEventListener(
+      RewardedAdEventType.LOADED,
+      () => {
+        setLoaded(true);
+      },
+    );
+    const unsubscribeEarned = rewarded.addAdEventListener(
+      RewardedAdEventType.EARNED_REWARD,
+      reward => {
+        hideModal();
+        mutate();
+        console.log('User earned reward of ', reward);
+      },
+    );
+
+    rewarded.load();
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeEarned();
+    };
+  }, [hideModal, mutate, rewarded]);
+
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
       <ModalHeadBorder />
@@ -239,6 +306,25 @@ export const DailyModal = ({
             보상으로 [{defaultData[item_type][item_no - 1].NAME}]을 받았어요!
           </NotoSansKR>
         </>
+      )}
+      {loaded ? (
+        isDaily &&
+        challenge_user_no && (
+          <ButtonComponent
+            onPress={() => {
+              rewarded.show();
+            }}>
+            광고보고 아이템 받기
+          </ButtonComponent>
+        )
+      ) : (
+        <ButtonComponent
+          disabled
+          onPress={() => {
+            rewarded.show();
+          }}>
+          광고 불러오는 중
+        </ButtonComponent>
       )}
     </View>
   );

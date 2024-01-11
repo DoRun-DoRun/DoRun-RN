@@ -1,3 +1,6 @@
+import {Platform} from 'react-native';
+import {TestIds} from 'react-native-google-mobile-ads';
+
 export enum SignType {
   KAKAO = 'KAKAO',
   APPLE = 'APPLE',
@@ -99,6 +102,17 @@ export const groupImage = [
   require('../assets/image/group/group_default_3.png'),
 ];
 
+export const sleepLottie = [
+  require('../assets/lottie/sleep_nuts.json'),
+  require('../assets/lottie/sleep_nuts.json'),
+  require('../assets/lottie/sleep_nuts.json'),
+  require('../assets/lottie/sleep_nuts.json'),
+  // require('../assets/lottie/sleep_dudu.json'),
+  // require('../assets/lottie/sleep_nuts.json'),
+  // require('../assets/lottie/sleep_pachi.json'),
+  // require('../assets/lottie/sleep_peats.json'),
+];
+
 export const usedItemImage = {
   hammer: [
     require('../assets/lottie/dudu_hammer.gif'),
@@ -183,3 +197,9 @@ export const completeText = [
   '성공하면 더 성공하고 싶어진다. - 토니 로빈스',
   '운은 용기 있는 사람의 편. - 베르길리우스',
 ];
+
+export const adUnitId = __DEV__
+  ? TestIds.ADAPTIVE_BANNER
+  : Platform.OS === 'ios'
+  ? 'ca-app-pub-5902646867257909~8665642249' // iOS용 실제 광고 단위 ID
+  : 'ca-app-pub-5902646867257909~6796396497'; // Android용 실제 광고 단위 ID

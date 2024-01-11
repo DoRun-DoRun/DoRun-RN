@@ -226,12 +226,11 @@ export const useApi = () => {
   const navigation = useNavigation();
 
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
-    let baseUrl = 'https://dorun.site';
-
-    // baseUrl =
-    //   Platform.OS === 'android'
-    //     ? 'http://10.0.2.2:8000'
-    //     : 'http://127.0.0.1:8000';
+    const baseUrl = __DEV__
+      ? 'https://dorun.site'
+      : Platform.OS === 'ios'
+      ? 'http://127.0.0.1:8000' // iOS용 로컬 IP
+      : 'http://10.0.2.2:8000'; // Android용 로컬 서버
 
     const url = `${baseUrl}/${endpoint}`;
 

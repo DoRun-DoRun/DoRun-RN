@@ -29,13 +29,16 @@ import LottieView from 'lottie-react-native';
 import {
   BackgroundImage,
   Dudus,
+  UserStatusType,
+  adUnitId,
   avatarImage,
   defaultData,
+  sleepLottie,
   struggleLottie,
 } from '../../store/data';
 import FastImage from 'react-native-fast-image';
 import {NavigationType} from '../App';
-import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
+import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -76,6 +79,7 @@ export interface ChallengeUserType {
   CHARACTER_NO: number;
   PET_NO: number;
   DIARIES: DiaryType[];
+  STATUS: UserStatusType;
 }
 const DiaryComponent = ({
   diary,
@@ -123,12 +127,6 @@ const RaceTab = () => {
   const navigation = useNavigation();
 
   const [refreshing, setRefreshing] = useState(false);
-
-  const adUnitId = __DEV__
-    ? TestIds.ADAPTIVE_BANNER
-    : Platform.OS === 'ios'
-    ? 'ca-app-pub-5902646867257909~8665642249' // iOS용 실제 광고 단위 ID
-    : 'ca-app-pub-5902646867257909~6796396497'; // Android용 실제 광고 단위 ID
 
   const ChallengeUserList = async () => {
     try {
@@ -411,10 +409,25 @@ const BGComponent = ({
           </>
         ) : (
           <>
-            <FastImage
-              source={Dudus[data.CHARACTER_NO - 1]}
-              style={{width: 60, height: 70}}
-            />
+            {data.STATUS === UserStatusType.SLEEPING ? (
+              <LottieView
+                source={sleepLottie[data.CHARACTER_NO - 1]}
+                autoPlay
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 70,
+                  height: 60,
+                }}
+              />
+            ) : (
+              <FastImage
+                source={Dudus[data.CHARACTER_NO - 1]}
+                style={{width: 60, height: 70}}
+              />
+            )}
+
             {!!data.PET_NO && (
               <FastImage
                 source={avatarImage[data.PET_NO - 1]}

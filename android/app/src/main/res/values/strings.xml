@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CLife</string>
+    <string name="app_name">두런두런</string>
     <string name="kakao_app_key">97d8ca4c2736fdb3f362246fe17f316b</string>
     <string name="CodePushDeploymentKey">5I-4v0CWLsiEJAN6KtB-UZJseL6P8i_MQAwbE</string>
     <string name="appCenterCrashes_whenToSendCrashes" moduleConfig="true" translatable="false">DO_NOT_ASK_JAVASCRIPT</string>

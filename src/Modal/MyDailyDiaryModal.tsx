@@ -65,7 +65,12 @@ export const MyDailyDrayModal = ({
         queryClient.invalidateQueries('getChallengeDetail');
 
         showModal(
-          <DailyModal item_no={res.item_no} item_type={res.item_type} />,
+          <DailyModal
+            item_no={res.item_no}
+            item_type={res.item_type}
+            challenge_user_no={challenge_user_no}
+            isDaily
+          />,
         );
       },
       onError: error => {

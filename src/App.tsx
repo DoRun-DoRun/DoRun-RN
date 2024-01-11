@@ -15,12 +15,9 @@ import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
 import {DailyNoteScreen} from './screens/DailyNoteScreen';
-import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
+import {loadGoals, loadSetting} from '../store/async/asyncStore';
 import {useDispatch} from 'react-redux';
 import {restoreGoal} from '../store/slice/GoalSlice';
-import {setAccessToken, setUser} from '../store/slice/UserSlice';
-import {useMutation} from 'react-query';
-import {useApi} from './Component';
 import {setVolume} from '../store/slice/SettingSlice';
 
 import mobileAds from 'react-native-google-mobile-ads';
@@ -56,27 +53,27 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function App() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const CallApi = useApi();
+  // const CallApi = useApi();
 
-  const loginGuest = (refreshToken: string) =>
-    CallApi({
-      endpoint: 'user/login',
-      method: 'GET',
-      accessToken: refreshToken,
-    });
+  // const loginGuest = (refreshToken: string) =>
+  //   CallApi({
+  //     endpoint: 'user/login',
+  //     method: 'GET',
+  //     accessToken: refreshToken,
+  //   });
 
-  const loginMutation = useMutation(loginGuest, {
-    onSuccess: async data => {
-      const {access_token} = data;
+  // const loginMutation = useMutation(loginGuest, {
+  //   onSuccess: async data => {
+  //     const {access_token} = data;
 
-      if (access_token) {
-        dispatch(setAccessToken({accessToken: access_token}));
-        navigation.navigate('MainTab' as never);
-      } else {
-        console.error('Access token is missing in the response');
-      }
-    },
-  });
+  //     if (access_token) {
+  //       dispatch(setAccessToken({accessToken: access_token}));
+  //       navigation.navigate('MainTab' as never);
+  //     } else {
+  //       console.error('Access token is missing in the response');
+  //     }
+  //   },
+  // });
 
   useEffect(() => {
     const bootstrapAsync = async () => {
@@ -85,11 +82,11 @@ function App() {
       if (goalData) {
         dispatch(restoreGoal(goalData));
       }
-      const userData = await loadUser();
-      if (userData?.refreshToken) {
-        dispatch(setUser(userData));
-        loginMutation.mutate(userData.refreshToken);
-      }
+      // const userData = await loadUser();
+      // if (userData?.refreshToken) {
+      //   dispatch(setUser(userData));
+      //   loginMutation.mutate(userData.refreshToken);
+      // }
       const settingData = await loadSetting();
       if (settingData) {
         dispatch(setVolume(settingData));
@@ -97,7 +94,6 @@ function App() {
     };
 
     bootstrapAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigation]);
 
   const getPermission = async () => {
