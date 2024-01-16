@@ -16,9 +16,6 @@ import {useNavigation} from '@react-navigation/native';
 // } from '@react-native-seoul/kakao-login';
 
 import {appleAuth} from '@invertase/react-native-apple-authentication';
-import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
-// import 'react-native-get-random-values';
-import {v4 as uuid} from 'uuid';
 import {SignType} from '../../store/data';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
@@ -135,56 +132,20 @@ const LoginTab = () => {
   });
 
   const signInWithApple = async () => {
-    if (Platform.OS === 'android') {
-      console.log('This is an Android device');
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    });
 
-      // Generate secure, random values for state and nonce
-      const rawNonce = uuid();
-      const state = uuid();
+    const credentialState = await appleAuth.getCredentialStateForUser(
+      appleAuthRequestResponse.user,
+    );
 
-      // Configure the request
-      appleAuthAndroid.configure({
-        // The Service ID you registered with Apple
-        clientId: 'com.example.CLife',
-
-        // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
-        // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
-        // redirectUri: 'https://dorun.site/auth/callback',
-        redirectUri: '',
-
-        // The type of response requested - code, id_token, or both.
-        responseType: appleAuthAndroid.ResponseType.ALL,
-
-        // The amount of user information requested from Apple.
-        scope: appleAuthAndroid.Scope.ALL,
-
-        // Random nonce value that will be SHA256 hashed before sending to Apple.
-        nonce: rawNonce,
-
-        // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
-        state,
-      });
-
-      // Open the browser window for user sign in
-      const response = await appleAuthAndroid.signIn();
-
-      console.log(response);
-    } else {
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      });
-
-      const credentialState = await appleAuth.getCredentialStateForUser(
-        appleAuthRequestResponse.user,
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      const payload = jwtDecode<AppleJwtToken>(
+        appleAuthRequestResponse.identityToken!,
       );
-
-      if (credentialState === appleAuth.State.AUTHORIZED) {
-        const payload = jwtDecode<AppleJwtToken>(
-          appleAuthRequestResponse.identityToken!,
-        );
-        SignUp({signType: SignType.APPLE, email: payload.email});
-      }
+      SignUp({signType: SignType.APPLE, email: payload.email});
     }
   };
 
@@ -231,28 +192,30 @@ const LoginTab = () => {
             </NotoSansKR>
           </RowContainer>
         </LoginButton>
-        <LoginButton
-          onPress={async () => {
-            const userData = await loadUser();
-            dispatch(setSelectedChallengeMstNo(null));
+        {Platform.OS === 'ios' && (
+          <LoginButton
+            onPress={async () => {
+              const userData = await loadUser();
+              dispatch(setSelectedChallengeMstNo(null));
 
-            if (userData?.APPLE) {
-              dispatch(setUser(userData));
-              loginMutation.mutate(userData.APPLE);
-            } else {
-              signInWithApple();
-            }
-          }}>
-          <RowContainer gap={8}>
-            <IconImage
-              source={require('../../assets/image/apple_icon.png')}
-              size={20}
-            />
-            <NotoSansKR size={14} style={{flex: 1, textAlign: 'center'}}>
-              Apple로 시작하기
-            </NotoSansKR>
-          </RowContainer>
-        </LoginButton>
+              if (userData?.APPLE) {
+                dispatch(setUser(userData));
+                loginMutation.mutate(userData.APPLE);
+              } else {
+                signInWithApple();
+              }
+            }}>
+            <RowContainer gap={8}>
+              <IconImage
+                source={require('../../assets/image/apple_icon.png')}
+                size={20}
+              />
+              <NotoSansKR size={14} style={{flex: 1, textAlign: 'center'}}>
+                Apple로 시작하기
+              </NotoSansKR>
+            </RowContainer>
+          </LoginButton>
+        )}
 
         <TouchableOpacity
           disabled={isLoading}
