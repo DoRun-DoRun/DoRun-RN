@@ -489,7 +489,7 @@ const Navigation = () => {
         onPress={() => navigation.navigate('FriendScreen' as never)}
         android_ripple={{color: '#eeeeee'}}>
         <NavigationButton>
-          <OcticonIcons name="people" size={24} />
+          <OcticonIcons name="people" size={24} color="#000" />
         </NavigationButton>
       </Pressable>
 
@@ -497,7 +497,7 @@ const Navigation = () => {
         onPress={() => navigation.navigate('SettingScreen' as never)}
         android_ripple={{color: '#eeeeee'}}>
         <NavigationButton>
-          <OcticonIcons name="gear" size={24} />
+          <OcticonIcons name="gear" size={24} color="#000" />
         </NavigationButton>
       </Pressable>
     </NavigationContainer>

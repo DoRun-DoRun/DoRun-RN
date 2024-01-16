@@ -68,7 +68,7 @@ const LoginTab = () => {
         type: 'success',
         text1: `${response.SIGN_TYPE} 로그인 성공`,
       });
-      console.log(response);
+      // console.log(response);
       dispatch(setAccessToken({accessToken: response.access_token}));
       navigation.navigate('MainTab' as never);
     },
@@ -118,7 +118,7 @@ const LoginTab = () => {
   const signInWithKakao = async (): Promise<void> => {
     try {
       const token: KakaoOAuthToken = await login();
-      console.log('token', token);
+      // console.log('token', token);
       const payload: KakaoJwtToken = jwtDecode(token.idToken);
       SignUp({signType: SignType.KAKAO, email: payload.email});
     } catch (err) {
