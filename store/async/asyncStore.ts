@@ -4,10 +4,12 @@ import {SignType} from '../data';
 export interface userDataType {
   UID: number | null;
   accessToken: string | null;
-  refreshToken: string | null;
   userName: string | null;
   SIGN_TYPE: SignType | null;
-  USER_EMAIL: string | null;
+  USER_EMAIL?: string | null;
+  GUEST?: string | null;
+  APPLE?: string | null;
+  KAKAO?: string | null;
 }
 
 export interface challengeDataType {

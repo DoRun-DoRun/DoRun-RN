@@ -6,10 +6,12 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState: userDataType = {
   userName: null,
   accessToken: null,
-  refreshToken: null,
   UID: null,
   SIGN_TYPE: null,
   USER_EMAIL: null,
+  GUEST: null,
+  APPLE: null,
+  KAKAO: null,
 };
 
 /**
@@ -21,12 +23,25 @@ export const UserSlice = createSlice({
   reducers: {
     // 모든 사용자 정보를 상태에 저장합니다.
     setUser(state, action) {
-      const {userName, UID, accessToken, refreshToken} = action.payload;
-      state.userName = userName;
-      state.UID = UID;
-      state.accessToken = accessToken;
-      state.refreshToken = refreshToken;
+      const response: userDataType = action.payload;
 
+      state.UID = response.UID;
+      state.accessToken = response.accessToken;
+      state.userName = response.userName;
+
+      state.SIGN_TYPE = response.SIGN_TYPE;
+
+      if (response.GUEST) {
+        state.GUEST = response.GUEST;
+      }
+      if (response.APPLE) {
+        state.APPLE = response.APPLE;
+      }
+      if (response.KAKAO) {
+        state.KAKAO = response.KAKAO;
+      }
+
+      console.log('state', state);
       persistUser(state);
     },
     setUserName(state, action) {
@@ -38,6 +53,7 @@ export const UserSlice = createSlice({
     setAccessToken(state, actoin) {
       const {accessToken} = actoin.payload;
       state.accessToken = accessToken;
+      console.log(accessToken);
 
       persistUser(state);
     },

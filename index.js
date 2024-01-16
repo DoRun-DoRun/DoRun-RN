@@ -9,6 +9,7 @@ import {light} from './src/style/theme';
 import {ThemeProvider} from 'styled-components/native';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import CodePush from 'react-native-code-push';
+import 'core-js/stable/atob';
 
 const queryClient = new QueryClient();
 import {ModalProvider} from './src/Modal/ModalProvider';

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {NotoSansKR, RowContainer, useApi} from '../Component';
 import {styled} from 'styled-components/native';
-import {Alert, Platform, TouchableOpacity, View} from 'react-native';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import {useMutation} from 'react-query';
 import {setAccessToken, setUser} from '../../store/slice/UserSlice';
 import {loadUser, userDataType} from '../../store/async/asyncStore';
@@ -23,76 +23,22 @@ import {SignType} from '../../store/data';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {jwtDecode} from 'jwt-decode';
 
-const signInWithApple = async () => {
-  // performs login request
-  if (Platform.OS === 'android') {
-    // Android 기기에서 실행되는 코드
-    console.log('This is an Android device');
-
-    // Generate secure, random values for state and nonce
-    const rawNonce = uuid();
-    const state = uuid();
-
-    // Configure the request
-    appleAuthAndroid.configure({
-      // The Service ID you registered with Apple
-      clientId: 'com.example.CLife',
-
-      // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
-      // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
-      // redirectUri: 'https://dorun.site/auth/callback',
-      redirectUri: '',
-
-      // The type of response requested - code, id_token, or both.
-      responseType: appleAuthAndroid.ResponseType.ALL,
-
-      // The amount of user information requested from Apple.
-      scope: appleAuthAndroid.Scope.ALL,
-
-      // Random nonce value that will be SHA256 hashed before sending to Apple.
-      nonce: rawNonce,
-
-      // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
-      state,
-    });
-
-    // Open the browser window for user sign in
-    const response = await appleAuthAndroid.signIn();
-
-    Alert.alert('response값', response.toString(), [
-      {text: '취소', onPress: () => console.log('취소됨')},
-      {text: '확인', onPress: () => console.log('확인됨')},
-    ]);
-  } else {
-    // performs login request
-    const appleAuthRequestResponse = await appleAuth.performRequest({
-      requestedOperation: appleAuth.Operation.LOGIN,
-      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-    });
-
-    // get current authentication state for user
-    // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
-    const credentialState = await appleAuth.getCredentialStateForUser(
-      appleAuthRequestResponse.user,
-    );
-
-    // use credentialState response to ensure the user is authenticated
-    if (credentialState === appleAuth.State.AUTHORIZED) {
-      // user is authenticated
-
-      Toast.show({
-        type: 'success',
-        text1: '로그인 성공',
-      });
-
-      console.warn(appleAuthRequestResponse.user);
-      console.warn(appleAuthRequestResponse.identityToken);
-      console.warn(appleAuthRequestResponse.authorizationCode);
-      console.warn(appleAuthRequestResponse.nonce);
-    }
-  }
-};
+interface AppleJwtToken {
+  iss: string;
+  aud: string;
+  exp: number;
+  iat: number;
+  sub: string;
+  nonce: string;
+  c_hash: string;
+  email: string;
+  email_verified: string;
+  is_private_email: string;
+  auth_time: number;
+  nonce_supported: boolean;
+}
 
 // const signInWithKakao = async (): Promise<void> => {
 //   try {
@@ -128,47 +74,55 @@ const LoginTab = () => {
     };
   }, [dispatch]);
 
-  const loginGuest = (refreshToken: string) =>
+  const login = (refreshToken: string) =>
     CallApi({
       endpoint: 'user/login',
       method: 'GET',
       accessToken: refreshToken,
     });
 
-  const loginMutation = useMutation(loginGuest, {
-    onSuccess: async data => {
-      const {access_token} = data;
-
-      if (access_token) {
-        dispatch(setAccessToken({accessToken: access_token}));
-        navigation.navigate('MainTab' as never);
-      } else {
-        console.error('Access token is missing in the response');
-      }
+  const loginMutation = useMutation(login, {
+    onSuccess: async response => {
+      Toast.show({
+        type: 'success',
+        text1: `${response.SIGN_TYPE} 로그인 성공`,
+      });
+      console.log(response);
+      dispatch(setAccessToken({accessToken: response.access_token}));
+      navigation.navigate('MainTab' as never);
     },
   });
 
-  const createGuest = () =>
+  const signUp = ({signType, email}: {signType: SignType; email?: string}) =>
     CallApi({
       endpoint: 'user',
       method: 'POST',
-      body: {SIGN_TYPE: SignType.GUEST},
+      body: {USER_EMAIL: email ? email : null, SIGN_TYPE: signType},
     });
 
   const {
-    mutate: create_guest,
+    mutate: SignUp,
     isLoading,
     error,
-  } = useMutation(createGuest, {
+  } = useMutation(signUp, {
     onSuccess: response => {
-      // 요청 성공 시 수행할 작업
+      Toast.show({
+        type: 'success',
+        text1: `${response.SIGN_TYPE} 로그인 성공`,
+      });
+
       const userData: userDataType = {
         UID: response.UID,
         accessToken: response.access_token,
-        refreshToken: response.refresh_token,
         userName: response.USER_NM,
-        SIGN_TYPE: SignType.GUEST,
-        USER_EMAIL: '',
+
+        SIGN_TYPE: response.SIGN_TYPE,
+        GUEST:
+          response.SIGN_TYPE === SignType.GUEST ? response.refresh_token : null,
+        APPLE:
+          response.SIGN_TYPE === SignType.APPLE ? response.refresh_token : null,
+        KAKAO:
+          response.SIGN_TYPE === SignType.KAKAO ? response.refresh_token : null,
       };
 
       dispatch(setUser(userData));
@@ -179,6 +133,60 @@ const LoginTab = () => {
       console.error('Error:', error);
     },
   });
+
+  const signInWithApple = async () => {
+    if (Platform.OS === 'android') {
+      console.log('This is an Android device');
+
+      // Generate secure, random values for state and nonce
+      const rawNonce = uuid();
+      const state = uuid();
+
+      // Configure the request
+      appleAuthAndroid.configure({
+        // The Service ID you registered with Apple
+        clientId: 'com.example.CLife',
+
+        // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
+        // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
+        // redirectUri: 'https://dorun.site/auth/callback',
+        redirectUri: '',
+
+        // The type of response requested - code, id_token, or both.
+        responseType: appleAuthAndroid.ResponseType.ALL,
+
+        // The amount of user information requested from Apple.
+        scope: appleAuthAndroid.Scope.ALL,
+
+        // Random nonce value that will be SHA256 hashed before sending to Apple.
+        nonce: rawNonce,
+
+        // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
+        state,
+      });
+
+      // Open the browser window for user sign in
+      const response = await appleAuthAndroid.signIn();
+
+      console.log(response);
+    } else {
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+      });
+
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        const payload = jwtDecode<AppleJwtToken>(
+          appleAuthRequestResponse.identityToken!,
+        );
+        SignUp({signType: SignType.APPLE, email: payload.email});
+      }
+    }
+  };
 
   useEffect(() => {
     // onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
@@ -223,7 +231,18 @@ const LoginTab = () => {
             </NotoSansKR>
           </RowContainer>
         </LoginButton>
-        <LoginButton onPress={() => signInWithApple()}>
+        <LoginButton
+          onPress={async () => {
+            const userData = await loadUser();
+            dispatch(setSelectedChallengeMstNo(null));
+
+            if (userData?.APPLE) {
+              dispatch(setUser(userData));
+              loginMutation.mutate(userData.APPLE);
+            } else {
+              signInWithApple();
+            }
+          }}>
           <RowContainer gap={8}>
             <IconImage
               source={require('../../assets/image/apple_icon.png')}
@@ -241,11 +260,11 @@ const LoginTab = () => {
             const userData = await loadUser();
             dispatch(setSelectedChallengeMstNo(null));
 
-            if (userData?.refreshToken) {
+            if (userData?.GUEST) {
               dispatch(setUser(userData));
-              loginMutation.mutate(userData.refreshToken);
+              loginMutation.mutate(userData.GUEST);
             } else {
-              create_guest();
+              SignUp({signType: SignType.GUEST});
             }
           }}>
           <NotoSansKR
