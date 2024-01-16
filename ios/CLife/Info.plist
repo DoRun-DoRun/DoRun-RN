@@ -24,21 +24,24 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
-			<array/>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<array>
+				<string>kakao97d8ca4c2736fdb3f362246fe17f316b</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>KAKAO_APP_KEY</key>
+	<string>97d8ca4c2736fdb3f362246fe17f316b</string>
 	<key>CodePushDeploymentKey</key>
 	<string>5I-4v0CWLsiEJAN6KtB-UZJseL6P8i_MQAwbE</string>
 	<key>LSApplicationQueriesSchemes</key>
-	<array/>
+	<array>
+		<string>kakaokompassauth</string>
+		<string>kakaolink</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

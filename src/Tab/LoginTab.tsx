@@ -7,13 +7,7 @@ import {setAccessToken, setUser} from '../../store/slice/UserSlice';
 import {loadUser, userDataType} from '../../store/async/asyncStore';
 import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
-// import {
-//   KakaoOAuthToken,
-//   KakaoProfile,
-//   KakaoProfileNoneAgreement,
-//   getProfile,
-//   login,
-// } from '@react-native-seoul/kakao-login';
+import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
 
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {SignType} from '../../store/data';
@@ -37,26 +31,16 @@ interface AppleJwtToken {
   nonce_supported: boolean;
 }
 
-// const signInWithKakao = async (): Promise<void> => {
-//   try {
-//     const token: KakaoOAuthToken = await login();
-//     console.log(token);
-
-//     // setResult(JSON.stringify(token));
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
-
-// const getKakaoProfile = async (): Promise<void> => {
-//   try {
-//     const profile: KakaoProfile | KakaoProfileNoneAgreement =
-//       await getProfile();
-//     console.log(profile);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+interface KakaoJwtToken {
+  aud: string;
+  sub: string;
+  auth_time: number;
+  iss: string;
+  nickname: string;
+  exp: number;
+  iat: number;
+  email: string;
+}
 
 const LoginTab = () => {
   const CallApi = useApi();
@@ -71,14 +55,14 @@ const LoginTab = () => {
     };
   }, [dispatch]);
 
-  const login = (refreshToken: string) =>
+  const signIn = (refreshToken: string) =>
     CallApi({
       endpoint: 'user/login',
       method: 'GET',
       accessToken: refreshToken,
     });
 
-  const loginMutation = useMutation(login, {
+  const loginMutation = useMutation(signIn, {
     onSuccess: async response => {
       Toast.show({
         type: 'success',
@@ -131,6 +115,17 @@ const LoginTab = () => {
     },
   });
 
+  const signInWithKakao = async (): Promise<void> => {
+    try {
+      const token: KakaoOAuthToken = await login();
+      console.log('token', token);
+      const payload: KakaoJwtToken = jwtDecode(token.idToken);
+      SignUp({signType: SignType.KAKAO, email: payload.email});
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const signInWithApple = async () => {
     const appleAuthRequestResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
@@ -178,9 +173,17 @@ const LoginTab = () => {
         <Title source={require('../../assets/image/title.png')} />
         <LoginButton
           kakao
-          onPress={() => {
-            // signInWithKakao();
-            // getKakaoProfile();
+          disabled={isLoading}
+          onPress={async () => {
+            const userData = await loadUser();
+            dispatch(setSelectedChallengeMstNo(null));
+
+            if (userData?.KAKAO) {
+              dispatch(setUser(userData));
+              loginMutation.mutate(userData.KAKAO);
+            } else {
+              signInWithKakao();
+            }
           }}>
           <RowContainer gap={8}>
             <IconImage
@@ -194,6 +197,7 @@ const LoginTab = () => {
         </LoginButton>
         {Platform.OS === 'ios' && (
           <LoginButton
+            disabled={isLoading}
             onPress={async () => {
               const userData = await loadUser();
               dispatch(setSelectedChallengeMstNo(null));
