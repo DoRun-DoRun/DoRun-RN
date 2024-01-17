@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import {
+  ButtonComponent,
+  GetImage,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -17,6 +19,7 @@ import {RootState} from '../../store/RootReducer';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {InviteAcceptType} from '../../store/data';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import KakaoShareLink from 'react-native-kakao-share-link';
 
 // const FrinedCharacter = styled.View`
 //   width: 32px;
@@ -81,8 +84,8 @@ const Friend = ({accessToken, name, friendNo, invited}: FriendType) => {
   );
 };
 
-const SearchContainer = styled.View<{isClicked: boolean}>`
-  width: 100%;
+const SearchContainer = styled.View`
+  flex: 1;
   background-color: #fff;
   border: 1px solid ${props => props.theme.gray6};
   padding: 8px;
@@ -147,7 +150,6 @@ const InviteFriend = ({name, UID, setUidInput}: InviteFriendType) => {
 };
 
 const SearchBox = ({UID}: {UID: number}) => {
-  const [isClicked, setIsClicked] = useState(false);
   const [uidInput, setUidInput] = useState('');
   const CallApi = useApi();
   const SearchList = async () => {
@@ -171,38 +173,39 @@ const SearchBox = ({UID}: {UID: number}) => {
   );
 
   return (
-    <SearchContainer isClicked={isClicked}>
-      <RowContainer gap={8}>
-        <OcticonIcons name="search" size={16} />
-        <InputNotoSansKR
-          size={14}
-          value={uidInput}
-          keyboardType="number-pad"
-          maxLength={7}
-          onChangeText={setUidInput}
-          style={{flex: 1}}
-          placeholder={`친구 UID 검색 (내 UID: ${UID})`}
-          onFocus={() => setIsClicked(true)}
-        />
-      </RowContainer>
+    <RowContainer gap={8}>
+      <SearchContainer>
+        <RowContainer gap={8}>
+          <OcticonIcons name="search" size={16} />
+          <InputNotoSansKR
+            size={14}
+            value={uidInput}
+            keyboardType="number-pad"
+            maxLength={7}
+            onChangeText={setUidInput}
+            style={{flex: 1}}
+            placeholder={`친구 UID 검색 (내 UID: ${UID})`}
+          />
+        </RowContainer>
 
-      {isClicked && uidInput ? (
-        <ExpandedContainer>
-          <NotoSansKR size={14}>검색 결과</NotoSansKR>
-          {isLoading ? (
-            <LoadingIndicatior />
-          ) : data?.USER_NM ? (
-            <InviteFriend
-              name={data?.USER_NM}
-              UID={data?.UID}
-              setUidInput={setUidInput}
-            />
-          ) : (
-            <NotoSansKR size={14}>검색 결과가 없습니다.</NotoSansKR>
-          )}
-        </ExpandedContainer>
-      ) : null}
-    </SearchContainer>
+        {uidInput && (
+          <ExpandedContainer>
+            <NotoSansKR size={14}>검색 결과</NotoSansKR>
+            {isLoading ? (
+              <LoadingIndicatior />
+            ) : data?.USER_NM ? (
+              <InviteFriend
+                name={data?.USER_NM}
+                UID={data?.UID}
+                setUidInput={setUidInput}
+              />
+            ) : (
+              <NotoSansKR size={14}>검색 결과가 없습니다.</NotoSansKR>
+            )}
+          </ExpandedContainer>
+        )}
+      </SearchContainer>
+    </RowContainer>
   );
 };
 
@@ -213,7 +216,9 @@ interface friendAPIType {
 }
 
 const FriendScreen = () => {
-  const {accessToken, UID} = useSelector((state: RootState) => state.user);
+  const {accessToken, UID, userName} = useSelector(
+    (state: RootState) => state.user,
+  );
   const CallApi = useApi();
   const FriendListModal = async () => {
     try {
@@ -233,6 +238,38 @@ const FriendScreen = () => {
     FriendListModal,
   );
 
+  const sendKakao = async () => {
+    try {
+      const response = await KakaoShareLink.sendFeed({
+        content: {
+          title: `${userName}님이 친구요청을 보냈어요!`,
+          imageUrl: GetImage('group_default_3@3x.png'),
+          link: {
+            webUrl: 'https://developers.kakao.com/',
+            mobileWebUrl: 'https://developers.kakao.com/',
+          },
+          description:
+            '두런두런과 함께 갓생 살기\n지금 친구들과 시작해 보세요!',
+        },
+        buttons: [
+          {
+            title: '앱에서 보기',
+            link: {
+              androidExecutionParams: [{key: 'key1', value: 'value1'}],
+              iosExecutionParams: [
+                {key: 'key1', value: 'value1'},
+                {key: 'key2', value: 'value2'},
+              ],
+            },
+          },
+        ],
+      });
+      console.log(response);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (friendLoading) {
     return <LoadingIndicatior />;
   }
@@ -244,46 +281,63 @@ const FriendScreen = () => {
           <View style={{gap: 24}}>
             <NotoSansKR size={20}>친구 목록</NotoSansKR>
             <SearchBox UID={UID!} />
-
             <View style={{gap: 8}}>
               <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
                 요청된 친구 초대
               </NotoSansKR>
 
-              <View style={{gap: 8}}>
-                {friendData?.pending.map((data: friendAPIType) => {
-                  return (
-                    <Friend
-                      accessToken={accessToken}
-                      key={data.FRIEND_NO}
-                      name={data.USER_NM}
-                      friendNo={data.FRIEND_NO}
-                      invited
-                    />
-                  );
-                })}
-              </View>
+              {friendData?.pending.length !== 0 ? (
+                <View style={{gap: 8}}>
+                  {friendData?.pending.map((data: friendAPIType) => {
+                    return (
+                      <Friend
+                        accessToken={accessToken}
+                        key={data.FRIEND_NO}
+                        name={data.USER_NM}
+                        friendNo={data.FRIEND_NO}
+                        invited
+                      />
+                    );
+                  })}
+                </View>
+              ) : (
+                <NotoSansKR size={12} weight="Medium">
+                  요청된 친구 초대가 없습니다
+                </NotoSansKR>
+              )}
             </View>
 
             <View style={{gap: 8}}>
               <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
                 친구 목록
               </NotoSansKR>
-
-              {friendData?.accepted.map((data: friendAPIType) => {
-                return (
-                  <Friend
-                    accessToken={accessToken}
-                    key={data.FRIEND_NO}
-                    name={data.USER_NM}
-                    friendNo={data.FRIEND_NO}
-                  />
-                );
-              })}
+              {friendData?.accepted.length !== 0 ? (
+                <View style={{gap: 8}}>
+                  {friendData?.accepted.map((data: friendAPIType) => {
+                    return (
+                      <Friend
+                        accessToken={accessToken}
+                        key={data.FRIEND_NO}
+                        name={data.USER_NM}
+                        friendNo={data.FRIEND_NO}
+                      />
+                    );
+                  })}
+                </View>
+              ) : (
+                <NotoSansKR size={12} weight="Medium">
+                  친구목록이 없습니다
+                </NotoSansKR>
+              )}
             </View>
           </View>
         </ScrollContainer>
-        {/* <ButtonComponent>카카오톡으로 초대하기</ButtonComponent> */}
+        <ButtonComponent
+          onPress={() => {
+            sendKakao();
+          }}>
+          카카오톡으로 초대하기
+        </ButtonComponent>
       </InnerContainer>
     </HomeContainer>
   );

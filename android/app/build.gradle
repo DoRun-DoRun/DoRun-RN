@@ -117,7 +117,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation 'com.facebook.fresco:fresco:2.5.0' // 버전은 프로젝트에 맞게 조정
     implementation 'com.facebook.fresco:animated-gif:2.5.0' // 버전은 프로젝트에 맞게 조정
-
+    implementation 'com.google.code.gson:gson:2.8.5'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

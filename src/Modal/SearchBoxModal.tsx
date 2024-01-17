@@ -21,6 +21,7 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 const SearchContainer = styled.View`
   background-color: #fff;
   border-radius: 10px;
+
   /* gap: 16px; */
   /* z-index: 10; */
 `;

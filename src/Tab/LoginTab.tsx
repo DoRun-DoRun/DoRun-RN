@@ -190,11 +190,14 @@ const LoginTab = () => {
               source={require('../../assets/image/kakao_icon.png')}
               size={24}
             />
-            <NotoSansKR size={14} style={{flex: 1, textAlign: 'center'}}>
+            <NotoSansKR
+              size={14}
+              style={{flex: 1, textAlign: 'center', alignSelf: 'center'}}>
               카카오톡으로 시작하기
             </NotoSansKR>
           </RowContainer>
         </LoginButton>
+
         {Platform.OS === 'ios' && (
           <LoginButton
             disabled={isLoading}
@@ -214,7 +217,9 @@ const LoginTab = () => {
                 source={require('../../assets/image/apple_icon.png')}
                 size={20}
               />
-              <NotoSansKR size={14} style={{flex: 1, textAlign: 'center'}}>
+              <NotoSansKR
+                size={14}
+                style={{flex: 1, textAlign: 'center', alignSelf: 'center'}}>
                 Apple로 시작하기
               </NotoSansKR>
             </RowContainer>
@@ -278,7 +283,8 @@ const IconImage = styled.Image<{size: number}>`
 `;
 
 const LoginButton = styled.TouchableOpacity<{kakao?: boolean}>`
-  width: 200px;
+  width: 210px;
+  height: 38px;
   margin-top: 6px;
   /* background-color: ${props => props.theme.secondary1}; */
   background-color: ${({kakao}) => (kakao ? '#fddc3f' : '#fff')};

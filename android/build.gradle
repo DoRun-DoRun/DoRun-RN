@@ -20,3 +20,9 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
     }
 }
+
+// allprojects {
+//     repositories {
+//         maven { url 'http://devrepo.kakao.com:8088/nexus/content/groups/public/' }
+//     }
+// }

@@ -6444,6 +6444,11 @@ react-native-image-resizer@^1.4.5:
   resolved "https://registry.npmjs.org/react-native-image-resizer/-/react-native-image-resizer-1.4.5.tgz"
   integrity sha512-33EgL3C9pyvjKpullAB6fWyD5QhoYEpNNB9rxNvUsrpAnL2mHBW7PTrUCCZudJeB6Weg7nbweKrSw1nnto5aqg==
 
+react-native-kakao-share-link@^1.0.10:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/react-native-kakao-share-link/-/react-native-kakao-share-link-1.0.10.tgz#085b1080e7e3641ce716fd5c09f1e5586e7e3c65"
+  integrity sha512-EtlPhe5PK85Yr/fQt29bWuGits6LwTyL/RHwffflP/ZderwjUvxk3ASuqy41CZg/2Pax/3N/wZdMFiZNExjnuA==
+
 react-native-linear-gradient@^2.8.3:
   version "2.8.3"
   resolved "https://registry.npmjs.org/react-native-linear-gradient/-/react-native-linear-gradient-2.8.3.tgz"
