@@ -69,7 +69,15 @@ const LoginTab = () => {
         text1: `${response.SIGN_TYPE} 로그인 성공`,
       });
       // console.log(response);
-      dispatch(setAccessToken({accessToken: response.access_token}));
+      // setUser 필요!
+      dispatch(
+        setAccessToken({
+          accessToken: response.access_token,
+          SIGN_TYPE: response.SIGN_TYPE,
+          UID: response.UID,
+          userName: response.USER_NM,
+        }),
+      );
       navigation.navigate('MainTab' as never);
     },
   });

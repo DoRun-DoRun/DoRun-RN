@@ -188,7 +188,7 @@ export const SearchBox = ({
         {uidInput === '' ? (
           friendData?.accepted.length > 0 ? (
             friendData?.accepted
-              .slice(0, 3)
+              .slice(0, 10)
               .map((data: FriendType, key: number) => (
                 <InviteFriend
                   key={key}

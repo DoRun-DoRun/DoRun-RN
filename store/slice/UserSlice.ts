@@ -51,10 +51,12 @@ export const UserSlice = createSlice({
       persistUser(state);
     },
     setAccessToken(state, actoin) {
-      const {accessToken} = actoin.payload;
+      const {accessToken, SIGN_TYPE, UID, userName} = actoin.payload;
+      state.UID = UID;
       state.accessToken = accessToken;
-      console.log(accessToken);
-
+      state.userName = userName;
+      state.SIGN_TYPE = SIGN_TYPE;
+      // console.log(accessToken);
       persistUser(state);
     },
   },

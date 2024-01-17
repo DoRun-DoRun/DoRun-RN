@@ -51,7 +51,7 @@ export const MainTab = () => {
           headerRight: () =>
             selectedChallengeMstNo && (
               <TouchableOpacity
-                style={{paddingHorizontal: 32}}
+                style={{paddingHorizontal: 24}}
                 onPress={() => {
                   navigation.navigate('EditChallengeScreen' as never);
                 }}>
@@ -83,7 +83,7 @@ export const MainTab = () => {
           headerRight: () => {
             return (
               <TouchableOpacity
-                style={{paddingHorizontal: 32}}
+                style={{paddingHorizontal: 24}}
                 onPress={() => {
                   navigation.navigate('ProfileSettingScreen' as never);
                 }}>

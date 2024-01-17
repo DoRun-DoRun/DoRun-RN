@@ -281,54 +281,56 @@ const FriendScreen = () => {
           <View style={{gap: 24}}>
             <NotoSansKR size={20}>친구 목록</NotoSansKR>
             <SearchBox UID={UID!} />
-            <View style={{gap: 8}}>
-              <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-                요청된 친구 초대
-              </NotoSansKR>
-
-              {friendData?.pending.length !== 0 ? (
-                <View style={{gap: 8}}>
-                  {friendData?.pending.map((data: friendAPIType) => {
-                    return (
-                      <Friend
-                        accessToken={accessToken}
-                        key={data.FRIEND_NO}
-                        name={data.USER_NM}
-                        friendNo={data.FRIEND_NO}
-                        invited
-                      />
-                    );
-                  })}
-                </View>
-              ) : (
-                <NotoSansKR size={12} weight="Medium">
-                  요청된 친구 초대가 없습니다
+            <View style={{gap: 32}}>
+              <View style={{gap: 8}}>
+                <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
+                  요청된 친구 초대
                 </NotoSansKR>
-              )}
-            </View>
 
-            <View style={{gap: 8}}>
-              <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
-                친구 목록
-              </NotoSansKR>
-              {friendData?.accepted.length !== 0 ? (
-                <View style={{gap: 8}}>
-                  {friendData?.accepted.map((data: friendAPIType) => {
-                    return (
-                      <Friend
-                        accessToken={accessToken}
-                        key={data.FRIEND_NO}
-                        name={data.USER_NM}
-                        friendNo={data.FRIEND_NO}
-                      />
-                    );
-                  })}
-                </View>
-              ) : (
-                <NotoSansKR size={12} weight="Medium">
-                  친구목록이 없습니다
+                {friendData?.pending.length !== 0 ? (
+                  <View style={{gap: 8}}>
+                    {friendData?.pending.map((data: friendAPIType) => {
+                      return (
+                        <Friend
+                          accessToken={accessToken}
+                          key={data.FRIEND_NO}
+                          name={data.USER_NM}
+                          friendNo={data.FRIEND_NO}
+                          invited
+                        />
+                      );
+                    })}
+                  </View>
+                ) : (
+                  <NotoSansKR size={12} weight="Medium" color="gray4">
+                    요청된 친구 초대가 없습니다
+                  </NotoSansKR>
+                )}
+              </View>
+
+              <View style={{gap: 8}}>
+                <NotoSansKR size={14} weight="Medium" style={{marginBottom: 4}}>
+                  친구 목록
                 </NotoSansKR>
-              )}
+                {friendData?.accepted.length !== 0 ? (
+                  <View style={{gap: 8}}>
+                    {friendData?.accepted.map((data: friendAPIType) => {
+                      return (
+                        <Friend
+                          accessToken={accessToken}
+                          key={data.FRIEND_NO}
+                          name={data.USER_NM}
+                          friendNo={data.FRIEND_NO}
+                        />
+                      );
+                    })}
+                  </View>
+                ) : (
+                  <NotoSansKR size={12} weight="Medium" color="gray4">
+                    친구목록이 없습니다
+                  </NotoSansKR>
+                )}
+              </View>
             </View>
           </View>
         </ScrollContainer>

@@ -40,7 +40,9 @@ interface participantsDataType {
 }
 
 const EditChallengeScreen = () => {
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, SIGN_TYPE} = useSelector(
+    (state: RootState) => state.user,
+  );
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,
   );
@@ -213,9 +215,8 @@ const EditChallengeScreen = () => {
               </NotoSansKR>
             ) : (
               <NotoSansKR size={20}>
-                챌린지 내용을
+                챌린지 내용을{' '}
                 <NotoSansKR size={20} color="primary1">
-                  {' '}
                   수정
                 </NotoSansKR>
                 할 수 있어요
@@ -328,15 +329,15 @@ const EditChallengeScreen = () => {
               }
 
               Alert.alert(
-                '챌린지 시작', // 대화상자 제목
-                `해당 챌린지는 ${calendarData.start}에 시작하도록 되어있어요.\n기다리지 않고 챌린지를 바로 시작할까요?`, // 메시지
+                '오늘 날짜로 시작합니다', // 대화상자 제목
+                '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
                 [
                   {
-                    text: '기다릴래요',
+                    text: '취소',
                     style: 'cancel',
                   },
                   {
-                    text: '시작할래요',
+                    text: '바로 시작',
                     onPress: () => {
                       ChallengeStartMutate();
                     },
@@ -443,7 +444,12 @@ const EditChallengeScreen = () => {
                     text: '그만두기',
                     onPress: () => {
                       ChallengeDeleteMutation(); // 챌린지 삭제 함수 호출
-                      dispatch(removeChallenge(selectedChallengeMstNo!));
+                      dispatch(
+                        removeChallenge({
+                          type: SIGN_TYPE!,
+                          challenge_mst_no: selectedChallengeMstNo!,
+                        }),
+                      );
                     },
                     style: 'destructive',
                   },

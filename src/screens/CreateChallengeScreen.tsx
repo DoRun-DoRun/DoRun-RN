@@ -540,16 +540,16 @@ const CreateChallengeScreen = () => {
 
             if (calendarData.start === formatDate(new Date())) {
               Alert.alert(
-                '챌린지 시작 날짜가 오늘입니다.', // 경고 제목
-                '친구들을 기다리지 않고 바로 시작할까요?', // 경고 메시지
+                '오늘 날짜로 시작합니다', // 대화상자 제목
+                '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
                 [
                   {
-                    text: '날짜 변경하기',
+                    text: '날짜 변경',
                     style: 'cancel',
                     onPress: () => setCalendarOpen(true),
                   },
                   {
-                    text: '바로 시작하기',
+                    text: '바로 시작',
                     onPress: () => ChallengeStartMutate(),
                     style: 'destructive',
                   },

@@ -6,7 +6,7 @@ import {
   NotoSansKR,
   RowContainer,
 } from '../Component';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   addPersonalGoal,
   removeGoal,
@@ -17,6 +17,7 @@ import {useModal} from './ModalProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from 'styled-components';
 import {styled} from 'styled-components/native';
+import {RootState} from '../../store/RootReducer';
 
 interface PersonModalType {
   id: number;
@@ -36,6 +37,8 @@ export const PersonGoalEditModal = ({
   challenge_mst_no,
   title,
 }: PersonModalType) => {
+  const {SIGN_TYPE} = useSelector((state: RootState) => state.user);
+
   const {hideModal} = useModal();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -78,6 +81,7 @@ export const PersonGoalEditModal = ({
             } else {
               dispatch(
                 updateGoalTitle({
+                  type: SIGN_TYPE!,
                   goalId: id,
                   newTitle: inputText,
                   challenge_mst_no: challenge_mst_no,
@@ -92,7 +96,11 @@ export const PersonGoalEditModal = ({
           type="black"
           onPress={() => {
             dispatch(
-              removeGoal({goalId: id, challenge_mst_no: challenge_mst_no}),
+              removeGoal({
+                type: SIGN_TYPE!,
+                goalId: id,
+                challenge_mst_no: challenge_mst_no,
+              }),
             );
             hideModal();
           }}>
@@ -108,6 +116,7 @@ export const PersonGoalAddModal = ({
 }: {
   challenge_mst_no: number;
 }) => {
+  const {SIGN_TYPE} = useSelector((state: RootState) => state.user);
   const {hideModal} = useModal();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -150,8 +159,12 @@ export const PersonGoalAddModal = ({
             } else {
               dispatch(
                 addPersonalGoal({
+                  type: SIGN_TYPE!,
                   challenge_mst_no: challenge_mst_no,
-                  newGoal: {title: inputText, isComplete: false},
+                  newGoal: {
+                    title: inputText,
+                    isComplete: false,
+                  },
                 }),
               );
               hideModal();

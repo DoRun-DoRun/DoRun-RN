@@ -1,15 +1,29 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {challengeDataType, persistGoals} from '../async/asyncStore';
+import {SignType} from '../data';
 
-const initialState: challengeDataType[] = [];
+interface goalType {
+  title: string;
+  isComplete: boolean;
+}
+
+const initialState: challengeDataType = {APPLE: [], GUEST: [], KAKAO: []};
 
 const goalsSlice = createSlice({
   name: 'goals',
   initialState,
   reducers: {
-    addPersonalGoal: (state, action) => {
-      const {challenge_mst_no, newGoal} = action.payload;
-      let challenge = state.find(
+    addPersonalGoal: (
+      state,
+      action: PayloadAction<{
+        type: SignType;
+        challenge_mst_no: number;
+        newGoal: goalType;
+      }>,
+    ) => {
+      const {type, challenge_mst_no, newGoal} = action.payload;
+
+      let challenge = state[type].find(
         ch => ch.challenge_mst_no === challenge_mst_no,
       );
 
@@ -18,7 +32,7 @@ const goalsSlice = createSlice({
           challenge_mst_no,
           personalGoals: [],
         };
-        state.push(challenge);
+        state[type].push(challenge);
       }
 
       challenge.personalGoals.push({...newGoal, id: Date.now()}); // ID 생성을 위해 Date.now() 사용
@@ -26,9 +40,16 @@ const goalsSlice = createSlice({
       console.log(state);
     },
 
-    toggleGoal: (state, action) => {
-      const {challenge_mst_no, goalId} = action.payload;
-      const challenge = state.find(
+    toggleGoal: (
+      state,
+      action: PayloadAction<{
+        type: SignType;
+        challenge_mst_no: number;
+        goalId: number;
+      }>,
+    ) => {
+      const {type, challenge_mst_no, goalId} = action.payload;
+      const challenge = state[type].find(
         ch => ch.challenge_mst_no === challenge_mst_no,
       );
       if (challenge) {
@@ -42,9 +63,16 @@ const goalsSlice = createSlice({
       persistGoals(state);
       console.log(state);
     },
-    removeGoal: (state, action) => {
-      const {challenge_mst_no, goalId} = action.payload;
-      const challenge = state.find(
+    removeGoal: (
+      state,
+      action: PayloadAction<{
+        type: SignType;
+        challenge_mst_no: number;
+        goalId: number;
+      }>,
+    ) => {
+      const {type, challenge_mst_no, goalId} = action.payload;
+      const challenge = state[type].find(
         ch => ch.challenge_mst_no === challenge_mst_no,
       );
       if (challenge) {
@@ -55,9 +83,17 @@ const goalsSlice = createSlice({
       persistGoals(state);
       console.log(state);
     },
-    updateGoalTitle: (state, action) => {
-      const {challenge_mst_no, goalId, newTitle} = action.payload;
-      const challenge = state.find(
+    updateGoalTitle: (
+      state,
+      action: PayloadAction<{
+        type: SignType;
+        challenge_mst_no: number;
+        goalId: number;
+        newTitle: string;
+      }>,
+    ) => {
+      const {type, challenge_mst_no, goalId, newTitle} = action.payload;
+      const challenge = state[type].find(
         ch => ch.challenge_mst_no === challenge_mst_no,
       );
       if (challenge) {
@@ -72,12 +108,20 @@ const goalsSlice = createSlice({
       console.log(state);
     },
 
-    removeChallenge: (state, action: PayloadAction<number>) => {
-      const index = state.findIndex(
-        challenge => challenge.challenge_mst_no === action.payload,
+    removeChallenge: (
+      state,
+      action: PayloadAction<{
+        type: SignType;
+        challenge_mst_no: number;
+      }>,
+    ) => {
+      const {type, challenge_mst_no} = action.payload;
+
+      const index = state[type].findIndex(
+        challenge => challenge.challenge_mst_no === challenge_mst_no,
       );
       if (index !== -1) {
-        state.splice(index, 1);
+        state[type].splice(index, 1);
       }
 
       persistGoals(state);

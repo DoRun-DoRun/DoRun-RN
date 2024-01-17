@@ -35,7 +35,7 @@ import {
   PersonGoalAddModal,
   PersonGoalEditModal,
 } from '../Modal/PersonGoalModal';
-import {challengeDataType, goalType} from '../../store/async/asyncStore';
+import {challengeData, goalType} from '../../store/async/asyncStore';
 import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
@@ -169,6 +169,7 @@ const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
 `;
 
 const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
+  const {SIGN_TYPE} = useSelector((state: RootState) => state.user);
   const theme = useTheme();
   const dispatch = useDispatch();
   const {showModal} = useModal();
@@ -191,7 +192,11 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
       }}
       onPress={() =>
         dispatch(
-          toggleGoal({goalId: goal.id, challenge_mst_no: challenge_mst_no}),
+          toggleGoal({
+            type: SIGN_TYPE!,
+            goalId: goal.id,
+            challenge_mst_no: challenge_mst_no,
+          }),
         )
       }
       bc={backgroundColor}
@@ -342,7 +347,7 @@ const getPersonalGoalsByChallengeNo = ({
   challenges,
   challengeNo,
 }: {
-  challenges: challengeDataType[];
+  challenges: challengeData[];
   challengeNo: number;
 }) => {
   const challenge = challenges.find(ch => ch.challenge_mst_no === challengeNo);
@@ -352,7 +357,9 @@ const getPersonalGoalsByChallengeNo = ({
 const ChallengeTab = () => {
   const CallApi = useApi();
 
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, SIGN_TYPE} = useSelector(
+    (state: RootState) => state.user,
+  );
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,
   );
@@ -374,20 +381,22 @@ const ChallengeTab = () => {
       throw err;
     }
   };
+
   const {
     data: listData,
     isLoading: listLoading,
     refetch,
     isFetching,
-  } = useQuery('getChallenge', getChallenge);
-
-  useEffect(() => {
-    if (listData?.progress_challenges?.length > 0) {
-      const firstChallengeMstNo =
-        listData.progress_challenges[0].CHALLENGE_MST_NO;
-      dispatch(setSelectedChallengeMstNo(firstChallengeMstNo));
-    }
-  }, [dispatch, listData?.progress_challenges]);
+  } = useQuery('getChallenge', getChallenge, {
+    onSuccess: data => {
+      // 쿼리 성공 시 실행될 로직
+      if (data?.progress_challenges?.length > 0) {
+        const firstChallengeMstNo =
+          data.progress_challenges[0].CHALLENGE_MST_NO;
+        dispatch(setSelectedChallengeMstNo(firstChallengeMstNo));
+      }
+    },
+  });
 
   const getChallengeDetail = async () => {
     try {
@@ -506,7 +515,12 @@ const ChallengeTab = () => {
 
   const {mutate: mutateUpdateChallengeLog} = useMutation(updateChallengeLog, {
     onSuccess: response => {
-      dispatch(removeChallenge(challengeModalQueue[0].CHALLENGE_MST_NO));
+      dispatch(
+        removeChallenge({
+          type: SIGN_TYPE!,
+          challenge_mst_no: challengeModalQueue[0].CHALLENGE_MST_NO,
+        }),
+      );
       showModal(
         <DailyModal
           item_no={response.AVATAR_NO}
@@ -654,7 +668,7 @@ const ChallengeTab = () => {
   }
 
   const personGoal = getPersonalGoalsByChallengeNo({
-    challenges: challenges ? challenges : [],
+    challenges: challenges[SIGN_TYPE!] ? challenges[SIGN_TYPE!] : [],
     challengeNo: selectedChallengeMstNo!,
   });
 
