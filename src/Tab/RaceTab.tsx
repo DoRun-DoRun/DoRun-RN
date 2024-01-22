@@ -164,7 +164,7 @@ const RaceTab = () => {
                   <OcticonIcons name="arrow-right" size={24} />
                 </TouchableOpacity>
               )
-            : undefined,
+            : null,
         headerLeft:
           index > 1
             ? () => (
@@ -176,11 +176,13 @@ const RaceTab = () => {
                   <OcticonIcons name="arrow-left" size={24} />
                 </TouchableOpacity>
               )
-            : undefined,
+            : null,
       });
     } else {
       navigation.setOptions({
         title: '두런두런',
+        headerRight: null,
+        headerLeft: null,
       });
     }
   }, [challengeListData, dispatch, index, navigation]);
@@ -365,7 +367,7 @@ const BGComponent = ({
         }}
         {...panResponder.panHandlers}>
         {isDragging ? (
-          <View style={{width: 60, height: 70}}>
+          <View style={{width: 95, height: 115}}>
             <LottieView
               source={struggleLottie[data.CHARACTER_NO - 1]}
               autoPlay
@@ -489,7 +491,7 @@ const Navigation = () => {
         onPress={() => navigation.navigate('FriendScreen' as never)}
         android_ripple={{color: '#eeeeee'}}>
         <NavigationButton>
-          <OcticonIcons name="people" size={24} color="#000" />
+          <OcticonIcons name="people" size={24} color="#B5B5B5" />
         </NavigationButton>
       </Pressable>
 
@@ -497,7 +499,7 @@ const Navigation = () => {
         onPress={() => navigation.navigate('SettingScreen' as never)}
         android_ripple={{color: '#eeeeee'}}>
         <NavigationButton>
-          <OcticonIcons name="gear" size={24} color="#000" />
+          <OcticonIcons name="gear" size={24} color="#B5B5B5" />
         </NavigationButton>
       </Pressable>
     </NavigationContainer>

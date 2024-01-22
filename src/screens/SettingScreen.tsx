@@ -14,7 +14,7 @@ import {Slider} from '@miblanchard/react-native-slider';
 import {useQuery} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 import {useDispatch, useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 import {setVolume} from '../../store/slice/SettingSlice';
 
 const SettingScreen = () => {
@@ -22,6 +22,7 @@ const SettingScreen = () => {
   // const [marketingAlarm, setMarketingAlarm] = useState(true);
   // const [nightAlarm, setNightAlarm] = useState(true);
   // const [soundEffect, setSoundEffect] = useState(100);
+
   const {volume} = useSelector((state: RootState) => state.setting);
 
   const dispatch = useDispatch();
@@ -115,9 +116,13 @@ const SettingScreen = () => {
       <View style={{gap: 8, padding: 16}}>
         {/* <ButtonComponent>고객 센터</ButtonComponent> */}
         <ButtonComponent
-          // type="secondary"
           onPress={() => {
-            navigation.navigate('LoginTab' as never);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{name: 'LoginTab'}],
+              }),
+            );
           }}>
           로그아웃
         </ButtonComponent>

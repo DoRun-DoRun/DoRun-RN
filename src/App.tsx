@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import CreateChallengeScreen from './screens/CreateChallengeScreen';
 import {MainTab} from './Tab/MainTab';
@@ -15,13 +15,20 @@ import LoginTab from './Tab/LoginTab';
 import SettingScreen from './screens/SettingScreen';
 import EditChallengeScreen from './screens/EditChallengeScreen';
 import {DailyNoteScreen} from './screens/DailyNoteScreen';
-import {loadGoals, loadSetting} from '../store/async/asyncStore';
-import {useDispatch} from 'react-redux';
+import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
+import {useDispatch, useSelector} from 'react-redux';
 import {restoreGoal} from '../store/slice/GoalSlice';
 import {setVolume} from '../store/slice/SettingSlice';
 
 import mobileAds from 'react-native-google-mobile-ads';
 import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
+import {Linking} from 'react-native';
+import Toast from 'react-native-toast-message';
+import {LoadingIndicatior, useApi} from './Component';
+import {RootState} from '../store/RootReducer';
+import {useMutation, useQueryClient} from 'react-query';
+import {InviteAcceptType, SignType} from '../store/data';
+import {setAccessToken, setUser} from '../store/slice/UserSlice';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -53,71 +60,185 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function App() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  // const CallApi = useApi();
+  const CallApi = useApi();
+  const {accessToken, UID, isLoggedIn} = useSelector(
+    (state: RootState) => state.user,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const [deepLinkUrl, setDeepLinkUrl] = useState('');
+  const [initialRoute, setInitialRoute] =
+    useState<keyof RootStackParamList>('LoginTab');
 
-  // const loginGuest = (refreshToken: string) =>
-  //   CallApi({
-  //     endpoint: 'user/login',
-  //     method: 'GET',
-  //     accessToken: refreshToken,
-  //   });
+  const changeFriend = (friendNo: number) =>
+    CallApi({
+      endpoint: `friend/${friendNo}?status=${InviteAcceptType.ACCEPTED}`,
+      method: 'PUT',
+      accessToken: accessToken!,
+    });
 
-  // const loginMutation = useMutation(loginGuest, {
-  //   onSuccess: async data => {
-  //     const {access_token} = data;
+  const {mutate: acceptFriend} = useMutation(changeFriend, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('FriendListModal');
+      Toast.show({
+        type: 'success',
+        text1: '친구추가 성공',
+      });
+      navigation.navigate('FriendScreen' as never);
+    },
+    onError: error => {
+      console.error('Challenge Status Change Error:', error);
+    },
+  });
+  const inviteFriend = (sender: number) =>
+    CallApi({
+      endpoint: `friend/${sender}`,
+      method: 'POST',
+      accessToken: accessToken!,
+    });
 
-  //     if (access_token) {
-  //       dispatch(setAccessToken({accessToken: access_token}));
-  //       navigation.navigate('MainTab' as never);
-  //     } else {
-  //       console.error('Access token is missing in the response');
-  //     }
-  //   },
-  // });
+  const {mutate: InviteFriend} = useMutation(inviteFriend, {
+    onSuccess: response => {
+      acceptFriend(response.FRIEND_NO);
+    },
+    onError: error => {
+      console.error('Challenge Start Error:', error);
+    },
+  });
+
+  const signIn = (refreshToken: string) =>
+    CallApi({
+      endpoint: 'user/login',
+      method: 'GET',
+      accessToken: refreshToken,
+    });
+
+  const loginMutation = useMutation(signIn, {
+    onSuccess: async response => {
+      Toast.show({
+        type: 'success',
+        text1: `${response.SIGN_TYPE} 로그인 성공`,
+      });
+      dispatch(
+        setAccessToken({
+          accessToken: response.access_token,
+          SIGN_TYPE: response.SIGN_TYPE,
+          UID: response.UID,
+          userName: response.USER_NM,
+        }),
+      );
+    },
+  });
 
   useEffect(() => {
     const bootstrapAsync = async () => {
-      // await AsyncStorage.removeItem('goals');
+      const userData = await loadUser();
+
+      if (userData) {
+        dispatch(setUser(userData));
+      }
+
+      console.log(userData);
+
+      if (userData.SIGN_TYPE === SignType.KAKAO) {
+        loginMutation.mutate(userData.KAKAO);
+        setInitialRoute('MainTab');
+      }
+      if (userData.SIGN_TYPE === SignType.APPLE) {
+        loginMutation.mutate(userData.APPLE);
+        setInitialRoute('MainTab');
+      }
+      if (userData.SIGN_TYPE === SignType.GUEST) {
+        loginMutation.mutate(userData.GUEST);
+        setInitialRoute('MainTab');
+      }
+
       const goalData = await loadGoals();
       if (goalData) {
         dispatch(restoreGoal(goalData));
       }
-      // const userData = await loadUser();
-      // if (userData?.refreshToken) {
-      //   dispatch(setUser(userData));
-      //   loginMutation.mutate(userData.refreshToken);
-      // }
+
       const settingData = await loadSetting();
       if (settingData) {
         dispatch(setVolume(settingData));
       }
+
+      setIsLoading(false);
     };
 
     bootstrapAsync();
-  }, [dispatch, navigation]);
+    mobileAds().initialize();
+    // .then(adapterStatuses => {
+    //   console.log(adapterStatuses);
+    // });
+
+    getPermission();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getPermission = async () => {
     const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
     if (result === RESULTS.DENIED) {
-      console.log('거절');
-      // The permission has not been requested, so request it.
       await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
     }
   };
-  getPermission();
 
-  mobileAds()
-    .initialize()
-    .then(adapterStatuses => {
-      console.log(adapterStatuses);
+  useEffect(() => {
+    const handleDeepLink = (event: {url: string}) => {
+      setDeepLinkUrl(event.url);
+    };
+
+    const unsubscribeLinking = Linking.addEventListener('url', handleDeepLink);
+
+    Linking.getInitialURL().then(url => {
+      if (url) {
+        setDeepLinkUrl(url);
+      }
     });
+
+    return () => {
+      unsubscribeLinking.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const extractParamsFromUrl = (url: string) => {
+      const queryParams = url.split('?')[1];
+      const params = queryParams ? queryParams.split('&') : [];
+      console.log(params);
+      params.map(param => {
+        const [key, value] = param.split('=');
+        if (key === 'SENDER_NO') {
+          if (UID! === parseInt(value, 10)) {
+            Toast.show({
+              type: 'error',
+              text1: '나 자신에게 친구요청을 할 수 없습니다.',
+            });
+          } else {
+            InviteFriend(parseInt(value, 10));
+          }
+        }
+      });
+    };
+
+    if (isLoggedIn && deepLinkUrl) {
+      extractParamsFromUrl(deepLinkUrl);
+      setDeepLinkUrl('');
+    }
+  }, [isLoggedIn, deepLinkUrl, UID, InviteFriend]);
+
+  if (isLoading) {
+    return <LoadingIndicatior />;
+  }
 
   return (
     <Stack.Navigator
+      initialRouteName={initialRoute}
       screenOptions={{
         headerShadowVisible: false,
         headerTitle: '',
-
+        // eslint-disable-next-line react/no-unstable-nested-components
         headerLeft: () => (
           <MaterialIcons
             name="arrow-back"
@@ -127,11 +248,6 @@ function App() {
           />
         ),
       }}>
-      {/* <Stack.Screen
-        name="TestTab2"
-        component={TestTab2}
-        options={{headerShown: false}}
-      /> */}
       <Stack.Screen
         name="LoginTab"
         component={LoginTab}

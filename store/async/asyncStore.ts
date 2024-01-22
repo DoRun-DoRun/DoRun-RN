@@ -5,6 +5,7 @@ export interface userDataType {
   UID: number | null;
   accessToken: string | null;
   userName: string | null;
+  isLoggedIn?: boolean;
   SIGN_TYPE: SignType | null;
   USER_EMAIL?: string | null;
   GUEST?: string | null;

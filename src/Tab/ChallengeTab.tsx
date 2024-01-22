@@ -102,7 +102,7 @@ const ChallengeInfo = ({
       </Profile>
       <View style={{gap: 8}}>
         <NotoSansKR size={14}>{mainText}</NotoSansKR>
-        <NotoSansKR size={10} color="gray5">
+        <NotoSansKR size={11} color="gray5">
           {subText}
         </NotoSansKR>
       </View>

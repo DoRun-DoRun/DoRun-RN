@@ -255,11 +255,10 @@ const FriendScreen = () => {
           {
             title: '앱에서 보기',
             link: {
-              androidExecutionParams: [{key: 'key1', value: 'value1'}],
-              iosExecutionParams: [
-                {key: 'key1', value: 'value1'},
-                {key: 'key2', value: 'value2'},
+              androidExecutionParams: [
+                {key: 'SENDER_NO', value: UID!.toString()},
               ],
+              iosExecutionParams: [{key: 'SENDER_NO', value: UID!.toString()}],
             },
           },
         ],

@@ -4,12 +4,12 @@
 #import <AppCenterReactNativeCrashes.h>
 #import <CodePush/CodePush.h>
 #import <RNKakaoLogins.h>
-
+#import <React/RCTLinkingManager.h>
 #import <React/RCTBundleURLProvider.h>
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)app
+- (BOOL)application:(UIApplication *)application
     openURL:(NSURL *)url
     options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
       dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
@@ -19,7 +19,7 @@
             }
           });
       });
- return NO;
+    return [RCTLinkingManager application:application openURL:url options:options];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

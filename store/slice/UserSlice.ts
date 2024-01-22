@@ -6,6 +6,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState: userDataType = {
   userName: null,
   accessToken: null,
+  isLoggedIn: false,
   UID: null,
   SIGN_TYPE: null,
   USER_EMAIL: null,
@@ -14,14 +15,10 @@ const initialState: userDataType = {
   KAKAO: null,
 };
 
-/**
- * TemplateSlice에서 관리할 상태를 지정합니다.
- */
 export const UserSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    // 모든 사용자 정보를 상태에 저장합니다.
     setUser(state, action) {
       const response: userDataType = action.payload;
 
@@ -41,7 +38,6 @@ export const UserSlice = createSlice({
         state.KAKAO = response.KAKAO;
       }
 
-      console.log('state', state);
       persistUser(state);
     },
     setUserName(state, action) {
@@ -51,18 +47,24 @@ export const UserSlice = createSlice({
       persistUser(state);
     },
     setAccessToken(state, actoin) {
-      const {accessToken, SIGN_TYPE, UID, userName} = actoin.payload;
-      state.UID = UID;
-      state.accessToken = accessToken;
-      state.userName = userName;
-      state.SIGN_TYPE = SIGN_TYPE;
-      // console.log(accessToken);
+      const response = actoin.payload;
+
+      state.UID = response.UID;
+      state.accessToken = response.accessToken;
+      state.userName = response.userName;
+      state.SIGN_TYPE = response.SIGN_TYPE;
+      state.isLoggedIn = true;
+
       persistUser(state);
+    },
+    setIsLoggedIn(state) {
+      state.isLoggedIn = true;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {setUser, setAccessToken, setUserName} = UserSlice.actions;
+export const {setUser, setAccessToken, setUserName, setIsLoggedIn} =
+  UserSlice.actions;
 
 export default UserSlice.reducer;

@@ -3,18 +3,23 @@ import {NotoSansKR, RowContainer, useApi} from '../Component';
 import {styled} from 'styled-components/native';
 import {Platform, TouchableOpacity, View} from 'react-native';
 import {useMutation} from 'react-query';
-import {setAccessToken, setUser} from '../../store/slice/UserSlice';
-import {loadUser, userDataType} from '../../store/async/asyncStore';
-import {useDispatch} from 'react-redux';
+import {
+  setAccessToken,
+  setIsLoggedIn,
+  setUser,
+} from '../../store/slice/UserSlice';
+import {userDataType} from '../../store/async/asyncStore';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
 
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {SignType} from '../../store/data';
-import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {jwtDecode} from 'jwt-decode';
+import {RootState} from '../../store/RootReducer';
+import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 
 interface AppleJwtToken {
   iss: string;
@@ -46,6 +51,7 @@ const LoginTab = () => {
   const CallApi = useApi();
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const userData = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     dispatch(playMusic());
@@ -68,8 +74,6 @@ const LoginTab = () => {
         type: 'success',
         text1: `${response.SIGN_TYPE} 로그인 성공`,
       });
-      // console.log(response);
-      // setUser 필요!
       dispatch(
         setAccessToken({
           accessToken: response.access_token,
@@ -100,11 +104,10 @@ const LoginTab = () => {
         text1: `${response.SIGN_TYPE} 로그인 성공`,
       });
 
-      const userData: userDataType = {
+      const userDataRes: userDataType = {
         UID: response.UID,
         accessToken: response.access_token,
         userName: response.USER_NM,
-
         SIGN_TYPE: response.SIGN_TYPE,
         GUEST:
           response.SIGN_TYPE === SignType.GUEST ? response.refresh_token : null,
@@ -114,8 +117,8 @@ const LoginTab = () => {
           response.SIGN_TYPE === SignType.KAKAO ? response.refresh_token : null,
       };
 
-      dispatch(setUser(userData));
-      // console.log('Success:', userData);
+      dispatch(setUser(userDataRes));
+      dispatch(setIsLoggedIn());
       navigation.navigate('MainTab' as never);
     },
     onError: () => {
@@ -126,7 +129,6 @@ const LoginTab = () => {
   const signInWithKakao = async (): Promise<void> => {
     try {
       const token: KakaoOAuthToken = await login();
-      // console.log('token', token);
       const payload: KakaoJwtToken = jwtDecode(token.idToken);
       SignUp({signType: SignType.KAKAO, email: payload.email});
     } catch (err) {
@@ -161,19 +163,6 @@ const LoginTab = () => {
     // });
   }, []); // passing in an empty array as the second argument ensures this is only ran once when component mounts initially.
 
-  // useEffect(() => {
-  //   const bootstrapAsync = async () => {
-  //     const userData = await loadUser();
-  //     if (userData?.refreshToken) {
-  //       dispatch(setUser(userData));
-  //       loginMutation.mutate(userData.refreshToken);
-  //     }
-  //   };
-
-  //   bootstrapAsync();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [dispatch, navigation]);
-
   return (
     <View style={{flex: 1}}>
       <BackgroundImage source={require('../../assets/image/background.png')} />
@@ -182,12 +171,9 @@ const LoginTab = () => {
         <LoginButton
           kakao
           disabled={isLoading}
-          onPress={async () => {
-            const userData = await loadUser();
+          onPress={() => {
             dispatch(setSelectedChallengeMstNo(null));
-
-            if (userData?.KAKAO) {
-              dispatch(setUser(userData));
+            if (userData.KAKAO) {
               loginMutation.mutate(userData.KAKAO);
             } else {
               signInWithKakao();
@@ -209,12 +195,9 @@ const LoginTab = () => {
         {Platform.OS === 'ios' && (
           <LoginButton
             disabled={isLoading}
-            onPress={async () => {
-              const userData = await loadUser();
+            onPress={() => {
               dispatch(setSelectedChallengeMstNo(null));
-
               if (userData?.APPLE) {
-                dispatch(setUser(userData));
                 loginMutation.mutate(userData.APPLE);
               } else {
                 signInWithApple();
@@ -236,12 +219,10 @@ const LoginTab = () => {
 
         <TouchableOpacity
           disabled={isLoading}
-          onPress={async () => {
-            const userData = await loadUser();
+          onPress={() => {
             dispatch(setSelectedChallengeMstNo(null));
 
             if (userData?.GUEST) {
-              dispatch(setUser(userData));
               loginMutation.mutate(userData.GUEST);
             } else {
               SignUp({signType: SignType.GUEST});

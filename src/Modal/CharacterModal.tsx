@@ -61,17 +61,19 @@ export const CharacterModal = ({
   const CallApi = useApi();
   const theme = useTheme();
   const {showModal} = useModal();
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, SIGN_TYPE} = useSelector(
+    (state: RootState) => state.user,
+  );
   const queryClient = useQueryClient();
 
   const goals = useSelector((state: RootState) => state.goal, shallowEqual);
 
   const personalGoals = useMemo(() => {
-    const challenge = goals.find(
+    const challenge = goals[SIGN_TYPE!].find(
       ch => ch.challenge_mst_no === CHALLENGE_MST_NO,
     );
     return challenge ? challenge.personalGoals : [];
-  }, [goals, CHALLENGE_MST_NO]);
+  }, [goals, SIGN_TYPE, CHALLENGE_MST_NO]);
 
   const useItem = ({item_no}: {item_no: number}) =>
     CallApi({
