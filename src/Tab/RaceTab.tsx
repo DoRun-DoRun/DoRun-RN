@@ -202,6 +202,10 @@ const RaceTab = () => {
         unitId={adUnitId!}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
       />
+      <Image
+        style={{width: '100%', height: '100%', position: 'absolute'}}
+        source={require('../../assets/image/background/bg_snow.png')}
+      />
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer
           refreshControl={

@@ -27,12 +27,12 @@
           <action android:name="android.intent.action.VIEW" />
           <category android:name="android.intent.category.DEFAULT" />
           <category android:name="android.intent.category.BROWSABLE" />
-          
+
           <data android:host="kakaolink"
                   android:scheme="kakao97d8ca4c2736fdb3f362246fe17f316b" />
         </intent-filter>
-      </activity>
-      <activity 
+        </activity>
+        <activity
         android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
         android:exported="true">
           <intent-filter>
@@ -43,6 +43,6 @@
             <data android:host="oauth"
               android:scheme="kakao97d8ca4c2736fdb3f362246fe17f316b" />
           </intent-filter>
-      </activity>
+        </activity>
     </application>
 </manifest>

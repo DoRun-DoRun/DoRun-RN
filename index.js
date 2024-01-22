@@ -16,11 +16,11 @@ import {ModalProvider} from './src/Modal/ModalProvider';
 import CustomModal from './src/Modal/CustomModal';
 import Toast from 'react-native-toast-message';
 
-const codePushOptions = {
-  checkFrequency: CodePush.CheckFrequency.ON_APP_START,
-  installMode: CodePush.InstallMode.IMMEDIATE,
-  mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
-};
+// const codePushOptions = {
+//   checkFrequency: CodePush.CheckFrequency.ON_APP_START,
+//   installMode: CodePush.InstallMode.IMMEDIATE,
+//   mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
+// };
 
 function Main() {
   return (
@@ -40,4 +40,5 @@ function Main() {
   );
 }
 
-AppRegistry.registerComponent(appName, () => CodePush(codePushOptions)(Main));
+// AppRegistry.registerComponent(appName, () => CodePush(codePushOptions)(Main));
+AppRegistry.registerComponent(appName, () => Main);

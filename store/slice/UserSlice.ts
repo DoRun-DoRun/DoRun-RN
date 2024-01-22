@@ -60,11 +60,16 @@ export const UserSlice = createSlice({
     setIsLoggedIn(state) {
       state.isLoggedIn = true;
     },
+    logOut(state) {
+      state.SIGN_TYPE = null;
+      state.isLoggedIn = false;
+      persistUser(state);
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {setUser, setAccessToken, setUserName, setIsLoggedIn} =
+export const {setUser, setAccessToken, setUserName, setIsLoggedIn, logOut} =
   UserSlice.actions;
 
 export default UserSlice.reducer;

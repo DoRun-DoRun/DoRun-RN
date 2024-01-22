@@ -17,11 +17,11 @@ import {DailyNoteScreen} from './screens/DailyNoteScreen';
 import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {restoreGoal} from '../store/slice/GoalSlice';
-import {setVolume} from '../store/slice/SettingSlice';
+import {playMusic, setVolume, stopMusic} from '../store/slice/SettingSlice';
 
 import mobileAds from 'react-native-google-mobile-ads';
 import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
-import {Linking} from 'react-native';
+import {AppState, AppStateStatus, Linking} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {LoadingIndicatior, useApi} from './Component';
 import {RootState} from '../store/RootReducer';
@@ -74,6 +74,10 @@ function App() {
   const [deepLinkUrl, setDeepLinkUrl] = useState('');
   const [initialRoute, setInitialRoute] =
     useState<keyof RootStackParamList>('LoginTab');
+
+  const [appState, setAppState] = useState<AppStateStatus>(
+    AppState.currentState,
+  );
 
   const changeFriend = (friendNo: number) =>
     CallApi({
@@ -165,18 +169,19 @@ function App() {
       const userData = await loadUser();
       if (userData) {
         dispatch(setUser(userData));
-      }
-      if (userData.SIGN_TYPE === SignType.KAKAO) {
-        loginMutation.mutate(userData.KAKAO);
-        setInitialRoute('MainTab');
-      }
-      if (userData.SIGN_TYPE === SignType.APPLE) {
-        loginMutation.mutate(userData.APPLE);
-        setInitialRoute('MainTab');
-      }
-      if (userData.SIGN_TYPE === SignType.GUEST) {
-        loginMutation.mutate(userData.GUEST);
-        setInitialRoute('MainTab');
+
+        if (userData.SIGN_TYPE === SignType.KAKAO) {
+          setInitialRoute('MainTab');
+          loginMutation.mutate(userData.KAKAO);
+        }
+        if (userData.SIGN_TYPE === SignType.APPLE) {
+          loginMutation.mutate(userData.APPLE);
+          setInitialRoute('MainTab');
+        }
+        if (userData.SIGN_TYPE === SignType.GUEST) {
+          loginMutation.mutate(userData.GUEST);
+          setInitialRoute('MainTab');
+        }
       }
 
       const goalData = await loadGoals();
@@ -199,6 +204,24 @@ function App() {
     getPermission();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const appStateChange = (nextAppState: AppStateStatus) => {
+      console.log(nextAppState);
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        dispatch(playMusic());
+      } else {
+        dispatch(stopMusic());
+      }
+      setAppState(nextAppState);
+    };
+
+    const app = AppState.addEventListener('change', appStateChange);
+
+    return () => {
+      app.remove();
+    };
+  }, [appState, dispatch]);
 
   const getPermission = async () => {
     const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);

@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {NotoSansKR, RowContainer, useApi} from '../Component';
 import {styled} from 'styled-components/native';
-import {Platform, TouchableOpacity, View} from 'react-native';
+import {Animated, Platform, TouchableOpacity, View} from 'react-native';
 import {useMutation} from 'react-query';
 import {
   setAccessToken,
@@ -154,91 +154,223 @@ const LoginTab = () => {
     }
   };
 
+  const [groupFadeAnim] = useState([
+    new Animated.Value(0),
+    new Animated.Value(0),
+    new Animated.Value(0),
+  ]);
+  const [groupScaleAnim] = useState([
+    new Animated.Value(0.8),
+    new Animated.Value(0.8),
+    new Animated.Value(0.8),
+  ]);
+  const [riseAnim] = useState([
+    new Animated.Value(20),
+    new Animated.Value(20),
+    new Animated.Value(20),
+  ]);
+  const [riseFadeAnim] = useState([
+    new Animated.Value(0),
+    new Animated.Value(0),
+    new Animated.Value(0),
+  ]);
+
   useEffect(() => {
-    // onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
-    // return appleAuth.onCredentialRevoked(async () => {
-    //   console.warn(
-    //     'If this function executes, User Credentials have been Revoked',
-    //   );
-    // });
-  }, []); // passing in an empty array as the second argument ensures this is only ran once when component mounts initially.
+    const animations = groupFadeAnim.map((anim, index) =>
+      Animated.parallel([
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 650 - index * 25,
+          delay: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(groupScaleAnim[index], {
+          toValue: 1,
+          duration: 650 - index * 25,
+          delay: 50,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    const animationsRaise = riseAnim.map((anim, index) =>
+      Animated.parallel([
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(riseFadeAnim[index], {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    Animated.sequence([
+      Animated.sequence(animations),
+      Animated.sequence(animationsRaise),
+    ]).start();
+  }, [groupFadeAnim, groupScaleAnim, riseAnim, riseFadeAnim]);
 
   return (
     <View style={{flex: 1}}>
-      <BackgroundImage source={require('../../assets/image/background.png')} />
-      <LoginContainer>
-        <Title source={require('../../assets/image/title.png')} />
-        <LoginButton
-          kakao
-          disabled={isLoading}
-          onPress={() => {
-            dispatch(setSelectedChallengeMstNo(null));
-            if (userData.KAKAO) {
-              loginMutation.mutate(userData.KAKAO);
-            } else {
-              signInWithKakao();
-            }
-          }}>
-          <RowContainer gap={8}>
-            <IconImage
-              source={require('../../assets/image/kakao_icon.png')}
-              size={24}
-            />
-            <NotoSansKR
-              size={14}
-              style={{flex: 1, textAlign: 'center', alignSelf: 'center'}}>
-              카카오톡으로 시작하기
-            </NotoSansKR>
-          </RowContainer>
-        </LoginButton>
+      {/* <BackgroundImage source={require('../../assets/image/background.jpg')} /> */}
+      <BackgroundImage
+        source={require('../../assets/image/background/bg_background.png')}
+      />
+      <BackgroundImage
+        source={require('../../assets/image/background/bg_mountain.png')}
+      />
+      <BackgroundImage
+        source={require('../../assets/image/background/bg_snow.png')}
+      />
+      <BackgroundImage
+        source={require('../../assets/image/background/bg_layer.png')}
+      />
 
-        {Platform.OS === 'ios' && (
+      <Animated.View
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          opacity: groupFadeAnim[0],
+          transform: [{scale: groupScaleAnim[0]}],
+        }}>
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_seed.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_title.png')}
+        />
+      </Animated.View>
+
+      <Animated.View
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          opacity: groupFadeAnim[1],
+          transform: [{scale: groupScaleAnim[1]}],
+        }}>
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_dudu.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_seeds.png')}
+        />
+      </Animated.View>
+
+      <Animated.View
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          opacity: groupFadeAnim[2],
+          transform: [{scale: groupScaleAnim[2]}],
+        }}>
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_nuts.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_pachi.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_peats.png')}
+        />
+      </Animated.View>
+
+      <LoginContainer>
+        {/* <Title source={require('../../assets/image/title.png')} /> */}
+        <Animated.View
+          style={{
+            opacity: riseFadeAnim[0],
+            transform: [{translateY: riseAnim[0]}],
+          }}>
           <LoginButton
+            kakao
             disabled={isLoading}
             onPress={() => {
               dispatch(setSelectedChallengeMstNo(null));
-              if (userData?.APPLE) {
-                loginMutation.mutate(userData.APPLE);
+              if (userData.KAKAO) {
+                loginMutation.mutate(userData.KAKAO);
               } else {
-                signInWithApple();
+                signInWithKakao();
               }
             }}>
             <RowContainer gap={8}>
               <IconImage
-                source={require('../../assets/image/apple_icon.png')}
-                size={20}
+                source={require('../../assets/image/kakao_icon.png')}
+                size={24}
               />
               <NotoSansKR
                 size={14}
                 style={{flex: 1, textAlign: 'center', alignSelf: 'center'}}>
-                Apple로 시작하기
+                카카오톡으로 시작하기
               </NotoSansKR>
             </RowContainer>
           </LoginButton>
+        </Animated.View>
+
+        {Platform.OS === 'ios' && (
+          <Animated.View
+            style={{
+              opacity: riseFadeAnim[1],
+              transform: [{translateY: riseAnim[1]}],
+            }}>
+            <LoginButton
+              disabled={isLoading}
+              onPress={() => {
+                dispatch(setSelectedChallengeMstNo(null));
+                if (userData?.APPLE) {
+                  loginMutation.mutate(userData.APPLE);
+                } else {
+                  signInWithApple();
+                }
+              }}>
+              <RowContainer gap={8}>
+                <IconImage
+                  source={require('../../assets/image/apple_icon.png')}
+                  size={20}
+                />
+                <NotoSansKR
+                  size={14}
+                  style={{flex: 1, textAlign: 'center', alignSelf: 'center'}}>
+                  Apple로 시작하기
+                </NotoSansKR>
+              </RowContainer>
+            </LoginButton>
+          </Animated.View>
         )}
 
-        <TouchableOpacity
-          disabled={isLoading}
-          onPress={() => {
-            dispatch(setSelectedChallengeMstNo(null));
-
-            if (userData?.GUEST) {
-              loginMutation.mutate(userData.GUEST);
-            } else {
-              SignUp({signType: SignType.GUEST});
-            }
+        <Animated.View
+          style={{
+            opacity: riseFadeAnim[2],
+            transform: [{translateY: riseAnim[2]}],
           }}>
-          <NotoSansKR
-            size={14}
-            weight="Medium"
-            color="white"
-            style={{
-              textDecorationLine: 'underline',
-              textAlign: 'center',
+          <TouchableOpacity
+            disabled={isLoading}
+            onPress={() => {
+              dispatch(setSelectedChallengeMstNo(null));
+
+              if (userData?.GUEST) {
+                loginMutation.mutate(userData.GUEST);
+              } else {
+                SignUp({signType: SignType.GUEST});
+              }
             }}>
-            게스트 계정으로 시작하기
-          </NotoSansKR>
-        </TouchableOpacity>
+            <NotoSansKR
+              size={14}
+              weight="Medium"
+              color="white"
+              style={{
+                textDecorationLine: 'underline',
+                textAlign: 'center',
+              }}>
+              게스트 계정으로 시작하기
+            </NotoSansKR>
+          </TouchableOpacity>
+        </Animated.View>
       </LoginContainer>
     </View>
   );
@@ -262,9 +394,9 @@ const LoginContainer = styled.View`
   margin-bottom: 16px;
 `;
 
-const Title = styled.Image`
-  margin-bottom: 44px;
-`;
+// const Title = styled.Image`
+//   margin-bottom: 44px;
+// `;
 
 const IconImage = styled.Image<{size: number}>`
   width: ${({size}) => `${size}px`};

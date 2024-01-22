@@ -16,6 +16,7 @@ import {RootState} from '../../store/RootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {setVolume} from '../../store/slice/SettingSlice';
+import {logOut} from '../../store/slice/UserSlice';
 
 const SettingScreen = () => {
   // const [pushAlarm, setPushAlarm] = useState(true);
@@ -117,6 +118,7 @@ const SettingScreen = () => {
         {/* <ButtonComponent>고객 센터</ButtonComponent> */}
         <ButtonComponent
           onPress={() => {
+            dispatch(logOut());
             navigation.dispatch(
               CommonActions.reset({
                 index: 0,

@@ -176,7 +176,7 @@ const SearchBox = ({UID}: {UID: number}) => {
     <RowContainer gap={8}>
       <SearchContainer>
         <RowContainer gap={8}>
-          <OcticonIcons name="search" size={16} />
+          <OcticonIcons name="search" size={16} color={'#000'} />
           <InputNotoSansKR
             size={14}
             value={uidInput}
