@@ -19,7 +19,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useMutation, useQueryClient} from 'react-query';
 import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
@@ -28,6 +28,7 @@ import {Alert} from 'react-native';
 import {Direction} from 'react-native-calendars/src/types';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
+import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 
 export const DatePicker = styled.TouchableOpacity`
   border: 1px solid ${props => props.theme.gray5};
@@ -63,7 +64,7 @@ export const InviteList = ({
       </NotoSansKR>
       <RowContainer gap={9}>
         <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
-          {accept ? '참여 중' : '대기 중'}
+          {accept ? '참여 중' : '초대완료'}
         </NotoSansKR>
         {!accept && (
           <TouchableOpacity
@@ -365,6 +366,7 @@ const CreateChallengeScreen = () => {
     {UserName: validUserName, UID: validUID, accept: true},
   ]);
   const CallApi = useApi();
+  const dispatch = useDispatch();
 
   const {showModal} = useModal();
 
@@ -386,13 +388,14 @@ const CreateChallengeScreen = () => {
     });
 
   const {mutate: ChallengeCreateMutate} = useMutation(createChallenge, {
-    onSuccess: () => {
+    onSuccess: response => {
       Toast.show({
         type: 'success',
         text1: '챌린지가 생성되었어요.',
       });
       queryClient.invalidateQueries('getChallenge');
-      navigation.navigate('MainTab' as never);
+      dispatch(setSelectedChallengeMstNo(response.CHALLENGE_MST_NO));
+      navigation.navigate('EditChallengeScreen' as never);
     },
     onError: error => {
       console.error('Error:', error);
@@ -540,8 +543,8 @@ const CreateChallengeScreen = () => {
 
             if (calendarData.start === formatDate(new Date())) {
               Alert.alert(
-                '오늘 날짜로 시작합니다', // 대화상자 제목
-                '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
+                '오늘 날짜로 시작합니다',
+                '챌린지 도중에는 친구참여가 불가능해요. 바로 시작하시겠습니까?', // 메시지
                 [
                   {
                     text: '날짜 변경',

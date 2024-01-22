@@ -156,25 +156,25 @@ const RaceTab = () => {
         headerRight:
           index < challengeListData?.total_page
             ? () => (
-                <TouchableOpacity
-                  style={{paddingHorizontal: 32}}
+                <OcticonIcons
+                  name="arrow-right"
+                  size={24}
                   onPress={() => {
                     setIndex(prev => prev + 1);
-                  }}>
-                  <OcticonIcons name="arrow-right" size={24} />
-                </TouchableOpacity>
+                  }}
+                />
               )
             : null,
         headerLeft:
           index > 1
             ? () => (
-                <TouchableOpacity
-                  style={{paddingHorizontal: 32}}
+                <OcticonIcons
+                  name="arrow-left"
+                  size={24}
                   onPress={() => {
                     setIndex(prev => prev - 1);
-                  }}>
-                  <OcticonIcons name="arrow-left" size={24} />
-                </TouchableOpacity>
+                  }}
+                />
               )
             : null,
       });

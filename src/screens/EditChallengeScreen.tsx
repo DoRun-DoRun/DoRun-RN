@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Alert, TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
+  GetImage,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -27,27 +28,26 @@ import {
   InviteList,
   formatDate,
 } from './CreateChallengeScreen';
-import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
-import {removeChallenge} from '../../store/slice/GoalSlice';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {ChallengeOptionModal} from '../Modal/Modals';
+import KakaoShareLink from 'react-native-kakao-share-link';
+import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+import {ChallengeStatusType, InviteAcceptType} from '../../store/data';
 
 interface participantsDataType {
   UID: number;
   USER_NM: string;
-  ACCEPT_STATUS: 'PENDING' | 'ACCEPTED';
+  ACCEPT_STATUS: InviteAcceptType;
 }
 
 const EditChallengeScreen = () => {
-  const {accessToken, SIGN_TYPE} = useSelector(
-    (state: RootState) => state.user,
-  );
+  const {accessToken, userName} = useSelector((state: RootState) => state.user);
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,
   );
-  const dispatch = useDispatch();
-
   const queryClient = useQueryClient();
   const navigation = useNavigation();
 
@@ -59,7 +59,8 @@ const EditChallengeScreen = () => {
   const [calendarData, setCalendarData] = useState({start: '', end: ''});
 
   const [inviteListData, setInviteListData] = useState<InviteList[]>([]);
-  const {showModal} = useModal();
+  const {showModal, hideModal} = useModal();
+  const dispatch = useDispatch();
 
   const CallApi = useApi();
 
@@ -84,7 +85,9 @@ const EditChallengeScreen = () => {
         CHALLENGE_MST_NM: challengeName,
         USERS_UID: inviteListData.map(item => ({
           USER_UID: item.UID,
-          INVITE_STATS: item.accept ? 'ACCEPTED' : 'PENDING',
+          INVITE_STATS: item.accept
+            ? InviteAcceptType.ACCEPTED
+            : InviteAcceptType.DELETED,
         })),
         START_DT: convertKoKRToUTC(calendarData.start).toISOString(),
         END_DT: convertKoKRToUTC(calendarData.end).toISOString(),
@@ -98,6 +101,7 @@ const EditChallengeScreen = () => {
         type: 'success',
         text1: '챌린지 정보가 수정되었어요.',
       });
+      hideModal();
       queryClient.invalidateQueries('getChallenge');
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
@@ -145,38 +149,13 @@ const EditChallengeScreen = () => {
     },
   });
 
-  const challengeDelete = () =>
-    CallApi({
-      endpoint: `challenge/${selectedChallengeMstNo}`,
-      method: 'DELETE',
-      accessToken: accessToken!,
-    });
-
-  const {mutate: ChallengeDeleteMutation} = useMutation(challengeDelete, {
-    onSuccess: () => {
-      dispatch(setSelectedChallengeMstNo(null));
-
-      // 상태 업데이트가 반영된 후 쿼리 무효화
-      queryClient.invalidateQueries('getChallenge');
-      queryClient.invalidateQueries('ChallengeUserList');
-      queryClient.invalidateQueries('challenge_history');
-      queryClient.invalidateQueries('userData');
-
-      navigation.navigate('MainTab' as never);
-    },
-
-    onError: error => {
-      console.error('Challenge Start Error:', error);
-    },
-  });
-
   useEffect(() => {
     if (challengeData !== undefined) {
       const listData = challengeData.PARTICIPANTS?.map(
         (participant: participantsDataType) => ({
           UserName: participant.USER_NM,
           UID: participant.UID,
-          accept: participant.ACCEPT_STATUS === 'ACCEPTED',
+          accept: participant.ACCEPT_STATUS === InviteAcceptType.ACCEPTED,
         }),
       );
 
@@ -197,6 +176,121 @@ const EditChallengeScreen = () => {
     challengeData?.START_DT,
   ]);
 
+  const challengeDelete = () =>
+    CallApi({
+      endpoint: `challenge/${selectedChallengeMstNo}`,
+      method: 'DELETE',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: ChallengeDeleteMutation} = useMutation(challengeDelete, {
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '챌린지가 삭제되었어요.',
+      });
+      dispatch(setSelectedChallengeMstNo(null));
+      hideModal();
+
+      // 상태 업데이트가 반영된 후 쿼리 무효화
+      queryClient.invalidateQueries('getChallenge');
+      queryClient.invalidateQueries('ChallengeUserList');
+      queryClient.invalidateQueries('challenge_history');
+      queryClient.invalidateQueries('userData');
+
+      navigation.navigate('MainTab' as never);
+    },
+
+    onError: error => {
+      console.error('Challenge Start Error:', error);
+    },
+  });
+
+  const sendKakao = async () => {
+    try {
+      const response = await KakaoShareLink.sendFeed({
+        content: {
+          title: `${userName}님이 챌린지에 초대했어요!`,
+          imageUrl: GetImage('group_default_3@3x.png'),
+          link: {
+            webUrl: 'https://developers.kakao.com/',
+            mobileWebUrl: 'https://developers.kakao.com/',
+          },
+          description: `두런두런과 함께 갓생 살기\n지금 친구들과 ${challengeData.CHALLENGE_MST_NM}에 도전해보세요!`,
+        },
+        buttons: [
+          {
+            title: '앱에서 보기',
+            link: {
+              androidExecutionParams: [
+                {
+                  key: 'INVITE_CHALLENGE_NO',
+                  value: challengeData.CHALLENGE_MST_NO.toString(),
+                },
+              ],
+              iosExecutionParams: [
+                {
+                  key: 'INVITE_CHALLENGE_NO',
+                  value: challengeData.CHALLENGE_MST_NO.toString(),
+                },
+              ],
+            },
+          },
+        ],
+      });
+      console.log(response);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () =>
+        challengeData?.CHALLENGE_STATUS === ChallengeStatusType.PENDING &&
+        challengeData?.IS_OWNER && (
+          <MaterialCommunityIcons
+            name="dots-vertical"
+            size={24}
+            color={'#1C1B1F'}
+            onPress={() => {
+              const missingItems = [];
+
+              if (!challengeName) {
+                missingItems.push('챌린지 목표');
+              }
+              if (!calendarData.start || !calendarData.end) {
+                missingItems.push('챌린지 날짜');
+              }
+              if (!selectedEmoji) {
+                missingItems.push('이모지');
+              }
+
+              showModal(
+                <ChallengeOptionModal
+                  deleteChallenge={ChallengeDeleteMutation}
+                  editChallenge={ChallengeEditMutate}
+                  calendarData={calendarData}
+                  missedItem={missingItems}
+                />,
+              );
+            }}
+          />
+        ),
+    });
+  }, [
+    ChallengeDeleteMutation,
+    ChallengeEditMutate,
+    calendarData,
+    challengeData?.CHALLENGE_STATUS,
+    challengeData?.IS_OWNER,
+    challengeName,
+    navigation,
+    selectedEmoji,
+    showModal,
+  ]);
+
   if (loadingChallenge) {
     return <LoadingIndicatior />;
   }
@@ -205,23 +299,13 @@ const EditChallengeScreen = () => {
     <HomeContainer>
       <ScrollContainer>
         <InnerContainer gap={24}>
-          {challengeData.CHALLENGE_STATUS === 'PENDING' ? (
-            challengeData.IS_OWNER === false ? (
-              <NotoSansKR size={20}>
-                <NotoSansKR size={20} color="primary1">
-                  대기중
-                </NotoSansKR>
-                인 챌린지 정보에요
+          {challengeData.CHALLENGE_STATUS === ChallengeStatusType.PENDING ? (
+            <NotoSansKR size={20}>
+              <NotoSansKR size={20} color="primary1">
+                대기중
               </NotoSansKR>
-            ) : (
-              <NotoSansKR size={20}>
-                챌린지 내용을{' '}
-                <NotoSansKR size={20} color="primary1">
-                  수정
-                </NotoSansKR>
-                할 수 있어요
-              </NotoSansKR>
-            )
+              인 챌린지 정보에요
+            </NotoSansKR>
           ) : (
             <NotoSansKR size={20}>
               <NotoSansKR size={20} color="primary1">
@@ -234,8 +318,9 @@ const EditChallengeScreen = () => {
           <RowContainer gap={16}>
             <TouchableOpacity
               onPress={() =>
-                challengeData.CHALLENGE_STATUS === 'PENDING' &&
-                challengeData.IS_OWNER !== false &&
+                challengeData.CHALLENGE_STATUS ===
+                  ChallengeStatusType.PENDING &&
+                challengeData.IS_OWNER &&
                 setEmojiOpen(true)
               }>
               {selectedEmoji ? (
@@ -252,8 +337,8 @@ const EditChallengeScreen = () => {
                 onChangeText={setChallengeName}
                 value={challengeName}
                 editable={
-                  challengeData.CHALLENGE_STATUS === 'PENDING' &&
-                  challengeData.IS_OWNER !== false
+                  challengeData.CHALLENGE_STATUS ===
+                    ChallengeStatusType.PENDING && challengeData.IS_OWNER
                 }
               />
             </View>
@@ -264,8 +349,9 @@ const EditChallengeScreen = () => {
 
             <DatePicker
               onPress={() => {
-                challengeData.CHALLENGE_STATUS === 'PENDING' &&
-                  challengeData.IS_OWNER !== false &&
+                challengeData.CHALLENGE_STATUS ===
+                  ChallengeStatusType.PENDING &&
+                  challengeData.IS_OWNER &&
                   setCalendarOpen(true);
               }}>
               {calendarData.end && calendarData.start ? (
@@ -297,37 +383,14 @@ const EditChallengeScreen = () => {
               />
             ))}
           </View>
-
-          {/* {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null} */}
         </InnerContainer>
       </ScrollContainer>
 
-      {challengeData.CHALLENGE_STATUS === 'PENDING' &&
-      challengeData.IS_OWNER !== false ? (
+      {challengeData.CHALLENGE_STATUS === ChallengeStatusType.PENDING &&
+      challengeData.IS_OWNER ? (
         <View style={{gap: 8, padding: 16}}>
           <ButtonComponent
             onPress={() => {
-              const missingItems = [];
-
-              if (!challengeName) {
-                missingItems.push('챌린지 목표');
-              }
-              if (!calendarData.start || !calendarData.end) {
-                missingItems.push('챌린지 날짜');
-              }
-              if (!selectedEmoji) {
-                missingItems.push('이모지');
-              }
-
-              if (missingItems.length > 0) {
-                Toast.show({
-                  type: 'error',
-                  text1: '모든 항목을 채워주세요',
-                  text2: missingItems.join(', ') + '을(를) 작성해주세요.',
-                });
-                return;
-              }
-
               Alert.alert(
                 '오늘 날짜로 시작합니다', // 대화상자 제목
                 '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
@@ -349,80 +412,28 @@ const EditChallengeScreen = () => {
             }}>
             지금 시작하기
           </ButtonComponent>
-          <ButtonComponent
-            type="secondary"
-            onPress={() => {
-              showModal(
-                <ChallengeInviteFriend
-                  setInviteListData={setInviteListData}
-                  inviteListData={inviteListData}
-                />,
-              );
-            }}>
-            친구 초대하기
-          </ButtonComponent>
           <RowContainer gap={8}>
             <View style={{flex: 1}}>
               <ButtonComponent
                 type="secondary"
                 onPress={() => {
-                  const missingItems = [];
-
-                  if (!challengeName) {
-                    missingItems.push('챌린지 목표');
-                  }
-                  if (!calendarData.start || !calendarData.end) {
-                    missingItems.push('챌린지 날짜');
-                  }
-                  if (!selectedEmoji) {
-                    missingItems.push('이모지');
-                  }
-
-                  if (missingItems.length > 0) {
-                    Toast.show({
-                      type: 'error',
-                      text1: '모든 항목을 채워주세요',
-                      text2: missingItems.join(', ') + '을(를) 작성해주세요.',
-                    });
-                    return;
-                  }
-
-                  if (calendarData.start === formatDate(new Date())) {
-                    Toast.show({
-                      type: 'error',
-                      text1: '챌린지 시작날짜를 오늘로 변경할 수 없습니다.',
-                    });
-                    return;
-                  }
-                  ChallengeEditMutate();
+                  sendKakao();
                 }}>
-                수정하기
+                링크 공유하기
               </ButtonComponent>
             </View>
             <View style={{flex: 1}}>
               <ButtonComponent
                 type="secondary"
                 onPress={() => {
-                  Alert.alert(
-                    '', // 대화상자 제목
-                    '정말로 챌린지를 삭제하시겠습니까?', // 메시지
-                    [
-                      {
-                        text: '취소',
-                        style: 'cancel',
-                      },
-                      {
-                        text: '삭제하기',
-                        onPress: () => {
-                          ChallengeDeleteMutation(); // 챌린지 삭제 함수 호출
-                        },
-                        style: 'destructive',
-                      },
-                    ],
-                    {cancelable: false}, // 바깥쪽을 눌러 대화상자를 닫을 수 없도록 설정
+                  showModal(
+                    <ChallengeInviteFriend
+                      setInviteListData={setInviteListData}
+                      inviteListData={inviteListData}
+                    />,
                   );
                 }}>
-                삭제하기
+                친구 초대하기
               </ButtonComponent>
             </View>
           </RowContainer>
@@ -433,28 +444,21 @@ const EditChallengeScreen = () => {
             type="primary"
             onPress={() => {
               Alert.alert(
-                '', // 대화상자 제목
-                '정말로 챌린지를 그만두시겠습니까?', // 메시지
+                '정말로 챌린지를 그만하시겠습니까?', // 대화상자 제목
+                '', // 메시지
                 [
                   {
                     text: '취소',
                     style: 'cancel',
                   },
                   {
-                    text: '그만두기',
+                    text: '그만하기',
                     onPress: () => {
                       ChallengeDeleteMutation(); // 챌린지 삭제 함수 호출
-                      dispatch(
-                        removeChallenge({
-                          type: SIGN_TYPE!,
-                          challenge_mst_no: selectedChallengeMstNo!,
-                        }),
-                      );
                     },
                     style: 'destructive',
                   },
                 ],
-                {cancelable: false}, // 바깥쪽을 눌러 대화상자를 닫을 수 없도록 설정
               );
             }}>
             챌린지 중단하기

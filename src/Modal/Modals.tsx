@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, Image, View} from 'react-native';
+import {Alert, Dimensions, Image, View} from 'react-native';
 import {
   ButtonComponent,
   ContentSave,
@@ -7,6 +7,7 @@ import {
   NotoSansKR,
   RowContainer,
   convertUTCToKoKRDay,
+  formatDate,
   timeSince,
   useApi,
 } from '../Component';
@@ -26,6 +27,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation} from 'react-query';
 import {useModal} from './ModalProvider';
+import Toast from 'react-native-toast-message';
 
 interface ParticipantsType {
   USER_NM: string;
@@ -326,6 +328,72 @@ export const DailyModal = ({
           광고 불러오는 중
         </ButtonComponent>
       )}
+    </View>
+  );
+};
+
+export const ChallengeOptionModal = ({
+  editChallenge,
+  deleteChallenge,
+  missedItem,
+  calendarData,
+}: any) => {
+  const {hideModal} = useModal();
+
+  return (
+    <View style={{gap: 24}}>
+      <ModalHeadBorder />
+
+      <View style={{gap: 8}}>
+        <ButtonComponent
+          type="black"
+          onPress={() => {
+            if (calendarData.start === formatDate(new Date())) {
+              Toast.show({
+                type: 'error',
+                text1: '챌린지 시작날짜를 오늘로 변경할 수 없습니다.',
+              });
+              hideModal();
+              return;
+            }
+
+            if (missedItem.length > 0) {
+              Toast.show({
+                type: 'error',
+                text1: '모든 항목을 채워주세요',
+                text2: missedItem.join(', ') + '을(를) 작성해주세요.',
+              });
+              hideModal();
+              return;
+            }
+            editChallenge();
+          }}>
+          수정하기
+        </ButtonComponent>
+        <ButtonComponent
+          type="black"
+          onPress={() => {
+            Alert.alert(
+              '정말로 챌린지를 삭제하시겠습니까?', // 대화상자 제목
+              '', // 메시지
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                },
+                {
+                  text: '삭제하기',
+                  onPress: () => {
+                    deleteChallenge(); // 챌린지 삭제 함수 호출
+                  },
+                  style: 'destructive',
+                },
+              ],
+            );
+          }}>
+          삭제하기
+        </ButtonComponent>
+      </View>
     </View>
   );
 };

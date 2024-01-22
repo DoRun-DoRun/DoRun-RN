@@ -611,7 +611,8 @@ const ChallengeTab = () => {
                 진행중인 챌린지가 없어요!
               </NotoSansKR>
             </View>
-
+          </TopContainer>
+          <TopContainer>
             <NotoSansKR size={16}>초대된 챌린지</NotoSansKR>
             {listData.invited_challenges?.length === 0 ? (
               <View
@@ -619,7 +620,6 @@ const ChallengeTab = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   padding: 16,
-                  flex: 1,
                 }}>
                 <NotoSansKR size={16} color="gray5">
                   초대된 챌린지가 없어요!
@@ -628,28 +628,31 @@ const ChallengeTab = () => {
             ) : (
               <RowScrollContainer gap={8}>
                 {listData.invited_challenges?.map(
-                  (challenge: ChallengeInfo) => (
-                    <Pressable
-                      key={challenge.CHALLENGE_MST_NO}
-                      onPress={() =>
-                        showModal(
-                          <ChallengeListModal
-                            count_challenge={
-                              listData.progress_challenges?.length
-                            }
-                            challenge_mst_no={challenge.CHALLENGE_MST_NO}
-                          />,
-                        )
-                      }>
-                      <ChallengeSubInfo
-                        headerEmoji={challenge.HEADER_EMOJI}
-                        mainText={challenge.CHALLENGE_MST_NM}
-                        subText={calculateDaysUntil(
-                          challenge.START_DT,
-                        ).toString()}
-                      />
-                    </Pressable>
-                  ),
+                  (challenge: ChallengeInfo) => {
+                    const leftDay = calculateDaysUntil(challenge.START_DT);
+                    return (
+                      <Pressable
+                        key={challenge.CHALLENGE_MST_NO}
+                        onPress={() =>
+                          showModal(
+                            <ChallengeListModal
+                              count_challenge={
+                                listData.progress_challenges?.length
+                              }
+                              challenge_mst_no={challenge.CHALLENGE_MST_NO}
+                            />,
+                          )
+                        }>
+                        <ChallengeSubInfo
+                          headerEmoji={challenge.HEADER_EMOJI}
+                          mainText={challenge.CHALLENGE_MST_NM}
+                          subText={
+                            leftDay === 0 ? '내일시작' : `${leftDay}일 뒤 시작`
+                          }
+                        />
+                      </Pressable>
+                    );
+                  },
                 )}
               </RowScrollContainer>
             )}

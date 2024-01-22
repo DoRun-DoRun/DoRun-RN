@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import CreateChallengeScreen from './screens/CreateChallengeScreen';
-import {MainTab} from './Tab/MainTab';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
@@ -29,6 +28,9 @@ import {RootState} from '../store/RootReducer';
 import {useMutation, useQueryClient} from 'react-query';
 import {InviteAcceptType, SignType} from '../store/data';
 import {setAccessToken, setUser} from '../store/slice/UserSlice';
+import {MainTab} from './Tab/MainTab';
+import {ChallengeListModal} from './Modal/ChallengeListModal';
+import {useModal} from './Modal/ModalProvider';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -65,6 +67,9 @@ function App() {
     (state: RootState) => state.user,
   );
   const [isLoading, setIsLoading] = useState(true);
+
+  const {showModal} = useModal();
+
   const queryClient = useQueryClient();
   const [deepLinkUrl, setDeepLinkUrl] = useState('');
   const [initialRoute, setInitialRoute] =
@@ -90,6 +95,7 @@ function App() {
       console.error('Challenge Status Change Error:', error);
     },
   });
+
   const inviteFriend = (sender: number) =>
     CallApi({
       endpoint: `friend/${sender}`,
@@ -130,16 +136,36 @@ function App() {
     },
   });
 
+  const inviteChallenge = (challenge_mst_no: number) =>
+    CallApi({
+      endpoint: `challenge/link/${challenge_mst_no}`,
+      method: 'PUT',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: InviteChallenge} = useMutation(inviteChallenge, {
+    onSuccess: async response => {
+      response.message === '참가 성공'
+        ? (queryClient.invalidateQueries('getChallenge'),
+          showModal(
+            <ChallengeListModal
+              count_challenge={response.challenge_count}
+              challenge_mst_no={response.challenge}
+            />,
+          ))
+        : Toast.show({
+            type: 'error',
+            text1: `${response.message}`,
+          });
+    },
+  });
+
   useEffect(() => {
     const bootstrapAsync = async () => {
       const userData = await loadUser();
-
       if (userData) {
         dispatch(setUser(userData));
       }
-
-      console.log(userData);
-
       if (userData.SIGN_TYPE === SignType.KAKAO) {
         loginMutation.mutate(userData.KAKAO);
         setInitialRoute('MainTab');
@@ -162,7 +188,6 @@ function App() {
       if (settingData) {
         dispatch(setVolume(settingData));
       }
-
       setIsLoading(false);
     };
 
@@ -171,9 +196,7 @@ function App() {
     // .then(adapterStatuses => {
     //   console.log(adapterStatuses);
     // });
-
     getPermission();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -219,6 +242,9 @@ function App() {
             InviteFriend(parseInt(value, 10));
           }
         }
+        if (key === 'INVITE_CHALLENGE_NO') {
+          InviteChallenge(parseInt(value, 10));
+        }
       });
     };
 
@@ -226,7 +252,7 @@ function App() {
       extractParamsFromUrl(deepLinkUrl);
       setDeepLinkUrl('');
     }
-  }, [isLoggedIn, deepLinkUrl, UID, InviteFriend]);
+  }, [isLoggedIn, deepLinkUrl, UID, InviteFriend, InviteChallenge]);
 
   if (isLoading) {
     return <LoadingIndicatior />;
