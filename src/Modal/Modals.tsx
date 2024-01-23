@@ -7,7 +7,6 @@ import {
   NotoSansKR,
   RowContainer,
   convertUTCToKoKRDay,
-  formatDate,
   timeSince,
   useApi,
 } from '../Component';
@@ -27,7 +26,6 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation} from 'react-query';
 import {useModal} from './ModalProvider';
-import Toast from 'react-native-toast-message';
 
 interface ParticipantsType {
   USER_NM: string;
@@ -333,13 +331,9 @@ export const DailyModal = ({
 };
 
 export const ChallengeOptionModal = ({
-  editChallenge,
+  startChallenge,
   deleteChallenge,
-  missedItem,
-  calendarData,
 }: any) => {
-  const {hideModal} = useModal();
-
   return (
     <View style={{gap: 24}}>
       <ModalHeadBorder />
@@ -348,27 +342,25 @@ export const ChallengeOptionModal = ({
         <ButtonComponent
           type="black"
           onPress={() => {
-            if (calendarData.start === formatDate(new Date())) {
-              Toast.show({
-                type: 'error',
-                text1: '챌린지 시작날짜를 오늘로 변경할 수 없습니다.',
-              });
-              hideModal();
-              return;
-            }
-
-            if (missedItem.length > 0) {
-              Toast.show({
-                type: 'error',
-                text1: '모든 항목을 채워주세요',
-                text2: missedItem.join(', ') + '을(를) 작성해주세요.',
-              });
-              hideModal();
-              return;
-            }
-            editChallenge();
+            Alert.alert(
+              '오늘 날짜로 시작합니다', // 대화상자 제목
+              '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                },
+                {
+                  text: '바로 시작',
+                  onPress: () => {
+                    startChallenge();
+                  },
+                  style: 'destructive',
+                },
+              ],
+            );
           }}>
-          수정하기
+          지금 시작하기
         </ButtonComponent>
         <ButtonComponent
           type="black"

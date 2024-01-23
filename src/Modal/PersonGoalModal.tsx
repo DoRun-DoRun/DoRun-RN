@@ -145,7 +145,7 @@ export const PersonGoalAddModal = ({
             style={{flex: 1}}
             size={16}
             value={inputText}
-            placeholder="새로운 목표를 추가해주세요."
+            placeholder="오늘 할 일은 무엇인가요?"
             onChangeText={setInputText}
           />
         </SearchContainer>

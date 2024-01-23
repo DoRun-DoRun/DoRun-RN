@@ -333,7 +333,7 @@ const History = () => {
                   alignItems: 'center',
                 }}>
                 <NotoSansKR size={16}>
-                  해당 날짜에는 챌린지를 수행하지 못했어요
+                  이날은 하루를 완료하지 못했어요.
                 </NotoSansKR>
               </View>
             )}
@@ -341,9 +341,7 @@ const History = () => {
       ) : (
         <View
           style={{height: 200, justifyContent: 'center', alignItems: 'center'}}>
-          <NotoSansKR size={16}>
-            해당 날짜에는 챌린지를 진행하지 않았어요
-          </NotoSansKR>
+          <NotoSansKR size={16}>이날은 챌린지를 진행하지 않았어요</NotoSansKR>
         </View>
       )}
     </>

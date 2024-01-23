@@ -361,7 +361,7 @@ const LoginTab = () => {
             <NotoSansKR
               size={14}
               weight="Medium"
-              color="white"
+              color="gray2"
               style={{
                 textDecorationLine: 'underline',
                 textAlign: 'center',

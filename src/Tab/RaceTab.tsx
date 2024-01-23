@@ -371,7 +371,7 @@ const BGComponent = ({
         }}
         {...panResponder.panHandlers}>
         {isDragging ? (
-          <View style={{width: 95, height: 115}}>
+          <View style={{width: 85, height: 105}}>
             <LottieView
               source={struggleLottie[data.CHARACTER_NO - 1]}
               autoPlay

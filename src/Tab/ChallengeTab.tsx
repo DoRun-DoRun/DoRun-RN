@@ -595,7 +595,7 @@ const ChallengeTab = () => {
         }>
         <HomeContainer>
           <TopContainer style={{flex: 1}}>
-            <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
+            <NotoSansKR size={16}>진행중인 챌린지</NotoSansKR>
             <View
               style={{
                 justifyContent: 'center',
@@ -686,7 +686,7 @@ const ChallengeTab = () => {
       }>
       <HomeContainer style={{gap: 32}}>
         <TopContainer>
-          <NotoSansKR size={16}>진행중 챌린지</NotoSansKR>
+          <NotoSansKR size={16}>진행중인 챌린지</NotoSansKR>
           <RowScrollContainer gap={8}>
             {listData.progress_challenges?.map((challenge: ChallengeInfo) => (
               <Pressable
@@ -770,7 +770,7 @@ const ChallengeTab = () => {
           <>
             <CenterContainer style={{flexGrow: 1}}>
               <RowContainer seperate>
-                <NotoSansKR size={18}>개인별 목표</NotoSansKR>
+                <NotoSansKR size={18}>오늘 할 일 목록</NotoSansKR>
               </RowContainer>
 
               <View style={{gap: 8}}>
@@ -790,7 +790,7 @@ const ChallengeTab = () => {
                     />,
                   );
                 }}>
-                <PlusContainers title="목표 추가하기" />
+                <PlusContainers title="할 일 추가하기" />
               </TouchableOpacity>
             </CenterContainer>
             <CenterContainer>
@@ -807,7 +807,7 @@ const ChallengeTab = () => {
                 {detailData.IS_DONE_TODAY
                   ? '오늘은 일기를 작성했어요'
                   : personGoal?.length === 0
-                  ? '개인별 목표를 추가해주세요'
+                  ? '아직 할 일을 추가하지 않았어요'
                   : '오늘 하루 완료하기'}
               </ButtonComponent>
             </CenterContainer>
@@ -815,7 +815,7 @@ const ChallengeTab = () => {
               <FootContainer>
                 <RowContainer seperate>
                   <NotoSansKR size={18} color="white">
-                    추가 목표
+                    개인 미션
                   </NotoSansKR>
                   <MaterialCommunityIcons
                     name="bomb"
@@ -833,7 +833,7 @@ const ChallengeTab = () => {
               <FootContainer disalbed>
                 <RowContainer seperate>
                   <NotoSansKR size={18} color="white">
-                    추가 목표
+                    개인 미션
                   </NotoSansKR>
                   <MaterialCommunityIcons
                     name="bomb"

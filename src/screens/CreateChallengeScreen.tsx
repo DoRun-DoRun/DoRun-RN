@@ -395,6 +395,7 @@ const CreateChallengeScreen = () => {
       });
       queryClient.invalidateQueries('getChallenge');
       dispatch(setSelectedChallengeMstNo(response.CHALLENGE_MST_NO));
+      navigation.navigate('MainTab' as never);
       navigation.navigate('EditChallengeScreen' as never);
     },
     onError: error => {

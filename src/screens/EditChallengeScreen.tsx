@@ -101,7 +101,6 @@ const EditChallengeScreen = () => {
         type: 'success',
         text1: '챌린지 정보가 수정되었어요.',
       });
-      hideModal();
       queryClient.invalidateQueries('getChallenge');
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
@@ -142,6 +141,7 @@ const EditChallengeScreen = () => {
       queryClient.invalidateQueries('ChallengeUserList');
       queryClient.invalidateQueries('challenge_history');
       queryClient.invalidateQueries('userData');
+      hideModal();
       navigation.navigate('MainTab' as never);
     },
     onError: error => {
@@ -255,24 +255,10 @@ const EditChallengeScreen = () => {
             size={24}
             color={'#1C1B1F'}
             onPress={() => {
-              const missingItems = [];
-
-              if (!challengeName) {
-                missingItems.push('챌린지 목표');
-              }
-              if (!calendarData.start || !calendarData.end) {
-                missingItems.push('챌린지 날짜');
-              }
-              if (!selectedEmoji) {
-                missingItems.push('이모지');
-              }
-
               showModal(
                 <ChallengeOptionModal
                   deleteChallenge={ChallengeDeleteMutation}
-                  editChallenge={ChallengeEditMutate}
-                  calendarData={calendarData}
-                  missedItem={missingItems}
+                  startChallenge={ChallengeStartMutate}
                 />,
               );
             }}
@@ -281,13 +267,10 @@ const EditChallengeScreen = () => {
     });
   }, [
     ChallengeDeleteMutation,
-    ChallengeEditMutate,
-    calendarData,
+    ChallengeStartMutate,
     challengeData?.CHALLENGE_STATUS,
     challengeData?.IS_OWNER,
-    challengeName,
     navigation,
-    selectedEmoji,
     showModal,
   ]);
 
@@ -391,26 +374,51 @@ const EditChallengeScreen = () => {
         <View style={{gap: 8, padding: 16}}>
           <ButtonComponent
             onPress={() => {
-              Alert.alert(
-                '오늘 날짜로 시작합니다', // 대화상자 제목
-                '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
-                [
-                  {
-                    text: '취소',
-                    style: 'cancel',
-                  },
-                  {
-                    text: '바로 시작',
-                    onPress: () => {
-                      ChallengeStartMutate();
+              const missingItems = [];
+
+              if (!challengeName) {
+                missingItems.push('챌린지 목표');
+              }
+              if (!calendarData.start || !calendarData.end) {
+                missingItems.push('챌린지 날짜');
+              }
+              if (!selectedEmoji) {
+                missingItems.push('이모지');
+              }
+
+              if (missingItems.length > 0) {
+                Toast.show({
+                  type: 'error',
+                  text1: '모든 항목을 채워주세요',
+                  text2: missingItems.join(', ') + '을(를) 작성해주세요.',
+                });
+                return;
+              }
+
+              if (calendarData.start === formatDate(new Date())) {
+                Alert.alert(
+                  '오늘 날짜로 시작합니다', // 대화상자 제목
+                  '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
+                  [
+                    {
+                      text: '취소',
+                      style: 'cancel',
                     },
-                    style: 'destructive',
-                  },
-                ],
-                {cancelable: false}, // 바깥쪽을 눌러 대화상자를 닫을 수 없도록 설정
-              );
+                    {
+                      text: '바로 시작',
+                      onPress: () => {
+                        ChallengeEditMutate();
+                        ChallengeStartMutate();
+                      },
+                      style: 'destructive',
+                    },
+                  ],
+                );
+                return;
+              }
+              ChallengeEditMutate();
             }}>
-            지금 시작하기
+            수정하기
           </ButtonComponent>
           <RowContainer gap={8}>
             <View style={{flex: 1}}>
