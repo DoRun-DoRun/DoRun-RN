@@ -1,79 +1,17 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+### 최근 트렌드로 급 부상한 '갓생'이라는 단어를 아시나요?
 
-# Getting Started
+갓생은 갓(God)과 인생의 생(生)을 합친 신조어로 부지런한 삶을 의미합니다.
+이러한 갓생 살기는 엄청 대단한 게 아니라 소소한 목표를 완수해 나가는 것에서부터 시작합니다. "열심히 운동해 바디프로필을 찍기" 보다는, "오늘은 탄산음료 먹지 않기"와 같은 목표를 세우고 이를 이루는 거죠.
+그리고 저는 이러한 나 스스로와의 목표를 정하고 이루는 과정에서 만족감과 성취감을 얻을 수 있다고 생각합니다.
+다만, 실제로 "갓생 살기"를 해보면 꽤 어렵습니다. 타인과의 약속에 비해서 나와의 약속은 지키지 않더라도 큰 피해가 없다고 합리화하고 쉽게 포기하기 때문입니다.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+그렇기에 저는 "두런두런" 서비스를 개발했습니다.
+혼자 외롭게 "갓생 살기"를 하기보다는 내 주변의 친구들과 함께 더 나은 삶을 향해 함께 달릴 수 있으면 합니다.
+그래서 더 많은 사람이 SNS, 게임과 같이 손쉽게 얻는 즐거움이 아닌, 어렵게 지켜낸 스스로와의 약속을 통해 얻는 기쁨이 얼마나 큰지 느껴봤으면 좋겠습니다.
 
-## Step 1: Start the Metro Server
+코로나19, 경제위기, 스마트폰 중독 등 여러 사회적인 이슈로 무력감, 우울감을 느끼는 사람들이 늘어났습니다. 이를 효과적으로 해결할 방법은 '자기 관리'라고 생각합니다.
+저희는 가장 효율적으로 '자기관리'를 통해 성취에 도달할 방법은 '달성할 수 있는 소소한 목표'와 '함께 달려가는 사람들의 응원'이라고 생각합니다.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+이를 도와주는 '두런두런'으로 2024년은 '갓생' 살아보는건 어떤가요?
 
-To start Metro, run the following command from the _root_ of your React Native project:
-
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+https://hin6150.notion.site/23-09-24-01-c8d6d95f3e9647ed84ab70a1636de936?pvs=74
