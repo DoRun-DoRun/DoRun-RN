@@ -1,3 +1,4 @@
+import {SignType} from '../data';
 import {persistUser, userDataType} from './../async/asyncStore';
 import {createSlice} from '@reduxjs/toolkit';
 
@@ -65,11 +66,37 @@ export const UserSlice = createSlice({
       state.isLoggedIn = false;
       persistUser(state);
     },
+    signOut(state, action) {
+      const {SIGN_TYPE} = action.payload;
+
+      if (SIGN_TYPE === SignType.GUEST) {
+        state.GUEST = null;
+      }
+      if (SIGN_TYPE === SignType.APPLE) {
+        state.APPLE = null;
+      }
+      if (SIGN_TYPE === SignType.KAKAO) {
+        state.KAKAO = null;
+      }
+
+      state.userName = null;
+      state.UID = null;
+      state.SIGN_TYPE = null;
+      state.accessToken = null;
+      state.isLoggedIn = false;
+      persistUser(state);
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {setUser, setAccessToken, setUserName, setIsLoggedIn, logOut} =
-  UserSlice.actions;
+export const {
+  setUser,
+  setAccessToken,
+  setUserName,
+  setIsLoggedIn,
+  logOut,
+  signOut,
+} = UserSlice.actions;
 
 export default UserSlice.reducer;

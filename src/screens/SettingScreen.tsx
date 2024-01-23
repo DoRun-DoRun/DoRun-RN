@@ -8,15 +8,15 @@ import {
   RowContainer,
   useApi,
 } from '../Component';
-import {View} from 'react-native';
+import {Alert, View} from 'react-native';
 import {useTheme} from 'styled-components/native';
 import {Slider} from '@miblanchard/react-native-slider';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery} from 'react-query';
 import {RootState} from '../../store/RootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {setVolume} from '../../store/slice/SettingSlice';
-import {logOut} from '../../store/slice/UserSlice';
+import {logOut, signOut} from '../../store/slice/UserSlice';
 
 const SettingScreen = () => {
   // const [pushAlarm, setPushAlarm] = useState(true);
@@ -30,7 +30,9 @@ const SettingScreen = () => {
   const navigation = useNavigation();
 
   const CallApi = useApi();
-  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {accessToken, SIGN_TYPE} = useSelector(
+    (state: RootState) => state.user,
+  );
 
   const UserDataSetting = async () => {
     try {
@@ -46,6 +48,29 @@ const SettingScreen = () => {
     }
   };
   const {data, isLoading} = useQuery('UserDataSetting', UserDataSetting);
+
+  const deleteUser = () =>
+    CallApi({
+      endpoint: 'user',
+      method: 'DELETE',
+      accessToken: accessToken!,
+    });
+
+  const {mutate} = useMutation(deleteUser, {
+    onSuccess: () => {
+      dispatch(signOut({SIGN_TYPE: SIGN_TYPE}));
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'LoginTab'}],
+        }),
+      );
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
   if (isLoading) {
     return <LoadingIndicatior />;
   }
@@ -115,7 +140,6 @@ const SettingScreen = () => {
         </View>
       </InnerContainer>
       <View style={{gap: 8, padding: 16}}>
-        {/* <ButtonComponent>고객 센터</ButtonComponent> */}
         <ButtonComponent
           onPress={() => {
             dispatch(logOut());
@@ -127,6 +151,29 @@ const SettingScreen = () => {
             );
           }}>
           로그아웃
+        </ButtonComponent>
+        <ButtonComponent
+          type="secondary"
+          onPress={() => {
+            Alert.alert(
+              '계정을 삭제하시겠습니까?', // 대화상자 제목
+              '', // 메시지
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                },
+                {
+                  text: '삭제하기',
+                  onPress: () => {
+                    mutate();
+                  },
+                  style: 'destructive',
+                },
+              ],
+            );
+          }}>
+          계정 삭제
         </ButtonComponent>
       </View>
     </HomeContainer>
