@@ -180,14 +180,12 @@ const LoginTab = () => {
       Animated.parallel([
         Animated.timing(anim, {
           toValue: 1,
-          duration: 650 - index * 25,
-          delay: 50,
+          duration: 450 - index * 25,
           useNativeDriver: true,
         }),
         Animated.timing(groupScaleAnim[index], {
           toValue: 1,
-          duration: 650 - index * 25,
-          delay: 50,
+          duration: 450 - index * 25,
           useNativeDriver: true,
         }),
       ]),
@@ -213,6 +211,7 @@ const LoginTab = () => {
     ]).start();
   }, [groupFadeAnim, groupScaleAnim, riseAnim, riseFadeAnim]);
 
+  const platformIndex = Platform.OS === 'android' ? 1 : 2;
   return (
     <View style={{flex: 1}}>
       {/* <BackgroundImage source={require('../../assets/image/background.jpg')} /> */}
@@ -345,8 +344,8 @@ const LoginTab = () => {
 
         <Animated.View
           style={{
-            opacity: riseFadeAnim[2],
-            transform: [{translateY: riseAnim[2]}],
+            opacity: riseFadeAnim[platformIndex],
+            transform: [{translateY: riseAnim[platformIndex]}],
           }}>
           <TouchableOpacity
             disabled={isLoading}
