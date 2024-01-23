@@ -233,22 +233,6 @@ const LoginTab = () => {
           width: '100%',
           height: '100%',
           position: 'absolute',
-          opacity: groupFadeAnim[0],
-          transform: [{scale: groupScaleAnim[0]}],
-        }}>
-        <BackgroundImage
-          source={require('../../assets/image/background/bg_seed.png')}
-        />
-        <BackgroundImage
-          source={require('../../assets/image/background/bg_title.png')}
-        />
-      </Animated.View>
-
-      <Animated.View
-        style={{
-          width: '100%',
-          height: '100%',
-          position: 'absolute',
           opacity: groupFadeAnim[1],
           transform: [{scale: groupScaleAnim[1]}],
         }}>
@@ -257,6 +241,22 @@ const LoginTab = () => {
         />
         <BackgroundImage
           source={require('../../assets/image/background/bg_seeds.png')}
+        />
+      </Animated.View>
+
+      <Animated.View
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          opacity: groupFadeAnim[0],
+          transform: [{scale: groupScaleAnim[0]}],
+        }}>
+        <BackgroundImage
+          source={require('../../assets/image/background/bg_seed.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/background/Title.png')}
         />
       </Animated.View>
 
@@ -280,7 +280,6 @@ const LoginTab = () => {
       </Animated.View>
 
       <LoginContainer>
-        {/* <Title source={require('../../assets/image/title.png')} /> */}
         <Animated.View
           style={{
             opacity: riseFadeAnim[0],
