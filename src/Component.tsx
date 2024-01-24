@@ -232,7 +232,7 @@ export const useApi = () => {
         : 'http://10.0.2.2:8000' // Android용 로컬 서버
       : 'https://dorun.site';
 
-    baseUrl = 'https://dorun.site';
+    // baseUrl = 'https://dorun.site';
 
     const url = `${baseUrl}/${endpoint}`;
 

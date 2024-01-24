@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {Modal, TouchableOpacity, View} from 'react-native';
+import {Modal, Pressable, TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -16,6 +16,7 @@ import {
 } from '../Component';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
@@ -26,9 +27,8 @@ import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {Alert} from 'react-native';
 import {Direction} from 'react-native-calendars/src/types';
-import {useModal} from '../Modal/ModalProvider';
-import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+import {InviteAcceptType} from '../../store/data';
 
 export const DatePicker = styled.TouchableOpacity`
   border: 1px solid ${props => props.theme.gray5};
@@ -37,53 +37,6 @@ export const DatePicker = styled.TouchableOpacity`
   align-items: center;
   border-radius: 10px;
 `;
-
-export interface InviteList {
-  UserName: string;
-  UID: number;
-  accept?: boolean;
-}
-
-interface InviteListType {
-  UserName: string;
-  UID: number;
-  accept?: boolean;
-  setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
-}
-
-export const InviteList = ({
-  UserName,
-  accept,
-  UID,
-  setInviteListData,
-}: InviteListType) => {
-  return (
-    <RowContainer seperate>
-      <NotoSansKR size={16} weight="Medium">
-        {UserName}
-      </NotoSansKR>
-      <RowContainer gap={9}>
-        <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
-          {accept ? '참여 중' : '초대완료'}
-        </NotoSansKR>
-        {!accept && (
-          <TouchableOpacity
-            onPress={() => {
-              setInviteListData(prev => prev.filter(item => item.UID !== UID));
-            }}>
-            <NotoSansKR
-              size={14}
-              weight="Regular"
-              color="gray3"
-              style={{textDecorationLine: 'underline'}}>
-              취소하기
-            </NotoSansKR>
-          </TouchableOpacity>
-        )}
-      </RowContainer>
-    </RowContainer>
-  );
-};
 
 interface EmojiType {
   emoji: string;
@@ -345,30 +298,20 @@ export const CalendarContainer = ({
 };
 
 const CreateChallengeScreen = () => {
-  const {accessToken, userName, UID} = useSelector(
-    (state: RootState) => state.user,
-  );
+  const {accessToken, UID} = useSelector((state: RootState) => state.user);
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-
-  // const validAccessToken = accessToken || '기본값 또는 대체값';
-  const validUserName = userName || '기본 사용자 이름';
-  const validUID = UID || 1000000;
 
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<EmojiType>();
   const [challengeName, setChallengeName] = useState('');
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [description, setDescription] = useState(false);
 
   const [calendarData, setCalendarData] = useState({start: '', end: ''});
 
-  const [inviteListData, setInviteListData] = useState<InviteList[]>([
-    {UserName: validUserName, UID: validUID, accept: true},
-  ]);
   const CallApi = useApi();
   const dispatch = useDispatch();
-
-  const {showModal} = useModal();
 
   const createChallenge = () =>
     CallApi({
@@ -377,10 +320,7 @@ const CreateChallengeScreen = () => {
       accessToken: accessToken!,
       body: {
         CHALLENGE_MST_NM: challengeName,
-        USERS_UID: inviteListData.map(item => ({
-          USER_UID: item.UID,
-          INVITE_STATS: item.accept ? 'ACCEPTED' : 'PENDING',
-        })),
+        USERS_UID: [{USER_UID: UID, INVITE_STATS: InviteAcceptType.ACCEPTED}],
         START_DT: convertKoKRToUTC(calendarData.start).toISOString(),
         END_DT: convertKoKRToUTC(calendarData.end).toISOString(),
         HEADER_EMOJI: selectedEmoji?.emoji,
@@ -496,25 +436,56 @@ const CreateChallengeScreen = () => {
             </DatePicker>
           </View>
 
-          <View style={{gap: 16}}>
-            <View style={{gap: 12}}>
-              <NotoSansKR size={18}>참여중인 인원</NotoSansKR>
-
-              {inviteListData.map((data, key) => (
-                <InviteList
-                  key={key}
-                  UserName={data.UserName}
-                  UID={data.UID}
-                  accept={data.accept}
-                  setInviteListData={setInviteListData}
+          <View style={{gap: 12}}>
+            <Pressable
+              onPress={() => {
+                setDescription(prev => !prev);
+              }}>
+              <RowContainer seperate>
+                <NotoSansKR size={18}>챌린지는 어떻게 진행되나요?</NotoSansKR>
+                <MaterialCommunityIcons
+                  name={description ? 'chevron-down' : 'chevron-up'}
+                  size={32}
+                  color={'#000'}
                 />
-              ))}
-            </View>
+              </RowContainer>
+            </Pressable>
+            {description && (
+              <View style={{gap: 8}}>
+                <View>
+                  <NotoSansKR size={14}>챌린지 시작과 종료</NotoSansKR>
+                  <NotoSansKR size={14} weight="Medium">
+                    챌린지는 한국시간으로 매일 오전 4시에 시작해서 다음날 오전
+                    4시에 끝납니다.
+                  </NotoSansKR>
+                </View>
+
+                <View>
+                  <NotoSansKR size={14}>할 일 생성 및 완료</NotoSansKR>
+                  <NotoSansKR size={14} weight="Medium">
+                    챌린지 내에서 자신만의 할 일을 만들고, 이를 완수할 수
+                    있어요.
+                  </NotoSansKR>
+                </View>
+
+                <View>
+                  <NotoSansKR size={14}>하루 마무리</NotoSansKR>
+                  <NotoSansKR size={14} weight="Medium">
+                    매일 한 번, '하루 완료하기' 기능을 통해 그날의 활동을
+                    마무리할 수 있습니다.
+                  </NotoSansKR>
+                </View>
+
+                <View>
+                  <NotoSansKR size={14}>챌린지 달성도 상승</NotoSansKR>
+                  <NotoSansKR size={14} weight="Medium">
+                    매일 하루를 성공적으로 마무리하면, 챌린지 기간 동안 달성도가
+                    올라가게 됩니다.
+                  </NotoSansKR>
+                </View>
+              </View>
+            )}
           </View>
-          {/* <NotoSansKR size={16}>챌린지는 04시에 시작 & 완료되어요</NotoSansKR> */}
-          {/* <RowContainer gap={8}>
-            {!searchOpen ? <OcticonIcons name="plus-circle" size={24} /> : null}
-          </RowContainer> */}
         </InnerContainer>
       </ScrollContainer>
 
@@ -565,18 +536,6 @@ const CreateChallengeScreen = () => {
             }
           }}>
           챌린지 생성하기
-        </ButtonComponent>
-        <ButtonComponent
-          type="secondary"
-          onPress={() =>
-            showModal(
-              <ChallengeInviteFriend
-                setInviteListData={setInviteListData}
-                inviteListData={inviteListData}
-              />,
-            )
-          }>
-          친구 초대하기
         </ButtonComponent>
       </View>
 

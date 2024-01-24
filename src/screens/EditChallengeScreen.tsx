@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {Alert, TouchableOpacity, View} from 'react-native';
 import {
   ButtonComponent,
@@ -25,7 +25,6 @@ import {useNavigation} from '@react-navigation/native';
 import {
   CalendarContainer,
   DatePicker,
-  InviteList,
   formatDate,
 } from './CreateChallengeScreen';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
@@ -36,6 +35,74 @@ import {ChallengeOptionModal} from '../Modal/Modals';
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {ChallengeStatusType, InviteAcceptType} from '../../store/data';
+
+export interface InviteList {
+  UserName: string;
+  UID: number;
+  accept?: boolean;
+}
+
+interface InviteListType {
+  UserName: string;
+  UID: number;
+  accept?: boolean;
+  setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
+}
+
+const InviteList = ({
+  UserName,
+  accept,
+  UID,
+  setInviteListData,
+}: InviteListType) => {
+  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {selectedChallengeMstNo} = useSelector(
+    (state: RootState) => state.challenge,
+  );
+  const CallApi = useApi();
+
+  const deleteChallegeUser = (uid: number) =>
+    CallApi({
+      endpoint: `challenge/delete_user/${selectedChallengeMstNo}?user_uid=${uid}`,
+      method: 'DELETE',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: DeleteChallegeUser} = useMutation(deleteChallegeUser, {
+    onSuccess: () => {},
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
+
+  return (
+    <RowContainer seperate>
+      <NotoSansKR size={16} weight="Medium">
+        {UserName}
+      </NotoSansKR>
+      <RowContainer gap={9}>
+        <NotoSansKR size={14} weight="Regular" color={accept ? 'green' : 'red'}>
+          {accept ? '참여 중' : '초대완료'}
+        </NotoSansKR>
+        {!accept && (
+          <TouchableOpacity
+            onPress={() => {
+              setInviteListData(prev => prev.filter(item => item.UID !== UID));
+              DeleteChallegeUser(UID);
+            }}>
+            <NotoSansKR
+              size={14}
+              weight="Regular"
+              color="gray3"
+              style={{textDecorationLine: 'underline'}}>
+              취소하기
+            </NotoSansKR>
+          </TouchableOpacity>
+        )}
+      </RowContainer>
+    </RowContainer>
+  );
+};
 
 interface participantsDataType {
   UID: number;
@@ -255,10 +322,23 @@ const EditChallengeScreen = () => {
             size={24}
             color={'#1C1B1F'}
             onPress={() => {
+              const missingItems = [];
+
+              if (!challengeName) {
+                missingItems.push('챌린지 목표');
+              }
+              if (!calendarData.start || !calendarData.end) {
+                missingItems.push('챌린지 날짜');
+              }
+              if (!selectedEmoji) {
+                missingItems.push('이모지');
+              }
+
               showModal(
                 <ChallengeOptionModal
+                  missingItems={missingItems}
                   deleteChallenge={ChallengeDeleteMutation}
-                  startChallenge={ChallengeStartMutate}
+                  editChallenge={ChallengeEditMutate}
                 />,
               );
             }}
@@ -267,10 +347,14 @@ const EditChallengeScreen = () => {
     });
   }, [
     ChallengeDeleteMutation,
-    ChallengeStartMutate,
+    ChallengeEditMutate,
+    calendarData.end,
+    calendarData.start,
     challengeData?.CHALLENGE_STATUS,
     challengeData?.IS_OWNER,
+    challengeName,
     navigation,
+    selectedEmoji,
     showModal,
   ]);
 
@@ -374,51 +458,25 @@ const EditChallengeScreen = () => {
         <View style={{gap: 8, padding: 16}}>
           <ButtonComponent
             onPress={() => {
-              const missingItems = [];
-
-              if (!challengeName) {
-                missingItems.push('챌린지 목표');
-              }
-              if (!calendarData.start || !calendarData.end) {
-                missingItems.push('챌린지 날짜');
-              }
-              if (!selectedEmoji) {
-                missingItems.push('이모지');
-              }
-
-              if (missingItems.length > 0) {
-                Toast.show({
-                  type: 'error',
-                  text1: '모든 항목을 채워주세요',
-                  text2: missingItems.join(', ') + '을(를) 작성해주세요.',
-                });
-                return;
-              }
-
-              if (calendarData.start === formatDate(new Date())) {
-                Alert.alert(
-                  '오늘 날짜로 시작합니다', // 대화상자 제목
-                  '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
-                  [
-                    {
-                      text: '취소',
-                      style: 'cancel',
+              Alert.alert(
+                '오늘 날짜로 시작합니다', // 대화상자 제목
+                '챌린지 도중에는 참여가 불가능합니다\n지금 시작하시겠습니까?', // 메시지
+                [
+                  {
+                    text: '취소',
+                    style: 'cancel',
+                  },
+                  {
+                    text: '바로 시작',
+                    onPress: () => {
+                      ChallengeStartMutate();
                     },
-                    {
-                      text: '바로 시작',
-                      onPress: () => {
-                        ChallengeEditMutate();
-                        ChallengeStartMutate();
-                      },
-                      style: 'destructive',
-                    },
-                  ],
-                );
-                return;
-              }
-              ChallengeEditMutate();
+                    style: 'destructive',
+                  },
+                ],
+              );
             }}>
-            수정하기
+            지금 시작하기
           </ButtonComponent>
           <RowContainer gap={8}>
             <View style={{flex: 1}}>

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Dispatch, SetStateAction} from 'react';
 import {styled} from 'styled-components/native';
-import {InviteList} from '../screens/CreateChallengeScreen';
 import {
   InputNotoSansKR,
   LoadingIndicatior,
@@ -12,11 +11,12 @@ import {
 import {TouchableOpacity, View} from 'react-native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery} from 'react-query';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {ModalHeadBorder} from './CustomModal';
 import {useModal} from './ModalProvider';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {InviteList} from '../screens/EditChallengeScreen';
 
 const SearchContainer = styled.View`
   background-color: #fff;
@@ -53,11 +53,30 @@ export const InviteFriend = ({
 }: InviteFriendType) => {
   const [uidExists, setUidExists] = useState(false);
   const {hideModal} = useModal();
+  const {accessToken} = useSelector((state: RootState) => state.user);
+  const {selectedChallengeMstNo} = useSelector(
+    (state: RootState) => state.challenge,
+  );
+  const CallApi = useApi();
 
   useEffect(() => {
     const exists = localExist.some(invite => invite.UID === UID);
     setUidExists(exists);
   }, [UID, localExist, setUidInput]);
+
+  const addChallengeUser = (uid: number) =>
+    CallApi({
+      endpoint: `challenge/add_user/${selectedChallengeMstNo}?new_user_uid=${uid}`,
+      method: 'PUT',
+      accessToken: accessToken!,
+    });
+
+  const {mutate: AddChallengeUser} = useMutation(addChallengeUser, {
+    onSuccess: () => {},
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
 
   return (
     <RowContainer seperate>
@@ -83,6 +102,7 @@ export const InviteFriend = ({
               ...prev,
               {UserName: name, UID, accept: false},
             ]);
+            AddChallengeUser(UID);
             setUidInput('');
           }
         }}>
@@ -230,8 +250,6 @@ export const ChallengeInviteFriend = ({
   setInviteListData,
   inviteListData,
 }: SearchBoxType) => {
-  useEffect(() => {}, [inviteListData]);
-
   return (
     <View style={{gap: 24}}>
       <ModalHeadBorder />
