@@ -215,18 +215,27 @@ const LoginTab = () => {
   return (
     <View style={{flex: 1}}>
       {/* <BackgroundImage source={require('../../assets/image/background.jpg')} /> */}
-      <BackgroundImage
-        source={require('../../assets/image/background/bg_background.png')}
-      />
-      <BackgroundImage
-        source={require('../../assets/image/background/bg_mountain.png')}
-      />
-      <BackgroundImage
-        source={require('../../assets/image/background/bg_snow.png')}
-      />
-      <BackgroundImage
-        source={require('../../assets/image/background/bg_layer.png')}
-      />
+      <BackgroundImage source={require('../../assets/image/login/No_10.png')} />
+      <BackgroundImage source={require('../../assets/image/login/No_9.png')} />
+
+      <Animated.View
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          opacity: groupFadeAnim[2],
+          transform: [{scale: groupScaleAnim[2]}],
+        }}>
+        <BackgroundImage
+          source={require('../../assets/image/login/No_7.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/login/No_6.png')}
+        />
+        <BackgroundImage
+          source={require('../../assets/image/login/No_5.png')}
+        />
+      </Animated.View>
 
       <Animated.View
         style={{
@@ -237,10 +246,10 @@ const LoginTab = () => {
           transform: [{scale: groupScaleAnim[1]}],
         }}>
         <BackgroundImage
-          source={require('../../assets/image/background/bg_dudu.png')}
+          source={require('../../assets/image/login/No_8.png')}
         />
         <BackgroundImage
-          source={require('../../assets/image/background/bg_seeds.png')}
+          source={require('../../assets/image/login/No_3.png')}
         />
       </Animated.View>
 
@@ -253,31 +262,14 @@ const LoginTab = () => {
           transform: [{scale: groupScaleAnim[0]}],
         }}>
         <BackgroundImage
-          source={require('../../assets/image/background/bg_seed.png')}
+          source={require('../../assets/image/login/No_4.png')}
         />
         <BackgroundImage
-          source={require('../../assets/image/background/Title.png')}
+          source={require('../../assets/image/login/No_2.png')}
         />
       </Animated.View>
 
-      <Animated.View
-        style={{
-          width: '100%',
-          height: '100%',
-          position: 'absolute',
-          opacity: groupFadeAnim[2],
-          transform: [{scale: groupScaleAnim[2]}],
-        }}>
-        <BackgroundImage
-          source={require('../../assets/image/background/bg_nuts.png')}
-        />
-        <BackgroundImage
-          source={require('../../assets/image/background/bg_pachi.png')}
-        />
-        <BackgroundImage
-          source={require('../../assets/image/background/bg_peats.png')}
-        />
-      </Animated.View>
+      <BackgroundImage source={require('../../assets/image/login/No_1.png')} />
 
       <LoginContainer>
         <Animated.View
