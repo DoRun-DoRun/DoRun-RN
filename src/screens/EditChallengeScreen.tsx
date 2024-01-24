@@ -35,6 +35,7 @@ import {ChallengeOptionModal} from '../Modal/Modals';
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {ChallengeStatusType, InviteAcceptType} from '../../store/data';
+import {EditChallengeRouteType} from '../App';
 
 export interface InviteList {
   UserName: string;
@@ -44,26 +45,26 @@ export interface InviteList {
 
 interface InviteListType {
   UserName: string;
+  challenge_mst_no: number;
   UID: number;
   accept?: boolean;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
 }
 
 const InviteList = ({
+  challenge_mst_no,
   UserName,
   accept,
   UID,
   setInviteListData,
 }: InviteListType) => {
   const {accessToken} = useSelector((state: RootState) => state.user);
-  const {selectedChallengeMstNo} = useSelector(
-    (state: RootState) => state.challenge,
-  );
+
   const CallApi = useApi();
 
   const deleteChallegeUser = (uid: number) =>
     CallApi({
-      endpoint: `challenge/delete_user/${selectedChallengeMstNo}?user_uid=${uid}`,
+      endpoint: `challenge/delete_user/${challenge_mst_no}?user_uid=${uid}`,
       method: 'DELETE',
       accessToken: accessToken!,
     });
@@ -110,11 +111,11 @@ interface participantsDataType {
   ACCEPT_STATUS: InviteAcceptType;
 }
 
-const EditChallengeScreen = () => {
+const EditChallengeScreen = ({route}: {route: EditChallengeRouteType}) => {
+  const {challenge_mst_no} = route.params;
+
   const {accessToken, userName} = useSelector((state: RootState) => state.user);
-  const {selectedChallengeMstNo} = useSelector(
-    (state: RootState) => state.challenge,
-  );
+
   const queryClient = useQueryClient();
   const navigation = useNavigation();
 
@@ -133,7 +134,7 @@ const EditChallengeScreen = () => {
 
   const getChallengeEdit = () =>
     CallApi({
-      endpoint: `challenge/invite/${selectedChallengeMstNo}`,
+      endpoint: `challenge/invite/${challenge_mst_no}`,
       method: 'GET',
       accessToken: accessToken!,
     });
@@ -145,7 +146,7 @@ const EditChallengeScreen = () => {
 
   const editChallenge = () =>
     CallApi({
-      endpoint: `challenge/${selectedChallengeMstNo}`,
+      endpoint: `challenge/${challenge_mst_no}`,
       method: 'PUT',
       accessToken: accessToken!,
       body: {
@@ -190,7 +191,7 @@ const EditChallengeScreen = () => {
 
   const challengeStart = () =>
     CallApi({
-      endpoint: `challenge/start?challenge_mst_no=${selectedChallengeMstNo}&start_dt=${convertKoKRToUTC(
+      endpoint: `challenge/start?challenge_mst_no=${challenge_mst_no}&start_dt=${convertKoKRToUTC(
         formatDate(new Date()),
       ).toISOString()}`,
       method: 'POST',
@@ -245,7 +246,7 @@ const EditChallengeScreen = () => {
 
   const challengeDelete = () =>
     CallApi({
-      endpoint: `challenge/${selectedChallengeMstNo}`,
+      endpoint: `challenge/${challenge_mst_no}`,
       method: 'DELETE',
       accessToken: accessToken!,
     });
@@ -272,6 +273,18 @@ const EditChallengeScreen = () => {
       console.error('Challenge Start Error:', error);
     },
   });
+
+  // const sendURL = async () => {
+  //   const deepLinkUrl = `myapp://challenge?INVITE_CHALLENGE_NO=${challengeData.CHALLENGE_MST_NO}`;
+
+  //   try {
+  //     await Share.share({
+  //       message: `${userName}님이 챌린지에 초대했어요!\n${challengeData.CHALLENGE_MST_NM}에 도전해보세요!\n${deepLinkUrl}`,
+  //     });
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   const sendKakao = async () => {
     try {
@@ -442,6 +455,7 @@ const EditChallengeScreen = () => {
 
             {inviteListData?.map((data, key) => (
               <InviteList
+                challenge_mst_no={challenge_mst_no}
                 key={key}
                 UserName={data.UserName}
                 UID={data.UID}
@@ -485,7 +499,7 @@ const EditChallengeScreen = () => {
                 onPress={() => {
                   sendKakao();
                 }}>
-                링크 공유하기
+                카카오톡 공유하기
               </ButtonComponent>
             </View>
             <View style={{flex: 1}}>
@@ -494,6 +508,7 @@ const EditChallengeScreen = () => {
                 onPress={() => {
                   showModal(
                     <ChallengeInviteFriend
+                      challenge_mst_no={challenge_mst_no}
                       setInviteListData={setInviteListData}
                       inviteListData={inviteListData}
                     />,

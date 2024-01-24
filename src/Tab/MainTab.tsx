@@ -12,15 +12,19 @@ import {useTheme} from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
+import {useQueryClient} from 'react-query';
+import {NavigationType} from '../App';
 
 const Tab = createBottomTabNavigator();
 
 export const MainTab = () => {
   const theme = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationType>();
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,
   );
+  const queryClient = useQueryClient();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -43,6 +47,12 @@ export const MainTab = () => {
       <Tab.Screen
         name="챌린지 리스트"
         component={ChallengeTab}
+        listeners={{
+          tabPress: () => {
+            queryClient.invalidateQueries('getChallenge');
+            queryClient.invalidateQueries('getChallengeDetail');
+          },
+        }}
         options={{
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="list-alt" color={color} size={size} />
@@ -55,7 +65,9 @@ export const MainTab = () => {
                 color={'black'}
                 style={{paddingRight: 16}}
                 onPress={() => {
-                  navigation.navigate('EditChallengeScreen' as never);
+                  navigation.navigate('EditChallengeScreen', {
+                    challenge_mst_no: selectedChallengeMstNo,
+                  });
                 }}
               />
             ),
@@ -64,6 +76,11 @@ export const MainTab = () => {
       <Tab.Screen
         name="두런두런"
         component={RaceTab}
+        listeners={{
+          tabPress: () => {
+            queryClient.invalidateQueries('ChallengeUserList');
+          },
+        }}
         options={{
           tabBarIcon: ({color, size}) => (
             <OcticonIcons name="home" color={color} size={size} />

@@ -34,6 +34,7 @@ const ExpandedContainer = styled.View`
 `;
 
 export interface InviteFriendType {
+  challenge_mst_no: number;
   name: string;
   UID: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
@@ -44,6 +45,7 @@ export interface InviteFriendType {
 }
 
 export const InviteFriend = ({
+  challenge_mst_no,
   name,
   UID,
   setInviteListData,
@@ -54,9 +56,7 @@ export const InviteFriend = ({
   const [uidExists, setUidExists] = useState(false);
   const {hideModal} = useModal();
   const {accessToken} = useSelector((state: RootState) => state.user);
-  const {selectedChallengeMstNo} = useSelector(
-    (state: RootState) => state.challenge,
-  );
+
   const CallApi = useApi();
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export const InviteFriend = ({
 
   const addChallengeUser = (uid: number) =>
     CallApi({
-      endpoint: `challenge/add_user/${selectedChallengeMstNo}?new_user_uid=${uid}`,
+      endpoint: `challenge/add_user/${challenge_mst_no}?new_user_uid=${uid}`,
       method: 'PUT',
       accessToken: accessToken!,
     });
@@ -119,6 +119,7 @@ export const InviteFriend = ({
 };
 
 interface SearchBoxType {
+  challenge_mst_no: number;
   setInviteListData: Dispatch<SetStateAction<InviteList[]>>;
   inviteListData: InviteList[];
 }
@@ -129,6 +130,7 @@ interface FriendType {
 }
 
 export const SearchBox = ({
+  challenge_mst_no,
   setInviteListData,
   inviteListData,
 }: SearchBoxType) => {
@@ -211,6 +213,7 @@ export const SearchBox = ({
               .slice(0, 10)
               .map((data: FriendType, key: number) => (
                 <InviteFriend
+                  challenge_mst_no={challenge_mst_no}
                   key={key}
                   name={data.USER_NM}
                   UID={data.UID}
@@ -228,6 +231,7 @@ export const SearchBox = ({
           )
         ) : searchData?.USER_NM ? (
           <InviteFriend
+            challenge_mst_no={challenge_mst_no}
             name={searchData.USER_NM}
             UID={searchData.UID}
             localExist={localExist}
@@ -247,6 +251,7 @@ export const SearchBox = ({
 };
 
 export const ChallengeInviteFriend = ({
+  challenge_mst_no,
   setInviteListData,
   inviteListData,
 }: SearchBoxType) => {
@@ -255,6 +260,7 @@ export const ChallengeInviteFriend = ({
       <ModalHeadBorder />
       <NotoSansKR size={18}>초대할 친구의 UID를 입력하세요</NotoSansKR>
       <SearchBox
+        challenge_mst_no={challenge_mst_no}
         setInviteListData={setInviteListData}
         inviteListData={inviteListData}
       />

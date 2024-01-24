@@ -39,7 +39,9 @@ export type RootStackParamList = {
   LoginTab: undefined;
   MainTab: undefined;
   CreateChallengeScreen: undefined;
-  EditChallengeScreen: undefined;
+  EditChallengeScreen: {
+    challenge_mst_no: number;
+  };
   ProfileSettingScreen: undefined;
   FriendScreen: undefined;
   SettingScreen: undefined;
@@ -48,13 +50,20 @@ export type RootStackParamList = {
 // Navigation 타입
 export type NavigationType = NavigationProp<
   RootStackParamList,
-  'DailyNoteScreen'
+  'DailyNoteScreen',
+  'EditChallengeScreen'
 >;
 
 // Route 타입
 export type DailyNoteRouteType = RouteProp<
   RootStackParamList,
   'DailyNoteScreen'
+>;
+
+// Route 타입
+export type EditChallengeRouteType = RouteProp<
+  RootStackParamList,
+  'EditChallengeScreen'
 >;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

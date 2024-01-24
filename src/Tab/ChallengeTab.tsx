@@ -50,6 +50,7 @@ import {
 } from '../Modal/Modals';
 import {removeChallenge, toggleGoal} from '../../store/slice/GoalSlice';
 import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
+import {NavigationType} from '../App';
 
 const Profile = styled.View`
   width: 40px;
@@ -364,7 +365,7 @@ const ChallengeTab = () => {
     (state: RootState) => state.challenge,
   );
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationType>();
   const {showModal} = useModal();
 
   const challenges = useSelector((state: RootState) => state.goal);
@@ -695,7 +696,9 @@ const ChallengeTab = () => {
                   dispatch(
                     setSelectedChallengeMstNo(challenge.CHALLENGE_MST_NO),
                   );
-                  navigation.navigate('EditChallengeScreen' as never);
+                  navigation.navigate('EditChallengeScreen', {
+                    challenge_mst_no: challenge.CHALLENGE_MST_NO,
+                  });
                 }}
                 onPress={() => {
                   dispatch(

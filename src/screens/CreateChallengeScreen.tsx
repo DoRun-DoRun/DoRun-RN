@@ -33,14 +33,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {styled, useTheme} from 'styled-components/native';
 import EmojiPicker from 'rn-emoji-keyboard';
 import {Calendar} from 'react-native-calendars';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {useMutation, useQueryClient} from 'react-query';
 import {RootState} from '../../store/Store';
 import {useNavigation} from '@react-navigation/native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {Alert} from 'react-native';
 import {Direction} from 'react-native-calendars/src/types';
-import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {InviteAcceptType, challengeDescription} from '../../store/data';
 
 export const DatePicker = styled.TouchableOpacity`
@@ -325,7 +324,6 @@ const CreateChallengeScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const CallApi = useApi();
-  const dispatch = useDispatch();
 
   const createChallenge = () =>
     CallApi({
@@ -347,10 +345,18 @@ const CreateChallengeScreen = () => {
         type: 'success',
         text1: '챌린지가 생성되었어요.',
       });
+
       queryClient.invalidateQueries('getChallenge');
-      dispatch(setSelectedChallengeMstNo(response.CHALLENGE_MST_NO));
-      navigation.navigate('MainTab' as never);
-      navigation.navigate('EditChallengeScreen' as never);
+      navigation.reset({
+        index: 1,
+        routes: [
+          {name: 'MainTab' as never},
+          {
+            name: 'EditChallengeScreen' as never,
+            params: {challenge_mst_no: response.CHALLENGE_MST_NO},
+          },
+        ],
+      });
     },
     onError: error => {
       console.error('Error:', error);

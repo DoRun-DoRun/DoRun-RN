@@ -46,10 +46,12 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>두런두런에서는 사용자에게 맞춤 광고를 제공하기 위해 정보를 수집하려 합니다.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>두런두런에서는 인증사진이나 일기를 작성하기 위해 카메라 권한이 필요합니다.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>두런두런에서는 사용자의 위치 정보를 확인하기 위해 권한이 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>두런두런에서는 사진 업로드 기능을 제공하기 위해 사진 라이브러리 접근 권한이 필요합니다.</string>
 	<key>UIAppFonts</key>
