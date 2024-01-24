@@ -1,5 +1,18 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {Modal, Pressable, TouchableOpacity, View} from 'react-native';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
+  Animated,
+  Modal,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   ButtonComponent,
   HomeContainer,
@@ -28,7 +41,7 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {Alert} from 'react-native';
 import {Direction} from 'react-native-calendars/src/types';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
-import {InviteAcceptType} from '../../store/data';
+import {InviteAcceptType, challengeDescription} from '../../store/data';
 
 export const DatePicker = styled.TouchableOpacity`
   border: 1px solid ${props => props.theme.gray5};
@@ -309,6 +322,7 @@ const CreateChallengeScreen = () => {
   const [description, setDescription] = useState(false);
 
   const [calendarData, setCalendarData] = useState({start: '', end: ''});
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const CallApi = useApi();
   const dispatch = useDispatch();
@@ -379,9 +393,39 @@ const CreateChallengeScreen = () => {
     },
   });
 
+  const [animValues, setAnimValues] = useState([
+    new Animated.Value(0),
+    new Animated.Value(0),
+    new Animated.Value(0),
+    new Animated.Value(0),
+  ]);
+
+  useEffect(() => {
+    if (description) {
+      const animations = animValues.map(anim =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      );
+
+      Animated.stagger(100, animations).start();
+      scrollViewRef.current?.scrollToEnd({animated: true});
+    } else {
+      setAnimValues([
+        new Animated.Value(0),
+        new Animated.Value(0),
+        new Animated.Value(0),
+        new Animated.Value(0),
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [description]);
+
   return (
     <HomeContainer>
-      <ScrollContainer>
+      <ScrollContainer ref={scrollViewRef}>
         <InnerContainer gap={24}>
           <NotoSansKR size={20}>
             <NotoSansKR size={20} color="primary1">
@@ -451,38 +495,30 @@ const CreateChallengeScreen = () => {
               </RowContainer>
             </Pressable>
             {description && (
-              <View style={{gap: 8}}>
-                <View>
-                  <NotoSansKR size={14}>챌린지 시작과 종료</NotoSansKR>
-                  <NotoSansKR size={14} weight="Medium">
-                    챌린지는 한국시간으로 매일 오전 4시에 시작해서 다음날 오전
-                    4시에 끝납니다.
-                  </NotoSansKR>
-                </View>
-
-                <View>
-                  <NotoSansKR size={14}>할 일 생성 및 완료</NotoSansKR>
-                  <NotoSansKR size={14} weight="Medium">
-                    챌린지 내에서 자신만의 할 일을 만들고, 이를 완수할 수
-                    있어요.
-                  </NotoSansKR>
-                </View>
-
-                <View>
-                  <NotoSansKR size={14}>하루 마무리</NotoSansKR>
-                  <NotoSansKR size={14} weight="Medium">
-                    매일 한 번, '하루 완료하기' 기능을 통해 그날의 활동을
-                    마무리할 수 있습니다.
-                  </NotoSansKR>
-                </View>
-
-                <View>
-                  <NotoSansKR size={14}>챌린지 달성도 상승</NotoSansKR>
-                  <NotoSansKR size={14} weight="Medium">
-                    매일 하루를 성공적으로 마무리하면, 챌린지 기간 동안 달성도가
-                    올라가게 됩니다.
-                  </NotoSansKR>
-                </View>
+              <View style={{gap: 12}}>
+                {animValues.map((anim, index) => (
+                  <Animated.View
+                    key={index}
+                    style={{
+                      opacity: anim,
+                      transform: [
+                        {
+                          translateY: anim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [30, 0], // 아래에서 올라오는 효과
+                          }),
+                        },
+                      ],
+                      gap: 8,
+                    }}>
+                    <NotoSansKR size={15}>
+                      {challengeDescription[index].title}
+                    </NotoSansKR>
+                    <NotoSansKR size={14} weight="Medium">
+                      {challengeDescription[index].description}
+                    </NotoSansKR>
+                  </Animated.View>
+                ))}
               </View>
             )}
           </View>
