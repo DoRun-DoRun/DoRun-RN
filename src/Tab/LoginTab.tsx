@@ -169,11 +169,7 @@ const LoginTab = () => {
     new Animated.Value(20),
     new Animated.Value(20),
   ]);
-  const [riseFadeAnim] = useState([
-    new Animated.Value(0),
-    new Animated.Value(0),
-    new Animated.Value(0),
-  ]);
+  const [riseFadeAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
     const animations = groupFadeAnim.map((anim, index) =>
@@ -190,14 +186,14 @@ const LoginTab = () => {
         }),
       ]),
     );
-    const animationsRaise = riseAnim.map((anim, index) =>
+    const animationsRaise = riseAnim.map(anim =>
       Animated.parallel([
         Animated.timing(anim, {
           toValue: 0,
           duration: 300,
           useNativeDriver: true,
         }),
-        Animated.timing(riseFadeAnim[index], {
+        Animated.timing(riseFadeAnim, {
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
@@ -211,7 +207,6 @@ const LoginTab = () => {
     ]).start();
   }, [groupFadeAnim, groupScaleAnim, riseAnim, riseFadeAnim]);
 
-  const platformIndex = Platform.OS === 'android' ? 1 : 2;
   return (
     <View style={{flex: 1}}>
       {/* <BackgroundImage source={require('../../assets/image/background.jpg')} /> */}
@@ -274,8 +269,9 @@ const LoginTab = () => {
       <LoginContainer>
         <Animated.View
           style={{
-            opacity: riseFadeAnim[0],
+            opacity: riseFadeAnim,
             transform: [{translateY: riseAnim[0]}],
+            gap: 12,
           }}>
           <LoginButton
             kakao
@@ -300,14 +296,8 @@ const LoginTab = () => {
               </NotoSansKR>
             </RowContainer>
           </LoginButton>
-        </Animated.View>
 
-        {Platform.OS === 'ios' && (
-          <Animated.View
-            style={{
-              opacity: riseFadeAnim[1],
-              transform: [{translateY: riseAnim[1]}],
-            }}>
+          {Platform.OS === 'ios' && (
             <LoginButton
               disabled={isLoading}
               onPress={() => {
@@ -330,14 +320,8 @@ const LoginTab = () => {
                 </NotoSansKR>
               </RowContainer>
             </LoginButton>
-          </Animated.View>
-        )}
+          )}
 
-        <Animated.View
-          style={{
-            opacity: riseFadeAnim[platformIndex],
-            transform: [{translateY: riseAnim[platformIndex]}],
-          }}>
           <TouchableOpacity
             disabled={isLoading}
             onPress={() => {
@@ -376,12 +360,11 @@ const BackgroundImage = styled.ImageBackground`
 `;
 
 const LoginContainer = styled.View`
-  flex: 1;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 32px;
-  gap: 12px;
-  margin-bottom: 16px;
+  position: absolute;
+  width: 55%;
+  min-width: 210px;
+  align-self: center;
+  bottom: 10%;
 `;
 
 // const Title = styled.Image`
@@ -394,8 +377,7 @@ const IconImage = styled.Image<{size: number}>`
 `;
 
 const LoginButton = styled.TouchableOpacity<{kakao?: boolean}>`
-  width: 210px;
-  height: 38px;
+  height: 40px;
   margin-top: 6px;
   /* background-color: ${props => props.theme.secondary1}; */
   background-color: ${({kakao}) => (kakao ? '#fddc3f' : '#fff')};

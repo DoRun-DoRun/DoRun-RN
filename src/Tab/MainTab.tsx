@@ -63,7 +63,7 @@ export const MainTab = () => {
                 name="pencil"
                 size={24}
                 color={'black'}
-                style={{paddingRight: 16}}
+                style={{paddingRight: 16, paddingLeft: 24}}
                 onPress={() => {
                   navigation.navigate('EditChallengeScreen', {
                     challenge_mst_no: selectedChallengeMstNo,
@@ -104,7 +104,7 @@ export const MainTab = () => {
                 name="gear"
                 size={24}
                 color={'black'}
-                style={{paddingRight: 16}}
+                style={{paddingRight: 16, paddingLeft: 24}}
                 onPress={() => {
                   navigation.navigate('ProfileSettingScreen' as never);
                 }}

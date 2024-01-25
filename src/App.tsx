@@ -21,7 +21,7 @@ import {playMusic, setVolume, stopMusic} from '../store/slice/SettingSlice';
 
 import mobileAds from 'react-native-google-mobile-ads';
 import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
-import {AppState, AppStateStatus, Linking} from 'react-native';
+import {AppState, AppStateStatus, Linking, Platform} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {LoadingIndicatior, useApi} from './Component';
 import {RootState} from '../store/RootReducer';
@@ -180,8 +180,8 @@ function App() {
         dispatch(setUser(userData));
 
         if (userData.SIGN_TYPE === SignType.KAKAO) {
-          setInitialRoute('MainTab');
           loginMutation.mutate(userData.KAKAO);
+          setInitialRoute('MainTab');
         }
         if (userData.SIGN_TYPE === SignType.APPLE) {
           loginMutation.mutate(userData.APPLE);
@@ -204,19 +204,30 @@ function App() {
       }
       setIsLoading(false);
     };
-
     bootstrapAsync();
     mobileAds().initialize();
     // .then(adapterStatuses => {
     //   console.log(adapterStatuses);
     // });
-    getPermission();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    const getPermission = async () => {
+      const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+      console.log(result);
+      if (result === RESULTS.DENIED) {
+        await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+      }
+    };
+
     const appStateChange = (nextAppState: AppStateStatus) => {
       console.log(nextAppState);
+      if (Platform.OS === 'ios' && nextAppState === 'active') {
+        console.log('getPerrmission');
+        getPermission();
+      }
+
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
         dispatch(playMusic());
       } else {
@@ -231,13 +242,6 @@ function App() {
       app.remove();
     };
   }, [appState, dispatch]);
-
-  const getPermission = async () => {
-    const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
-    if (result === RESULTS.DENIED) {
-      await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
-    }
-  };
 
   useEffect(() => {
     const handleDeepLink = (event: {url: string}) => {
@@ -301,6 +305,7 @@ function App() {
           <MaterialIcons
             name="arrow-back"
             size={24}
+            style={{paddingRight: 24}}
             color={'#1C1B1F'}
             onPress={() => navigation.goBack()}
           />

@@ -159,6 +159,7 @@ const RaceTab = () => {
                 <OcticonIcons
                   name="arrow-right"
                   size={24}
+                  style={{paddingRight: 16, paddingLeft: 24}}
                   onPress={() => {
                     setIndex(prev => prev + 1);
                   }}
@@ -171,6 +172,7 @@ const RaceTab = () => {
                 <OcticonIcons
                   name="arrow-left"
                   size={24}
+                  style={{paddingRight: 24, paddingLeft: 16}}
                   onPress={() => {
                     setIndex(prev => prev - 1);
                   }}
