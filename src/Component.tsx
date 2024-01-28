@@ -9,7 +9,7 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
@@ -224,6 +224,7 @@ interface Config {
 
 export const useApi = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   async function CallApi({endpoint, method, accessToken, body, formData}: API) {
     let baseUrl = __DEV__
@@ -252,23 +253,6 @@ export const useApi = () => {
 
       const response = await axios(axiosConfig);
 
-      if (response.status !== 200) {
-        if (response.data?.detail === '토큰이 만료되었습니다.') {
-          Toast.show({
-            type: 'error',
-            text1: '토큰이 만료되었습니다.',
-          });
-
-          navigation.navigate('LoginTab' as never);
-        }
-
-        throw new Error(
-          `API call failed: ${response.status}, Details: ${response.statusText}`,
-        );
-      }
-
-      // console.log(response.data);
-
       return response.data;
     } catch (error) {
       // 오류 로깅 개선
@@ -277,10 +261,25 @@ export const useApi = () => {
           'Axios Error:',
           error.response?.data?.detail || error.message,
         );
-        Toast.show({
-          type: 'error',
-          text1: error.response?.data?.detail || error.message,
-        });
+
+        if (error.response?.data?.detail === '토큰이 만료되었습니다.') {
+          Toast.show({
+            type: 'error',
+            text1: '장기간 접속하지 않으셔서 다시 로그인 해주세요!',
+          });
+          dispatch(logOut());
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'LoginTab'}],
+            }),
+          );
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: error.response?.data?.detail || error.message,
+          });
+        }
       } else {
         Toast.show({
           type: 'error',
@@ -636,6 +635,8 @@ LocaleConfig.locales.kr = {
 LocaleConfig.defaultLocale = 'kr';
 
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {logOut} from '../store/slice/UserSlice';
+import {useDispatch} from 'react-redux';
 
 const requestCameraPermission = async () => {
   let permission;
