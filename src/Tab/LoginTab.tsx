@@ -15,7 +15,7 @@ import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
 
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {SignType} from '../../store/data';
-import {playMusic, stopMusic} from '../../store/slice/SettingSlice';
+
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {jwtDecode} from 'jwt-decode';
 import {RootState} from '../../store/RootReducer';
@@ -52,14 +52,6 @@ const LoginTab = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.user);
-
-  useEffect(() => {
-    dispatch(playMusic());
-
-    return () => {
-      dispatch(stopMusic());
-    };
-  }, [dispatch]);
 
   const signIn = (refreshToken: string) =>
     CallApi({

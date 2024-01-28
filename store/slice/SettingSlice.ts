@@ -9,7 +9,7 @@ const sound = new Sound('main_bgm.wav', Sound.MAIN_BUNDLE, error => {
     return;
   }
   sound.setNumberOfLoops(-1);
-  sound.play();
+  sound.play().setVolume(0);
 });
 
 export const settingSlice = createSlice({
