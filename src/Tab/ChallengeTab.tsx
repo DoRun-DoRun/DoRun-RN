@@ -28,7 +28,7 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import {useMutation, useQuery} from 'react-query';
-import {ChallengeStatusType, adUnitId} from '../../store/data';
+import {ChallengeStatusType, adBannerChallenge} from '../../store/data';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
 import {
@@ -764,7 +764,7 @@ const ChallengeTab = () => {
         </TopContainer>
         <View style={{marginTop: -16}}>
           <BannerAd
-            unitId={adUnitId!}
+            unitId={adBannerChallenge!}
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           />
         </View>

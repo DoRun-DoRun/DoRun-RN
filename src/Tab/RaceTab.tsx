@@ -30,7 +30,7 @@ import {
   BackgroundImage,
   Dudus,
   UserStatusType,
-  adUnitId,
+  adBannerRace,
   avatarImage,
   defaultData,
   sleepLottie,
@@ -201,7 +201,7 @@ const RaceTab = () => {
   return (
     <HomeContainer color="background">
       <BannerAd
-        unitId={adUnitId!}
+        unitId={adBannerRace!}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
       />
 

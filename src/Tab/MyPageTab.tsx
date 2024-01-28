@@ -21,7 +21,7 @@ import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
 import LinearGradient from 'react-native-linear-gradient';
-import {adUnitId, profileImage} from '../../store/data';
+import {adBannerMyPage, profileImage} from '../../store/data';
 import {Direction} from 'react-native-calendars/src/types';
 import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 
@@ -420,7 +420,7 @@ const MyPageTab = () => {
           )}
           <View style={{marginLeft: -16}}>
             <BannerAd
-              unitId={adUnitId!}
+              unitId={adBannerMyPage!}
               size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             />
           </View>

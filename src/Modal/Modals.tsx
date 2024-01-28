@@ -14,7 +14,7 @@ import {ModalHeadBorder, ModalHeadText} from './CustomModal';
 import LottieView from 'lottie-react-native';
 import {
   ItemName,
-  adUnitId,
+  adReward,
   completeText,
   defaultData,
   groupImage,
@@ -220,16 +220,30 @@ export const DailyModal = ({
   item_type,
   item_no,
   isDaily,
+  isReward,
   challenge_user_no,
 }: {
   item_type: 'Avatar' | 'Item' | 'Nothing';
   item_no: number;
   isDaily?: boolean;
+  isReward?: boolean;
   challenge_user_no?: number;
 }) => {
   const {showModal, hideModal} = useModal();
-  const rewarded = RewardedAd.createForAdRequest(adUnitId!, {
-    keywords: ['fashion', 'clothing'],
+
+  const rewardedInterstitial = RewardedAd.createForAdRequest(adReward!, {
+    keywords: [
+      'self-improvement',
+      'productivity',
+      'mindfulness',
+      'wellness',
+      'time-management',
+      'goal-setting',
+      'stress-reduction',
+      'personal-growth',
+      'healthy-habits',
+      'life-balance',
+    ],
   });
 
   const width = Dimensions.get('window').width;
@@ -239,18 +253,20 @@ export const DailyModal = ({
 
   const getItem = () =>
     CallApi({
-      endpoint: `item?challenge_user=${challenge_user_no}`,
+      endpoint: `item?challenge_user_no=${challenge_user_no}`,
       method: 'POST',
       accessToken: accessToken!,
     });
 
   const {mutate} = useMutation(getItem, {
     onSuccess: response => {
+      console.log(response);
       showModal(
         <DailyModal
-          item_no={response.AVATAR_NO}
-          item_type={response.AVATAR_TYPE}
+          item_no={response.item_no}
+          item_type={response.item_type}
           isDaily
+          isReward
           challenge_user_no={challenge_user_no}
         />,
       );
@@ -261,14 +277,13 @@ export const DailyModal = ({
   });
 
   useEffect(() => {
-    console.log('ddd');
-    const unsubscribeLoaded = rewarded.addAdEventListener(
+    const unsubscribeLoaded = rewardedInterstitial.addAdEventListener(
       RewardedAdEventType.LOADED,
       () => {
         setLoaded(true);
       },
     );
-    const unsubscribeEarned = rewarded.addAdEventListener(
+    const unsubscribeEarned = rewardedInterstitial.addAdEventListener(
       RewardedAdEventType.EARNED_REWARD,
       reward => {
         hideModal();
@@ -277,13 +292,15 @@ export const DailyModal = ({
       },
     );
 
-    rewarded.load();
+    // Start loading the rewarded interstitial ad straight away
+    rewardedInterstitial.load();
 
+    // Unsubscribe from events on unmount
     return () => {
       unsubscribeLoaded();
       unsubscribeEarned();
     };
-  }, [hideModal, mutate, rewarded]);
+  }, [hideModal, mutate, rewardedInterstitial]);
 
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
@@ -308,25 +325,26 @@ export const DailyModal = ({
           </NotoSansKR>
         </>
       )}
-      {loaded ? (
-        isDaily &&
-        challenge_user_no && (
+      {!isReward &&
+        (loaded ? (
+          isDaily &&
+          challenge_user_no && (
+            <ButtonComponent
+              onPress={() => {
+                rewardedInterstitial.show();
+              }}>
+              광고보고 아이템 받기
+            </ButtonComponent>
+          )
+        ) : (
           <ButtonComponent
+            disabled
             onPress={() => {
-              rewarded.show();
+              rewardedInterstitial.show();
             }}>
-            광고보고 아이템 받기
+            광고 불러오는 중
           </ButtonComponent>
-        )
-      ) : (
-        <ButtonComponent
-          disabled
-          onPress={() => {
-            rewarded.show();
-          }}>
-          광고 불러오는 중
-        </ButtonComponent>
-      )}
+        ))}
     </View>
   );
 };

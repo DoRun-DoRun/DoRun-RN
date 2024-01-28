@@ -194,11 +194,29 @@ export const completeText = [
   '운은 용기 있는 사람의 편. - 베르길리우스',
 ];
 
-export const adUnitId = __DEV__
+export const adBannerChallenge = __DEV__
   ? TestIds.ADAPTIVE_BANNER
   : Platform.OS === 'ios'
-  ? 'ca-app-pub-5902646867257909~8665642249' // iOS용 실제 광고 단위 ID
-  : 'ca-app-pub-5902646867257909~6796396497'; // Android용 실제 광고 단위 ID
+  ? 'ca-app-pub-5902646867257909/8014537996' // iOS용 실제 광고 단위 ID
+  : 'ca-app-pub-5902646867257909/3654660586'; // Android용 실제 광고 단위 ID
+
+export const adBannerRace = __DEV__
+  ? TestIds.ADAPTIVE_BANNER
+  : Platform.OS === 'ios'
+  ? 'ca-app-pub-5902646867257909/9511027464' // iOS용 실제 광고 단위 ID
+  : 'ca-app-pub-5902646867257909/3975575856'; // Android용 실제 광고 단위 ID
+
+export const adBannerMyPage = __DEV__
+  ? TestIds.ADAPTIVE_BANNER
+  : Platform.OS === 'ios'
+  ? 'ca-app-pub-5902646867257909/4967742257' // iOS용 실제 광고 단위 ID
+  : 'ca-app-pub-5902646867257909/2341578912'; // Android용 실제 광고 단위 ID
+
+export const adReward = __DEV__
+  ? TestIds.REWARDED
+  : Platform.OS === 'ios'
+  ? 'ca-app-pub-5902646867257909/4015158209' // iOS용 실제 광고 단위 ID
+  : 'ca-app-pub-5902646867257909/8958958159'; // Android용 실제 광고 단위 ID
 
 export const challengeDescription = [
   {
