@@ -11,7 +11,7 @@ import {
   ScrollContainer,
   useApi,
 } from '../Component';
-import {TouchableOpacity, View} from 'react-native';
+import {Alert, TouchableOpacity, View} from 'react-native';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {styled, useTheme} from 'styled-components/native';
 import {useSelector} from 'react-redux';
@@ -70,13 +70,41 @@ const Friend = ({accessToken, name, friendNo, invited}: FriendType) => {
             <OcticonIcons name="check" size={24} color={theme.green} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => changeFriendMutation(InviteAcceptType.DECLINED)}>
+            onPress={() => {
+              Alert.alert(`${name}의\n 친구요청을 거절하시겠습니까?`, '', [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                },
+                {
+                  text: '거절',
+                  onPress: () => {
+                    changeFriendMutation(InviteAcceptType.DECLINED);
+                  },
+                  style: 'destructive',
+                },
+              ]);
+            }}>
             <OcticonIcons name="x" size={24} color={theme.red} />
           </TouchableOpacity>
         </>
       ) : (
         <TouchableOpacity
-          onPress={() => changeFriendMutation(InviteAcceptType.DELETED)}>
+          onPress={() => {
+            Alert.alert(`${name}을(를)\n 친구목록에서 삭제하시겠습니까?`, '', [
+              {
+                text: '취소',
+                style: 'cancel',
+              },
+              {
+                text: '삭제',
+                onPress: () => {
+                  changeFriendMutation(InviteAcceptType.DELETED);
+                },
+                style: 'destructive',
+              },
+            ]);
+          }}>
           <OcticonIcons name="trash" size={24} color={theme.gray4} />
         </TouchableOpacity>
       )}
