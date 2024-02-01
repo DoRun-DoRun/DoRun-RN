@@ -130,6 +130,25 @@ const goalsSlice = createSlice({
     restoreGoal: (state, action) => {
       return action.payload;
     },
+    resetGoals: (
+      state,
+      action: PayloadAction<{
+        type: SignType;
+        challenge_mst_no: number;
+      }>,
+    ) => {
+      const {type, challenge_mst_no} = action.payload;
+      const challenge = state[type].find(
+        ch => ch.challenge_mst_no === challenge_mst_no,
+      );
+      if (challenge) {
+        challenge.personalGoals.map(goal => {
+          goal.isComplete = false;
+        });
+      }
+      persistGoals(state);
+      console.log(state);
+    },
   },
 });
 
@@ -140,5 +159,6 @@ export const {
   updateGoalTitle,
   restoreGoal,
   removeChallenge,
+  resetGoals,
 } = goalsSlice.actions;
 export default goalsSlice.reducer;

@@ -48,7 +48,11 @@ import {
   ItemLogType,
   ShareModal,
 } from '../Modal/Modals';
-import {removeChallenge, toggleGoal} from '../../store/slice/GoalSlice';
+import {
+  removeChallenge,
+  resetGoals,
+  toggleGoal,
+} from '../../store/slice/GoalSlice';
 import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 import {NavigationType} from '../App';
 
@@ -236,7 +240,7 @@ const PlusContainers = ({title}: {title: String}) => {
   return (
     <RowContainer gap={4} style={{justifyContent: 'flex-end'}}>
       <OcticonIcons name="plus-circle" size={16} color={theme.primary1} />
-      <NotoSansKR size={13} color="primary1">
+      <NotoSansKR size={14} color="primary1">
         {title}
       </NotoSansKR>
     </RowContainer>
@@ -774,6 +778,20 @@ const ChallengeTab = () => {
             <CenterContainer style={{flexGrow: 1}}>
               <RowContainer seperate>
                 <NotoSansKR size={18}>오늘 할 일 목록</NotoSansKR>
+                <MaterialIcons
+                  name="restore"
+                  size={24}
+                  color={'black'}
+                  style={{paddingLeft: 16}}
+                  onPress={() => {
+                    dispatch(
+                      resetGoals({
+                        type: SIGN_TYPE!,
+                        challenge_mst_no: selectedChallengeMstNo!,
+                      }),
+                    );
+                  }}
+                />
               </RowContainer>
 
               <View style={{gap: 8}}>

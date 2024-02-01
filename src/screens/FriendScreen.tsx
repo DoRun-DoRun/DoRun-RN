@@ -212,7 +212,7 @@ const SearchBox = ({UID}: {UID: number}) => {
             maxLength={7}
             onChangeText={setUidInput}
             style={{flex: 1}}
-            placeholder={`친구 UID 검색 (내 UID: ${UID})`}
+            placeholder={`UID 검색 (내 UID: ${UID})`}
           />
         </RowContainer>
 
@@ -228,7 +228,9 @@ const SearchBox = ({UID}: {UID: number}) => {
                 setUidInput={setUidInput}
               />
             ) : (
-              <NotoSansKR size={14}>검색 결과가 없습니다.</NotoSansKR>
+              <NotoSansKR size={14} weight="Medium">
+                검색 결과가 없습니다.
+              </NotoSansKR>
             )}
           </ExpandedContainer>
         )}

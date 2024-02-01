@@ -28,7 +28,7 @@ export const NotoSansKR = styled.Text<FontType>`
   color: ${({color, theme}) => (color ? theme[color] : theme.black)};
   font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
   line-height: ${({lineHeight, size}) =>
-    lineHeight ? lineHeight + 'px' : size * 1.45 + 'px'};
+    lineHeight ? lineHeight + 'px' : size * 1.25 + 'px'};
   font-size: ${({size}) => size + 'px'};
   text-align: ${({textAlign}) => (textAlign ? textAlign : 'auto')};
 `;
@@ -56,7 +56,7 @@ export const TossFace = styled.Text<{size: number}>`
   line-height: ${({size}) =>
     Platform.select({
       ios: '0px',
-      android: `${size * 1.7}px`,
+      android: `${size * 2.2}px`,
     })};
   font-family: 'TossFaceFontMac';
 `;
