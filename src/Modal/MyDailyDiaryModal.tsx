@@ -5,6 +5,7 @@ import {
   InputNotoSansKR,
   ModalViewPhoto,
   NotoSansKR,
+  RowContainer,
   useApi,
 } from '../Component';
 import styled, {useTheme} from 'styled-components';
@@ -35,8 +36,14 @@ export const MyDailyDrayModal = ({
   const theme = useTheme();
   const queryClient = useQueryClient();
   const CallApi = useApi();
-  const {onLaunchCamera, onViewPhoto, deletePhoto, modalImage, imageVisible} =
-    useCamera();
+  const {
+    onLaunchCamera,
+    onViewPhoto,
+    deletePhoto,
+    modalImage,
+    imageVisible,
+    onLaunchLibary,
+  } = useCamera();
 
   const {accessToken, userName} = useSelector((state: RootState) => state.user);
   const {showModal} = useModal();
@@ -143,16 +150,27 @@ export const MyDailyDrayModal = ({
               공유돼요.{'\n'}
               24시간 후에는 나만 확인 할 수 있게 프로필에 저장할게요.
             </NotoSansKR>
+            <RowContainer gap={8}>
+              <Pressable onPress={onLaunchCamera}>
+                <PhotoUploadFrame>
+                  <MaterialIcons
+                    name="photo-camera"
+                    color={theme.primary1}
+                    size={40}
+                  />
+                </PhotoUploadFrame>
+              </Pressable>
 
-            <Pressable onPress={onLaunchCamera}>
-              <PhotoUploadFrame>
-                <MaterialIcons
-                  name="photo-camera"
-                  color={theme.primary1}
-                  size={40}
-                />
-              </PhotoUploadFrame>
-            </Pressable>
+              <Pressable onPress={onLaunchLibary}>
+                <PhotoUploadFrame>
+                  <MaterialIcons
+                    name="image"
+                    color={theme.primary1}
+                    size={40}
+                  />
+                </PhotoUploadFrame>
+              </Pressable>
+            </RowContainer>
           </>
         )}
         <InputNotoSansKR

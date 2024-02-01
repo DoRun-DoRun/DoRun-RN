@@ -14,6 +14,9 @@ import axios from 'axios';
 import ImageResizer from 'react-native-image-resizer';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import LinearGradient from 'react-native-linear-gradient';
+import {logOut} from '../store/slice/UserSlice';
+import {useDispatch} from 'react-redux';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 interface FontType {
   size: number;
@@ -233,7 +236,7 @@ export const useApi = () => {
         : 'http://10.0.2.2:8000' // Android용 로컬 서버
       : 'https://dorun.site';
 
-    // baseUrl = 'https://dorun.site';
+    baseUrl = 'https://dorun.site';
 
     const url = `${baseUrl}/${endpoint}`;
 
@@ -635,11 +638,7 @@ LocaleConfig.locales.kr = {
 };
 LocaleConfig.defaultLocale = 'kr';
 
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {logOut} from '../store/slice/UserSlice';
-import {useDispatch} from 'react-redux';
-
-const requestCameraPermission = async () => {
+export const requestCameraPermission = async () => {
   let permission;
   if (Platform.OS === 'ios') {
     permission = PERMISSIONS.IOS.CAMERA;
@@ -659,4 +658,26 @@ const requestCameraPermission = async () => {
   return requestResult === RESULTS.GRANTED;
 };
 
-export default requestCameraPermission;
+export const requestPhotoPermission = async () => {
+  let permission;
+  // openPhotoPicker().catch(() => {
+  //   console.warn('Cannot open photo library picker');
+  // });
+  if (Platform.OS === 'ios') {
+    permission = PERMISSIONS.IOS.PHOTO_LIBRARY;
+  } else {
+    permission = PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+  }
+
+  const result = await check(permission);
+  if (result === RESULTS.GRANTED) {
+    // console.log('카메라 권한이 이미 허용되어 있습니다.');
+    return true;
+  } else {
+    console.log(result);
+  }
+
+  const requestResult = await request(permission);
+
+  return requestResult === RESULTS.GRANTED;
+};
