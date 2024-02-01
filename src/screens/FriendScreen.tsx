@@ -365,7 +365,7 @@ const FriendScreen = () => {
           onPress={() => {
             sendKakao();
           }}>
-          카카오톡으로 초대하기
+          카카오톡으로 친구요청하기
         </ButtonComponent>
       </InnerContainer>
     </HomeContainer>

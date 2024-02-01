@@ -62,6 +62,7 @@ const ShareModalComponent = ({
     const textAfterDash = splitText[1].trim();
     setRandomText({text: textBeforeDash, person: textAfterDash});
   }, []);
+
   return (
     <View style={{gap: 24, backgroundColor: 'white'}}>
       <ModalHeadText>
@@ -91,7 +92,7 @@ const ShareModalComponent = ({
                 <NotoSansKR size={16} weight="Medium">
                   {user.progress > 80
                     ? `${user.progress + 20}점으로 완주 했어요!`
-                    : '99점! 다음에는 더 열심히 :)'}
+                    : '다음에는 더 열심히!'}
                 </NotoSansKR>
               </RowContainer>
             );
@@ -123,9 +124,11 @@ const ShareModalComponent = ({
 
 export const ShareModal = ({response}: {response: ChallengeLogType}) => {
   return (
-    <ContentSave file_name={`dorun_${response.CHALLENGE_MST_NO}`}>
-      <ShareModalComponent response={response} />
-    </ContentSave>
+    <View style={{margin: -24}}>
+      <ContentSave file_name={`dorun_${response.CHALLENGE_MST_NO}`}>
+        <ShareModalComponent response={response} />
+      </ContentSave>
+    </View>
   );
 };
 

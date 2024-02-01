@@ -404,6 +404,7 @@ const CreateChallengeScreen = () => {
     new Animated.Value(0),
     new Animated.Value(0),
     new Animated.Value(0),
+    new Animated.Value(0),
   ]);
 
   useEffect(() => {
@@ -420,6 +421,7 @@ const CreateChallengeScreen = () => {
       scrollViewRef.current?.scrollToEnd({animated: true});
     } else {
       setAnimValues([
+        new Animated.Value(0),
         new Animated.Value(0),
         new Animated.Value(0),
         new Animated.Value(0),
@@ -455,9 +457,9 @@ const CreateChallengeScreen = () => {
             </TouchableOpacity>
             <InputNotoSansKR
               maxLength={14}
-              style={{height: 40}}
+              style={{height: 40, flex: 1}}
               size={20}
-              placeholder="챌린지 목표"
+              placeholder="목표를 입력해주세요"
               onChangeText={setChallengeName}
               value={challengeName}
             />
@@ -557,8 +559,8 @@ const CreateChallengeScreen = () => {
 
             if (calendarData.start === formatDate(new Date())) {
               Alert.alert(
-                '오늘 날짜로 시작합니다',
-                '챌린지 도중에는 친구참여가 불가능해요. 바로 시작하시겠습니까?', // 메시지
+                '친구와 챌린지를 진행하기 위해서는 날짜를 변경해주세요!', // 메시지
+                '챌린지를 생성한 후에도 언제든지 챌린지를 바로 시작할 수 있습니다',
                 [
                   {
                     text: '날짜 변경',

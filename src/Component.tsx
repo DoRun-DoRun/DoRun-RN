@@ -384,7 +384,8 @@ export const ContentSave = ({
           fileName: file_name,
           format: 'jpg',
           quality: 0.9,
-        }}>
+        }}
+        style={{padding: 24}}>
         {childrenWithProps}
       </ViewShot>
     </>

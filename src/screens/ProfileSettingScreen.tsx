@@ -286,7 +286,6 @@ const ProfileSettingScreen = () => {
                                 '챌린지 완료를 통해 캐릭터/펫을 흭득할 수 있어요',
                               text2:
                                 '여러 친구들과 오래 챌린지를 진행할수록 흭득 확률이 올라가요!',
-                              topOffset: 60,
                             });
                             return;
                           }
@@ -322,7 +321,6 @@ const ProfileSettingScreen = () => {
                               '챌린지 완료를 통해 캐릭터/펫을 흭득할 수 있어요',
                             text2:
                               '여러 친구들과 오래 챌린지를 진행할수록 흭득 확률이 올라가요!',
-                            topOffset: 60,
                           });
                           return;
                         }
