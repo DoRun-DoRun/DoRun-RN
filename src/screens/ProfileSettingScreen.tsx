@@ -85,7 +85,9 @@ const CharecterSlotAndroid = styled.Pressable<{
 
 const PencilIcon = styled.TouchableOpacity`
   position: absolute;
-  right: 8px;
+  right: 0;
+  padding: 0 8px;
+  padding-left: 24px;
 `;
 
 const ProfileSettingScreen = () => {
@@ -233,7 +235,7 @@ const ProfileSettingScreen = () => {
                   }
                 }}>
                 <NotoSansKR size={14} color="primary1" weight="Medium">
-                  {loadingSetCharacter ? '변경 중' : '변경하기'}
+                  {loadingSetCharacter ? '변경 중' : '캐릭터/펫 변경하기'}
                 </NotoSansKR>
               </SelectedButton>
               <View
@@ -277,13 +279,21 @@ const ProfileSettingScreen = () => {
                           color: adjustBrightness('white', 0.95),
                         }}
                         onPress={() => {
-                          if (
-                            avatar.IS_OWNED &&
-                            avatar.AVATAR_TYPE === 'CHARACTER'
-                          ) {
+                          if (!avatar.IS_OWNED) {
+                            Toast.show({
+                              type: 'info',
+                              text1:
+                                '챌린지 완료를 통해 캐릭터/펫을 흭득할 수 있어요',
+                              text2:
+                                '여러 친구들과 오래 챌린지를 진행할수록 흭득 확률이 올라가요!',
+                              topOffset: 60,
+                            });
+                            return;
+                          }
+                          if (avatar.AVATAR_TYPE === 'CHARACTER') {
                             setSelectedCharacter(avatar.AVATAR_NO);
                           }
-                          if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
+                          if (avatar.AVATAR_TYPE === 'PET') {
                             setSelectedPet(avatar.AVATAR_NO);
                           }
                         }}
@@ -305,13 +315,21 @@ const ProfileSettingScreen = () => {
                     <CharecterSlot
                       key={avatar.AVATAR_NO}
                       onPress={() => {
-                        if (
-                          avatar.IS_OWNED &&
-                          avatar.AVATAR_TYPE === 'CHARACTER'
-                        ) {
+                        if (!avatar.IS_OWNED) {
+                          Toast.show({
+                            type: 'info',
+                            text1:
+                              '챌린지 완료를 통해 캐릭터/펫을 흭득할 수 있어요',
+                            text2:
+                              '여러 친구들과 오래 챌린지를 진행할수록 흭득 확률이 올라가요!',
+                            topOffset: 60,
+                          });
+                          return;
+                        }
+                        if (avatar.AVATAR_TYPE === 'CHARACTER') {
                           setSelectedCharacter(avatar.AVATAR_NO);
                         }
-                        if (avatar.IS_OWNED && avatar.AVATAR_TYPE === 'PET') {
+                        if (avatar.AVATAR_TYPE === 'PET') {
                           setSelectedPet(avatar.AVATAR_NO);
                         }
                       }}
