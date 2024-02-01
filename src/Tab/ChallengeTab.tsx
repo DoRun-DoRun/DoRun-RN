@@ -784,6 +784,10 @@ const ChallengeTab = () => {
                   color={'black'}
                   style={{paddingLeft: 16}}
                   onPress={() => {
+                    Toast.show({
+                      type: 'success',
+                      text1: '오늘 할 일 완료상태를 초기화 했어요',
+                    });
                     dispatch(
                       resetGoals({
                         type: SIGN_TYPE!,

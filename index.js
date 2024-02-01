@@ -8,19 +8,74 @@ import {NavigationContainer} from '@react-navigation/native';
 import {light} from './src/style/theme';
 import {ThemeProvider} from 'styled-components/native';
 import {QueryClient, QueryClientProvider} from 'react-query';
-import CodePush from 'react-native-code-push';
+// import CodePush from 'react-native-code-push';
 import 'core-js/stable/atob';
 
 const queryClient = new QueryClient();
 import {ModalProvider} from './src/Modal/ModalProvider';
 import CustomModal from './src/Modal/CustomModal';
-import Toast from 'react-native-toast-message';
+import Toast, {
+  BaseToast,
+  ErrorToast,
+  InfoToast,
+} from 'react-native-toast-message';
 
 // const codePushOptions = {
 //   checkFrequency: CodePush.CheckFrequency.ON_APP_START,
 //   installMode: CodePush.InstallMode.IMMEDIATE,
 //   mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
 // };
+
+const toastConfig = {
+  success: props => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#648CF3',
+      }}
+      text1Style={{
+        fontSize: 14,
+        fontFamily: 'NotoSansKR-Bold',
+        lineHeight: 17.5,
+      }}
+      text2Style={{
+        fontSize: 12,
+        fontFamily: 'NotoSansKR-Medium',
+        lineHeight: 15,
+      }}
+    />
+  ),
+  error: props => (
+    <ErrorToast
+      {...props}
+      text1Style={{
+        fontSize: 14,
+        fontFamily: 'NotoSansKR-Bold',
+        lineHeight: 17.5,
+      }}
+      text2Style={{
+        fontSize: 12,
+        fontFamily: 'NotoSansKR-Medium',
+        lineHeight: 15,
+      }}
+    />
+  ),
+  info: props => (
+    <InfoToast
+      {...props}
+      text1Style={{
+        fontSize: 14,
+        fontFamily: 'NotoSansKR-Bold',
+        lineHeight: 17.5,
+      }}
+      text2Style={{
+        fontSize: 12,
+        fontFamily: 'NotoSansKR-Medium',
+        lineHeight: 15,
+      }}
+    />
+  ),
+};
 
 function Main() {
   return (
@@ -30,7 +85,7 @@ function Main() {
           <ModalProvider>
             <NavigationContainer>
               <App />
-              <Toast />
+              <Toast config={toastConfig} />
               <CustomModal />
             </NavigationContainer>
           </ModalProvider>
