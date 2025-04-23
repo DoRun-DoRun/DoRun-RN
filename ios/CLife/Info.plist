@@ -35,8 +35,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>KAKAO_APP_KEY</key>
 	<string>97d8ca4c2736fdb3f362246fe17f316b</string>
-	<key>CodePushDeploymentKey</key>
-	<string>5I-4v0CWLsiEJAN6KtB-UZJseL6P8i_MQAwbE</string>
+	<!-- <key>CodePushDeploymentKey</key> -->
+	<!-- <string>5I-4v0CWLsiEJAN6KtB-UZJseL6P8i_MQAwbE</string> -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakaokompassauth</string>
@@ -45,7 +45,12 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-	<dict/>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>두런두런에서는 사용자에게 맞춤 광고를 제공하기 위해 정보를 수집하려 합니다.</string>
 	<key>NSCameraUsageDescription</key>
@@ -74,7 +79,7 @@
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>

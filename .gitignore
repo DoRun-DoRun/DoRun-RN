@@ -20,8 +20,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-ios/.xcode.env.local
-ios/CLife/AppCenter-Config.plist
+**/.xcode.env.local
 
 # Android/IntelliJ
 #
@@ -34,8 +33,7 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
-android/app/src/main/assets/appcenter-config.json
-android/gradle.properties
+.kotlin/
 
 # node.js
 #
@@ -59,7 +57,7 @@ yarn-error.log
 *.jsbundle
 
 # Ruby / CocoaPods
-/ios/Pods/
+**/Pods/
 /vendor/bundle/
 
 # Temporary files created by Metro to check the health of the file watcher
@@ -68,5 +66,10 @@ yarn-error.log
 # testing
 /coverage
 
-DoRun_DoRun_hin6150
-android/gradle.properties
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
