@@ -1,5 +1,19 @@
+import LottieView from 'lottie-react-native';
 import React, {useEffect, useState} from 'react';
 import {Alert, Dimensions, Image, View} from 'react-native';
+import FastImage from 'react-native-fast-image';
+import Toast from 'react-native-toast-message';
+import {useMutation} from 'react-query';
+import {useSelector} from 'react-redux';
+import {
+  ItemName,
+  // adReward,
+  completeText,
+  defaultData,
+  groupImage,
+  usedItemImage,
+} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
 import {
   ButtonComponent,
   ContentSave,
@@ -11,22 +25,7 @@ import {
   useApi,
 } from '../Component';
 import {ModalHeadBorder, ModalHeadText} from './CustomModal';
-import LottieView from 'lottie-react-native';
-import {
-  ItemName,
-  adReward,
-  completeText,
-  defaultData,
-  groupImage,
-  usedItemImage,
-} from '../../store/data';
-import FastImage from 'react-native-fast-image';
-import {RewardedAd, RewardedAdEventType} from 'react-native-google-mobile-ads';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {useMutation} from 'react-query';
 import {useModal} from './ModalProvider';
-import Toast from 'react-native-toast-message';
 
 interface ParticipantsType {
   USER_NM: string;
@@ -234,20 +233,20 @@ export const DailyModal = ({
 }) => {
   const {showModal, hideModal} = useModal();
 
-  const rewardedInterstitial = RewardedAd.createForAdRequest(adReward!, {
-    keywords: [
-      'self-improvement',
-      'productivity',
-      'mindfulness',
-      'wellness',
-      'time-management',
-      'goal-setting',
-      'stress-reduction',
-      'personal-growth',
-      'healthy-habits',
-      'life-balance',
-    ],
-  });
+  // const rewardedInterstitial = RewardedAd.createForAdRequest(adReward!, {
+  //   keywords: [
+  //     'self-improvement',
+  //     'productivity',
+  //     'mindfulness',
+  //     'wellness',
+  //     'time-management',
+  //     'goal-setting',
+  //     'stress-reduction',
+  //     'personal-growth',
+  //     'healthy-habits',
+  //     'life-balance',
+  //   ],
+  // });
 
   const width = Dimensions.get('window').width;
   const [loaded, setLoaded] = useState(false);
@@ -279,31 +278,31 @@ export const DailyModal = ({
     },
   });
 
-  useEffect(() => {
-    const unsubscribeLoaded = rewardedInterstitial.addAdEventListener(
-      RewardedAdEventType.LOADED,
-      () => {
-        setLoaded(true);
-      },
-    );
-    const unsubscribeEarned = rewardedInterstitial.addAdEventListener(
-      RewardedAdEventType.EARNED_REWARD,
-      reward => {
-        hideModal();
-        mutate();
-        console.log('User earned reward of ', reward);
-      },
-    );
+  // useEffect(() => {
+  //   const unsubscribeLoaded = rewardedInterstitial.addAdEventListener(
+  //     RewardedAdEventType.LOADED,
+  //     () => {
+  //       setLoaded(true);
+  //     },
+  //   );
+  //   const unsubscribeEarned = rewardedInterstitial.addAdEventListener(
+  //     RewardedAdEventType.EARNED_REWARD,
+  //     reward => {
+  //       hideModal();
+  //       mutate();
+  //       console.log('User earned reward of ', reward);
+  //     },
+  //   );
 
-    // Start loading the rewarded interstitial ad straight away
-    rewardedInterstitial.load();
+  //   // Start loading the rewarded interstitial ad straight away
+  //   rewardedInterstitial.load();
 
-    // Unsubscribe from events on unmount
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeEarned();
-    };
-  }, [hideModal, mutate, rewardedInterstitial]);
+  //   // Unsubscribe from events on unmount
+  //   return () => {
+  //     unsubscribeLoaded();
+  //     unsubscribeEarned();
+  //   };
+  // }, [hideModal, mutate, rewardedInterstitial]);
 
   return (
     <View style={{gap: 24, alignItems: 'center'}}>
@@ -334,7 +333,7 @@ export const DailyModal = ({
           challenge_user_no && (
             <ButtonComponent
               onPress={() => {
-                rewardedInterstitial.show();
+                // rewardedInterstitial.show();
               }}>
               광고보고 아이템 받기
             </ButtonComponent>
@@ -343,7 +342,7 @@ export const DailyModal = ({
           <ButtonComponent
             disabled
             onPress={() => {
-              rewardedInterstitial.show();
+              // rewardedInterstitial.show();
             }}>
             광고 불러오는 중
           </ButtonComponent>

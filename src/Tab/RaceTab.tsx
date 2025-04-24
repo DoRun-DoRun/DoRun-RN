@@ -1,15 +1,34 @@
+import {useNavigation} from '@react-navigation/native';
+import LottieView from 'lottie-react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
-  PanResponder,
+  Dimensions,
   Image,
+  PanResponder,
+  Platform,
   Pressable,
+  RefreshControl,
   TouchableOpacity,
   View,
-  Dimensions,
-  Platform,
-  RefreshControl,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useQuery} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import styled from 'styled-components/native';
+import {
+  BackgroundImage,
+  Dudus,
+  UserStatusType,
+  // adBannerRace,
+  avatarImage,
+  defaultData,
+  sleepLottie,
+  struggleLottie,
+} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
+import {NavigationType} from '../App';
 import {
   HomeContainer,
   LoadingIndicatior,
@@ -17,28 +36,8 @@ import {
   ScrollContainer,
   useApi,
 } from '../Component';
-import {useNavigation} from '@react-navigation/native';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
-import styled from 'styled-components/native';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {useQuery} from 'react-query';
-import {useModal} from '../Modal/ModalProvider';
 import {CharacterModal} from '../Modal/CharacterModal';
-import LottieView from 'lottie-react-native';
-import {
-  BackgroundImage,
-  Dudus,
-  UserStatusType,
-  adBannerRace,
-  avatarImage,
-  defaultData,
-  sleepLottie,
-  struggleLottie,
-} from '../../store/data';
-import FastImage from 'react-native-fast-image';
-import {NavigationType} from '../App';
-import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
+import {useModal} from '../Modal/ModalProvider';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -200,10 +199,10 @@ const RaceTab = () => {
   }
   return (
     <HomeContainer color="background">
-      <BannerAd
+      {/* <BannerAd
         unitId={adBannerRace!}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-      />
+      /> */}
 
       {challengeListData && challengeListData?.total_page !== 0 ? (
         <ScrollContainer

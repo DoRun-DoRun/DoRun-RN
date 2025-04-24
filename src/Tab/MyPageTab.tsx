@@ -1,4 +1,14 @@
 import React, {useState} from 'react';
+import {Dimensions, Image, TouchableOpacity, View} from 'react-native';
+import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
+import {Direction} from 'react-native-calendars/src/types';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useQuery} from 'react-query';
+import {useSelector} from 'react-redux';
+import styled, {useTheme} from 'styled-components/native';
+import {profileImage} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
 import {
   GetImage,
   HomeContainer,
@@ -13,17 +23,6 @@ import {
   formatDateToYYYYMM,
   useApi,
 } from '../Component';
-import styled, {useTheme} from 'styled-components/native';
-import {Dimensions, Image, TouchableOpacity, View} from 'react-native';
-import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useQuery} from 'react-query';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import LinearGradient from 'react-native-linear-gradient';
-import {adBannerMyPage, profileImage} from '../../store/data';
-import {Direction} from 'react-native-calendars/src/types';
-import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 
 const ProfileContainer = styled(RowContainer)`
   border: 1px solid ${props => props.theme.primary1};
@@ -419,10 +418,10 @@ const MyPageTab = () => {
             </ProfileContainer>
           )}
           <View style={{marginLeft: -16}}>
-            <BannerAd
+            {/* <BannerAd
               unitId={adBannerMyPage!}
               size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-            />
+            /> */}
           </View>
 
           <HistoryContainer>

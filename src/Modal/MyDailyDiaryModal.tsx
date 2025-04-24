@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
 import {Image, Pressable, View} from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useMutation, useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
+import styled, {useTheme} from 'styled-components/native';
+import {goalType} from '../../store/async/asyncStore';
+import {RootState} from '../../store/RootReducer';
 import {
   ButtonComponent,
   InputNotoSansKR,
@@ -8,16 +14,10 @@ import {
   RowContainer,
   useApi,
 } from '../Component';
-import styled, {useTheme} from 'styled-components';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {ModalHeadText} from './CustomModal';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {useMutation, useQueryClient} from 'react-query';
 import useCamera from '../Hook/UseCamera';
+import {ModalHeadText} from './CustomModal';
 import {useModal} from './ModalProvider';
 import {DailyModal} from './Modals';
-import {goalType} from '../../store/async/asyncStore';
 
 const transformData = (state: goalType[]) => {
   return state.map(goal => ({

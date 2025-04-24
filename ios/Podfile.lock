@@ -8,9 +8,6 @@ PODS:
   - FBLazyVector (0.79.1)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - Google-Mobile-Ads-SDK (12.2.0):
-    - GoogleUserMessagingPlatform (>= 1.1)
-  - GoogleUserMessagingPlatform (2.7.0)
   - hermes-engine (0.79.1):
     - hermes-engine/Pre-built (= 0.79.1)
   - hermes-engine/Pre-built (0.79.1)
@@ -1869,32 +1866,6 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNGoogleMobileAds (15.1.0):
-    - DoubleConversion
-    - glog
-    - Google-Mobile-Ads-SDK (= 12.2.0)
-    - GoogleUserMessagingPlatform (= 2.7.0)
-    - hermes-engine
-    - RCT-Folly (= 2024.11.18.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-hermes
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - RNPermissions (5.3.0):
     - DoubleConversion
     - glog
@@ -2114,7 +2085,6 @@ DEPENDENCIES:
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
-  - RNGoogleMobileAds (from `../node_modules/react-native-google-mobile-ads`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
@@ -2125,8 +2095,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Alamofire
-    - Google-Mobile-Ads-SDK
-    - GoogleUserMessagingPlatform
     - KakaoSDKAuth
     - KakaoSDKCommon
     - KakaoSDKUser
@@ -2296,8 +2264,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
-  RNGoogleMobileAds:
-    :path: "../node_modules/react-native-google-mobile-ads"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
   RNScreens:
@@ -2320,8 +2286,6 @@ SPEC CHECKSUMS:
   FBLazyVector: abbac80c6f89e71a8c55c7e92ec015c8a9496753
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  Google-Mobile-Ads-SDK: 1dfb0c3cb46c7e2b00b0f4de74a1e06d9ea25d67
-  GoogleUserMessagingPlatform: a8b56893477f67212fbc8411c139e61d463349f5
   hermes-engine: c32f2e405098bc1ebe30630a051ddce6f21d3c2e
   kakao-login: 39d7c13140ad97c54f9d42893d32ab4a1476420a
   KakaoSDKAuth: 569b377eda622d93d4575240b8031cd658163eef
@@ -2399,7 +2363,6 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: c3dddf5918126c9aae85dc2e2ce9fb87835e9e04
   RNCAsyncStorage: 39c42c1e478e1f5166d1db52b5055e090e85ad66
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
-  RNGoogleMobileAds: f895b10c8943879008b1af07c73ab30baa8eaa7e
   RNPermissions: aa1218854e3d2a896ac778da95a51a993b35971f
   RNScreens: 5621e3ad5a329fbd16de683344ac5af4192b40d3
   RNShare: 43faaefd287ef344e8379caeaca12d112f713295

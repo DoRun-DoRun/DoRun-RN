@@ -1,7 +1,14 @@
 import React, {useState} from 'react';
+import {Alert, TouchableOpacity, View} from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
+import {styled, useTheme} from 'styled-components/native';
+import {InviteAcceptType} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
 import {
   ButtonComponent,
-  GetImage,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -11,15 +18,7 @@ import {
   ScrollContainer,
   useApi,
 } from '../Component';
-import {Alert, TouchableOpacity, View} from 'react-native';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
-import {styled, useTheme} from 'styled-components/native';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {InviteAcceptType} from '../../store/data';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import KakaoShareLink from 'react-native-kakao-share-link';
+// import KakaoShareLink from 'react-native-kakao-share-link';
 
 // const FrinedCharacter = styled.View`
 //   width: 32px;
@@ -268,36 +267,36 @@ const FriendScreen = () => {
     FriendListModal,
   );
 
-  const sendKakao = async () => {
-    try {
-      const response = await KakaoShareLink.sendFeed({
-        content: {
-          title: `${userName}님이 친구요청을 보냈어요!`,
-          imageUrl: GetImage('group_default_3@3x.png'),
-          link: {
-            webUrl: 'https://developers.kakao.com/',
-            mobileWebUrl: 'https://developers.kakao.com/',
-          },
-          description:
-            '두런두런과 함께 갓생 살기\n지금 친구들과 시작해 보세요!',
-        },
-        buttons: [
-          {
-            title: '앱에서 보기',
-            link: {
-              androidExecutionParams: [
-                {key: 'SENDER_NO', value: UID!.toString()},
-              ],
-              iosExecutionParams: [{key: 'SENDER_NO', value: UID!.toString()}],
-            },
-          },
-        ],
-      });
-      console.log(response);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const sendKakao = async () => {
+  //   try {
+  //     const response = await KakaoShareLink.sendFeed({
+  //       content: {
+  //         title: `${userName}님이 친구요청을 보냈어요!`,
+  //         imageUrl: GetImage('group_default_3@3x.png'),
+  //         link: {
+  //           webUrl: 'https://developers.kakao.com/',
+  //           mobileWebUrl: 'https://developers.kakao.com/',
+  //         },
+  //         description:
+  //           '두런두런과 함께 갓생 살기\n지금 친구들과 시작해 보세요!',
+  //       },
+  //       buttons: [
+  //         {
+  //           title: '앱에서 보기',
+  //           link: {
+  //             androidExecutionParams: [
+  //               {key: 'SENDER_NO', value: UID!.toString()},
+  //             ],
+  //             iosExecutionParams: [{key: 'SENDER_NO', value: UID!.toString()}],
+  //           },
+  //         },
+  //       ],
+  //     });
+  //     console.log(response);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   if (friendLoading) {
     return <LoadingIndicatior />;
@@ -365,7 +364,7 @@ const FriendScreen = () => {
         </ScrollContainer>
         <ButtonComponent
           onPress={() => {
-            sendKakao();
+            // sendKakao();
           }}>
           카카오톡으로 친구요청하기
         </ButtonComponent>

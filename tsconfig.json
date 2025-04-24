@@ -1,6 +1,8 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "esModuleInterop": true
+    "types": ["react-native", "jest"],
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }

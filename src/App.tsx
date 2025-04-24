@@ -1,36 +1,35 @@
-import React, {useEffect, useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, {useEffect, useState} from 'react';
 import CreateChallengeScreen from './screens/CreateChallengeScreen';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   NavigationProp,
   RouteProp,
   useNavigation,
 } from '@react-navigation/native';
-import ProfileSettingScreen from './screens/ProfileSettingScreen';
-import FriendScreen from './screens/FriendScreen';
-import LoginTab from './Tab/LoginTab';
-import SettingScreen from './screens/SettingScreen';
-import EditChallengeScreen from './screens/EditChallengeScreen';
-import {DailyNoteScreen} from './screens/DailyNoteScreen';
-import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from 'react-redux';
+import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
 import {restoreGoal} from '../store/slice/GoalSlice';
 import {playMusic, setVolume, stopMusic} from '../store/slice/SettingSlice';
+import {DailyNoteScreen} from './screens/DailyNoteScreen';
+import EditChallengeScreen from './screens/EditChallengeScreen';
+import FriendScreen from './screens/FriendScreen';
+import ProfileSettingScreen from './screens/ProfileSettingScreen';
+import SettingScreen from './screens/SettingScreen';
+import LoginTab from './Tab/LoginTab';
 
-import mobileAds from 'react-native-google-mobile-ads';
-import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
 import {AppState, AppStateStatus, Linking, Platform} from 'react-native';
+import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
-import {LoadingIndicatior, useApi} from './Component';
-import {RootState} from '../store/RootReducer';
 import {useMutation, useQueryClient} from 'react-query';
 import {InviteAcceptType, SignType} from '../store/data';
+import {RootState} from '../store/RootReducer';
 import {setAccessToken, setUser} from '../store/slice/UserSlice';
-import {MainTab} from './Tab/MainTab';
+import {LoadingIndicatior, useApi} from './Component';
 import {ChallengeListModal} from './Modal/ChallengeListModal';
 import {useModal} from './Modal/ModalProvider';
+import {MainTab} from './Tab/MainTab';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -205,7 +204,7 @@ function App() {
       setIsLoading(false);
     };
     bootstrapAsync();
-    mobileAds().initialize();
+    // mobileAds().initialize();
     // .then(adapterStatuses => {
     //   console.log(adapterStatuses);
     // });

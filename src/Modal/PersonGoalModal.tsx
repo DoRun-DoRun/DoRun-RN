@@ -1,23 +1,22 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useDispatch, useSelector} from 'react-redux';
+import {styled, useTheme} from 'styled-components/native';
+import {RootState} from '../../store/RootReducer';
+import {
+  addPersonalGoal,
+  removeGoal,
+  updateGoalTitle,
+} from '../../store/slice/GoalSlice';
 import {
   ButtonComponent,
   InputNotoSansKR,
   NotoSansKR,
   RowContainer,
 } from '../Component';
-import {useDispatch, useSelector} from 'react-redux';
-import {
-  addPersonalGoal,
-  removeGoal,
-  updateGoalTitle,
-} from '../../store/slice/GoalSlice';
 import {ModalHeadBorder} from './CustomModal';
 import {useModal} from './ModalProvider';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTheme} from 'styled-components';
-import {styled} from 'styled-components/native';
-import {RootState} from '../../store/RootReducer';
 
 interface PersonModalType {
   id: number;

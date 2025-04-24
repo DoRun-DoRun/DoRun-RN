@@ -5,8 +5,27 @@ import {
   Platform,
   Pressable,
   RefreshControl,
+  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useMutation, useQuery} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import styled, {useTheme} from 'styled-components/native';
+import {challengeData, goalType} from '../../store/async/asyncStore';
+import {ChallengeStatusType} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
+import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+import {
+  removeChallenge,
+  resetGoals,
+  toggleGoal,
+} from '../../store/slice/GoalSlice';
+import {NavigationType} from '../App';
 import {
   ButtonComponent,
   HomeContainer,
@@ -19,27 +38,9 @@ import {
   calculateRemainTime,
   useApi,
 } from '../Component';
-import styled, {useTheme} from 'styled-components/native';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ScrollView} from 'react-native';
-import {View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {useMutation, useQuery} from 'react-query';
-import {ChallengeStatusType, adBannerChallenge} from '../../store/data';
-import {useModal} from '../Modal/ModalProvider';
-import {ChallengeListModal} from '../Modal/ChallengeListModal';
-import {
-  PersonGoalAddModal,
-  PersonGoalEditModal,
-} from '../Modal/PersonGoalModal';
-import {challengeData, goalType} from '../../store/async/asyncStore';
-import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
-import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {AdditionalGoalModal} from '../Modal/AdditionalGoalModal';
+import {ChallengeListModal} from '../Modal/ChallengeListModal';
+import {useModal} from '../Modal/ModalProvider';
 import {
   AlertItemModal,
   ChallengeLogType,
@@ -48,13 +49,11 @@ import {
   ItemLogType,
   ShareModal,
 } from '../Modal/Modals';
+import {MyDailyDrayModal} from '../Modal/MyDailyDiaryModal';
 import {
-  removeChallenge,
-  resetGoals,
-  toggleGoal,
-} from '../../store/slice/GoalSlice';
-import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
-import {NavigationType} from '../App';
+  PersonGoalAddModal,
+  PersonGoalEditModal,
+} from '../Modal/PersonGoalModal';
 
 const Profile = styled.View`
   width: 40px;
@@ -767,10 +766,10 @@ const ChallengeTab = () => {
           </TouchableOpacity>
         </TopContainer>
         <View style={{marginTop: -16}}>
-          <BannerAd
+          {/* <BannerAd
             unitId={adBannerChallenge!}
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          />
+          /> */}
         </View>
 
         {detailData?.CHALLENGE_STATUS === ChallengeStatusType.PROGRESS ? (
@@ -832,8 +831,8 @@ const ChallengeTab = () => {
                 {detailData.IS_DONE_TODAY
                   ? '오늘은 일기를 작성했어요'
                   : personGoal?.length === 0
-                  ? '아직 할 일을 추가하지 않았어요'
-                  : '오늘 하루 완료하기'}
+                    ? '아직 할 일을 추가하지 않았어요'
+                    : '오늘 하루 완료하기'}
               </ButtonComponent>
             </CenterContainer>
             {detailData?.additionalGoal.length !== 0 ? (

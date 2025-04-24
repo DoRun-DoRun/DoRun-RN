@@ -1,8 +1,15 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {Alert, TouchableOpacity, View} from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import EmojiPicker from 'rn-emoji-keyboard';
+import {RootState} from '../../store/Store';
 import {
   ButtonComponent,
-  GetImage,
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
@@ -16,25 +23,17 @@ import {
   getDayOfWeek,
   useApi,
 } from '../Component';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
-import EmojiPicker from 'rn-emoji-keyboard';
-import {useDispatch, useSelector} from 'react-redux';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {RootState} from '../../store/Store';
-import {useNavigation} from '@react-navigation/native';
+import {useModal} from '../Modal/ModalProvider';
+import {ChallengeOptionModal} from '../Modal/Modals';
+import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
 import {
   CalendarContainer,
   DatePicker,
   formatDate,
 } from './CreateChallengeScreen';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import {useModal} from '../Modal/ModalProvider';
-import {ChallengeInviteFriend} from '../Modal/SearchBoxModal';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ChallengeOptionModal} from '../Modal/Modals';
-import KakaoShareLink from 'react-native-kakao-share-link';
-import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+// import KakaoShareLink from 'react-native-kakao-share-link';
 import {ChallengeStatusType, InviteAcceptType} from '../../store/data';
+import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {EditChallengeRouteType} from '../App';
 
 export interface InviteList {
@@ -286,43 +285,43 @@ const EditChallengeScreen = ({route}: {route: EditChallengeRouteType}) => {
   //   }
   // };
 
-  const sendKakao = async () => {
-    try {
-      const response = await KakaoShareLink.sendFeed({
-        content: {
-          title: `${userName}님이 챌린지에 초대했어요!`,
-          imageUrl: GetImage('group_default_3@3x.png'),
-          link: {
-            webUrl: 'https://developers.kakao.com/',
-            mobileWebUrl: 'https://developers.kakao.com/',
-          },
-          description: `두런두런과 함께 갓생 살기\n지금 친구들과 ${challengeData.CHALLENGE_MST_NM}에 도전해보세요!`,
-        },
-        buttons: [
-          {
-            title: '앱에서 보기',
-            link: {
-              androidExecutionParams: [
-                {
-                  key: 'INVITE_CHALLENGE_NO',
-                  value: challengeData.CHALLENGE_MST_NO.toString(),
-                },
-              ],
-              iosExecutionParams: [
-                {
-                  key: 'INVITE_CHALLENGE_NO',
-                  value: challengeData.CHALLENGE_MST_NO.toString(),
-                },
-              ],
-            },
-          },
-        ],
-      });
-      console.log(response);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const sendKakao = async () => {
+  //   try {
+  //     const response = await KakaoShareLink.sendFeed({
+  //       content: {
+  //         title: `${userName}님이 챌린지에 초대했어요!`,
+  //         imageUrl: GetImage('group_default_3@3x.png'),
+  //         link: {
+  //           webUrl: 'https://developers.kakao.com/',
+  //           mobileWebUrl: 'https://developers.kakao.com/',
+  //         },
+  //         description: `두런두런과 함께 갓생 살기\n지금 친구들과 ${challengeData.CHALLENGE_MST_NM}에 도전해보세요!`,
+  //       },
+  //       buttons: [
+  //         {
+  //           title: '앱에서 보기',
+  //           link: {
+  //             androidExecutionParams: [
+  //               {
+  //                 key: 'INVITE_CHALLENGE_NO',
+  //                 value: challengeData.CHALLENGE_MST_NO.toString(),
+  //               },
+  //             ],
+  //             iosExecutionParams: [
+  //               {
+  //                 key: 'INVITE_CHALLENGE_NO',
+  //                 value: challengeData.CHALLENGE_MST_NO.toString(),
+  //               },
+  //             ],
+  //           },
+  //         },
+  //       ],
+  //     });
+  //     console.log(response);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   useEffect(() => {
     navigation.setOptions({
@@ -497,7 +496,7 @@ const EditChallengeScreen = ({route}: {route: EditChallengeRouteType}) => {
               <ButtonComponent
                 type="secondary"
                 onPress={() => {
-                  sendKakao();
+                  // sendKakao();
                 }}>
                 카카오톡 공유하기
               </ButtonComponent>
