@@ -1,4 +1,13 @@
+import {Slider} from '@miblanchard/react-native-slider';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import React from 'react';
+import {Alert, View} from 'react-native';
+import {useMutation, useQuery} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import {useTheme} from 'styled-components/native';
+import {RootState} from '../../store/RootReducer';
+import {setVolume} from '../../store/slice/SettingSlice';
+import {logOut, signOut} from '../../store/slice/UserSlice';
 import {
   ButtonComponent,
   HomeContainer,
@@ -8,15 +17,6 @@ import {
   RowContainer,
   useApi,
 } from '../Component';
-import {Alert, View} from 'react-native';
-import {useTheme} from 'styled-components/native';
-import {Slider} from '@miblanchard/react-native-slider';
-import {useMutation, useQuery} from 'react-query';
-import {RootState} from '../../store/RootReducer';
-import {useDispatch, useSelector} from 'react-redux';
-import {useNavigation, CommonActions} from '@react-navigation/native';
-import {setVolume} from '../../store/slice/SettingSlice';
-import {logOut, signOut} from '../../store/slice/UserSlice';
 
 const SettingScreen = () => {
   // const [pushAlarm, setPushAlarm] = useState(true);

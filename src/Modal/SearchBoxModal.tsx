@@ -1,6 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {Dispatch, SetStateAction} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {TouchableOpacity, View} from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useMutation, useQuery} from 'react-query';
+import {useSelector} from 'react-redux';
 import {styled} from 'styled-components/native';
+import {RootState} from '../../store/RootReducer';
 import {
   InputNotoSansKR,
   LoadingIndicatior,
@@ -8,15 +13,9 @@ import {
   RowContainer,
   useApi,
 } from '../Component';
-import {TouchableOpacity, View} from 'react-native';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {useMutation, useQuery} from 'react-query';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {InviteList} from '../screens/EditChallengeScreen';
 import {ModalHeadBorder} from './CustomModal';
 import {useModal} from './ModalProvider';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import {InviteList} from '../screens/EditChallengeScreen';
 
 const SearchContainer = styled.View`
   background-color: #fff;

@@ -1,22 +1,22 @@
-import React, {useEffect, useRef} from 'react';
-import styled, {useTheme} from 'styled-components/native';
-import Share from 'react-native-share';
-import ViewShot, {captureRef} from 'react-native-view-shot';
-import {
-  Platform,
-  Modal,
-  useWindowDimensions,
-  View,
-  ActivityIndicator,
-} from 'react-native';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 import axios from 'axios';
+import React, {useEffect, useRef} from 'react';
+import {
+  ActivityIndicator,
+  Modal,
+  Platform,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import ImageResizer from 'react-native-image-resizer';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import LinearGradient from 'react-native-linear-gradient';
-import {logOut} from '../store/slice/UserSlice';
+import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
+import Share from 'react-native-share';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import ViewShot, {captureRef} from 'react-native-view-shot';
 import {useDispatch} from 'react-redux';
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import styled, {useTheme} from 'styled-components/native';
+import {logOut} from '../store/slice/UserSlice';
 
 interface FontType {
   size: number;
@@ -28,7 +28,8 @@ interface FontType {
 }
 
 export const NotoSansKR = styled.Text<FontType>`
-  color: ${({color, theme}) => (color ? theme[color] : theme.black)};
+  color: ${({color, theme}) =>
+    color && color in theme ? (theme as any)[color] : theme.black};
   font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
   line-height: ${({lineHeight, size}) =>
     lineHeight ? lineHeight + 'px' : size * 1.25 + 'px'};
@@ -40,7 +41,8 @@ export const InputNotoSansKR = styled.TextInput.attrs(({theme}) => ({
   placeholderTextColor: theme.gray4,
 }))<FontType>`
   ${Platform.OS === 'android' && 'include-font-padding: false;'}
-  color: ${({color, theme}) => (color ? theme[color] : theme.black)};
+  color: ${({color, theme}) =>
+    color && (theme as any)[color] ? (theme as any)[color] : theme.black};
   font-family: ${({weight}) => `NotoSansKR-${weight || 'Bold'}`};
   line-height: ${({size}) =>
     Platform.select({
@@ -75,7 +77,8 @@ export const InnerContainer = styled.View<{gap?: number; seperate?: boolean}>`
 export const HomeContainer = styled.SafeAreaView<{color?: string}>`
   position: relative;
   flex: 1;
-  background-color: ${({color, theme}) => (color ? theme[color] : theme.white)};
+  background-color: ${({color, theme}) =>
+    color && (theme as any)[color] ? (theme as any)[color] : theme.white};
   padding-top: 0;
 `;
 
@@ -335,7 +338,7 @@ export const ContentSave = ({
   children,
   file_name,
 }: {
-  children: React.ReactElement;
+  children: React.ReactElement<{onShare: () => void}>;
   file_name: string;
 }) => {
   const ref = useRef<ViewShot | null>(null);
@@ -371,6 +374,7 @@ export const ContentSave = ({
       console.error('Error sharing:', error);
     }
   };
+
   const childrenWithProps = React.cloneElement(children, {onShare});
 
   return (

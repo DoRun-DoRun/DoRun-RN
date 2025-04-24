@@ -1,5 +1,13 @@
+import {Slider} from '@miblanchard/react-native-slider';
 import React, {useMemo} from 'react';
 import {Image, View} from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {shallowEqual, useSelector} from 'react-redux';
+import styled, {useTheme} from 'styled-components/native';
+import {RootState} from '../../store/RootReducer';
+import {UserStatusType, profileImage} from '../../store/data';
 import {
   LoadingIndicatior,
   NotoSansKR,
@@ -7,20 +15,12 @@ import {
   isWithin24Hours,
   useApi,
 } from '../Component';
-import styled, {useTheme} from 'styled-components/native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Slider} from '@miblanchard/react-native-slider';
 import {ChallengeUserType} from '../Tab/RaceTab';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {shallowEqual, useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
-import {UserStatusType, profileImage} from '../../store/data';
 import {useModal} from './ModalProvider';
 import {UsedItemModal} from './Modals';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const ButtonContainer = styled.TouchableOpacity<{
-  color: string;
+  color: 'primary1' | 'secondary1';
 }>`
   background-color: ${props =>
     props.disabled ? props.theme.gray4 : props.theme[props.color]};
@@ -142,8 +142,8 @@ export const CharacterModal = ({
                     user.STATUS === UserStatusType.SLEEPING
                       ? 'sleep'
                       : user.STATUS === UserStatusType.WALKING
-                      ? 'walk'
-                      : 'run-fast'
+                        ? 'walk'
+                        : 'run-fast'
                   }
                   color={user.IS_ME ? theme.primary1 : theme.secondary1}
                   size={16}

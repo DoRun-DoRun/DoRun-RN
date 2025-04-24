@@ -1,23 +1,23 @@
+import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {NotoSansKR, RowContainer, useApi} from '../Component';
-import {styled} from 'styled-components/native';
 import {Animated, Platform, TouchableOpacity, View} from 'react-native';
 import {useMutation} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import {styled} from 'styled-components/native';
+import {userDataType} from '../../store/async/asyncStore';
 import {
   setAccessToken,
   setIsLoggedIn,
   setUser,
 } from '../../store/slice/UserSlice';
-import {userDataType} from '../../store/async/asyncStore';
-import {useDispatch, useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
-import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
+import {NotoSansKR, RowContainer, useApi} from '../Component';
 
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {SignType} from '../../store/data';
 
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {jwtDecode} from 'jwt-decode';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {RootState} from '../../store/RootReducer';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 

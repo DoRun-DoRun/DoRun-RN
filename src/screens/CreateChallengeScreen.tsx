@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {
   Dispatch,
   SetStateAction,
@@ -6,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Alert,
   Animated,
   Modal,
   Pressable,
@@ -13,6 +15,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Calendar} from 'react-native-calendars';
+import {Direction} from 'react-native-calendars/src/types';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useMutation, useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
+import EmojiPicker from 'rn-emoji-keyboard';
+import {styled, useTheme} from 'styled-components/native';
+import {InviteAcceptType, challengeDescription} from '../../store/data';
+import {RootState} from '../../store/Store';
 import {
   ButtonComponent,
   HomeContainer,
@@ -27,20 +41,6 @@ import {
   getDayOfWeek,
   useApi,
 } from '../Component';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {styled, useTheme} from 'styled-components/native';
-import EmojiPicker from 'rn-emoji-keyboard';
-import {Calendar} from 'react-native-calendars';
-import {useSelector} from 'react-redux';
-import {useMutation, useQueryClient} from 'react-query';
-import {RootState} from '../../store/Store';
-import {useNavigation} from '@react-navigation/native';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import {Alert} from 'react-native';
-import {Direction} from 'react-native-calendars/src/types';
-import {InviteAcceptType, challengeDescription} from '../../store/data';
 
 export const DatePicker = styled.TouchableOpacity`
   border: 1px solid ${props => props.theme.gray5};
@@ -258,7 +258,6 @@ export const CalendarContainer = ({
                 ? setDisabledLeft(false)
                 : setDisabledLeft(true)
             }
-            allowShadow
             renderArrow={(direction: Direction) =>
               direction === 'left' ? (
                 !disabledLeft ? (

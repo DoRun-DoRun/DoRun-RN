@@ -1,4 +1,4 @@
-import React, {createContext, useContext, FC, ReactNode} from 'react';
+import React, {createContext, FC, ReactNode, useContext} from 'react';
 import {create} from 'zustand';
 
 type ModalState = {

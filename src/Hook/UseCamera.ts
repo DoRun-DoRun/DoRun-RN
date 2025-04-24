@@ -1,5 +1,5 @@
-import {openSettings} from './../../node_modules/react-native-permissions/src/index';
 import {useState} from 'react';
+import {Platform} from 'react-native';
 import {
   Asset,
   ImageLibraryOptions,
@@ -7,13 +7,13 @@ import {
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {
   requestCameraPermission,
   requestPhotoPermission,
   resizeImage,
 } from '../Component';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import {Platform} from 'react-native';
+import {openSettings} from './../../node_modules/react-native-permissions/src/index';
 
 const useCamera = () => {
   const [modalImage, setModalImage] = useState<Asset | null>(null);

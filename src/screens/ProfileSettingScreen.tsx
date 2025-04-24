@@ -1,4 +1,14 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
+import {Image, Platform, View} from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import OcticonIcons from 'react-native-vector-icons/Octicons';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import {styled} from 'styled-components/native';
+import {Avatar, avatarImage} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
+import {setUserName} from '../../store/slice/UserSlice';
 import {
   HomeContainer,
   InnerContainer,
@@ -11,16 +21,6 @@ import {
   adjustBrightness,
   useApi,
 } from '../Component';
-import {Image, Platform, View} from 'react-native';
-import {styled} from 'styled-components/native';
-import {useDispatch, useSelector} from 'react-redux';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {RootState} from '../../store/RootReducer';
-import OcticonIcons from 'react-native-vector-icons/Octicons';
-import {Avatar, avatarImage} from '../../store/data';
-import {useNavigation} from '@react-navigation/native';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
-import {setUserName} from '../../store/slice/UserSlice';
 
 const SelectedContainer = styled.View`
   flex: 1;

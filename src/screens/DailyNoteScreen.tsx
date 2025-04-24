@@ -3,6 +3,13 @@ import {Image, TouchableOpacity, View} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import styled, {useTheme} from 'styled-components/native';
 
+import {useNavigation} from '@react-navigation/native';
+import {useMutation, useQuery} from 'react-query';
+import {useSelector} from 'react-redux';
+import EmojiPicker from 'rn-emoji-keyboard';
+import {groupImage} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
+import {DailyNoteRouteType} from '../App';
 import {
   GetImage,
   HomeContainer,
@@ -15,15 +22,8 @@ import {
   timeSince,
   useApi,
 } from '../Component';
-import EmojiPicker from 'rn-emoji-keyboard';
-import {useMutation, useQuery} from 'react-query';
-import {DailyNoteRouteType} from '../App';
-import {groupImage} from '../../store/data';
-import {useNavigation} from '@react-navigation/native';
-import {RootState} from '../../store/RootReducer';
-import {useSelector} from 'react-redux';
-import {ImageZoomModal} from '../Modal/Modals';
 import {useModal} from '../Modal/ModalProvider';
+import {ImageZoomModal} from '../Modal/Modals';
 
 interface goal {
   PERSON_NM: string;

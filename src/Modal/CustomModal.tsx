@@ -1,12 +1,12 @@
 import React, {useEffect, useRef} from 'react';
 import {
-  Modal,
-  View,
   Animated,
-  PanResponder,
-  Platform,
   Dimensions,
   KeyboardAvoidingView,
+  Modal,
+  PanResponder,
+  Platform,
+  View,
 } from 'react-native';
 import styled from 'styled-components/native';
 import {useModal} from './ModalProvider';

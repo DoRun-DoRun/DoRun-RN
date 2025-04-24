@@ -5,14 +5,14 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 
 import ChallengeTab from './ChallengeTab';
-import RaceTab from './RaceTab';
 import MyPageTab from './MyPageTab';
+import RaceTab from './RaceTab';
 
-import {useTheme} from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
 import {useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
+import {useTheme} from 'styled-components/native';
+import {RootState} from '../../store/RootReducer';
 import {NavigationType} from '../App';
 
 const Tab = createBottomTabNavigator();
@@ -41,7 +41,7 @@ export const MainTab = () => {
         },
         headerTitleAlign: 'center',
         tabBarShowLabel: false,
-        tabBarActiveTintColor: theme.primary,
+        tabBarActiveTintColor: theme.primary1,
         tabBarInactiveTintColor: theme.gray5,
       }}>
       <Tab.Screen

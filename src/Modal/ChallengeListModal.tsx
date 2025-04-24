@@ -1,5 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
+import styled from 'styled-components/native';
+import {InviteAcceptType} from '../../store/data';
+import {RootState} from '../../store/RootReducer';
 import {
   ButtonComponent,
   LoadingIndicatior,
@@ -10,13 +16,7 @@ import {
   useApi,
 } from '../Component';
 import {ModalHeadText} from './CustomModal';
-import styled from 'styled-components/native';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {InviteAcceptType} from '../../store/data';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/RootReducer';
 import {useModal} from './ModalProvider';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 const ChallengeTimeBox = styled.View`
   border-radius: 100px;
@@ -151,8 +151,8 @@ export const ChallengeListModal = ({
                   user.ACCEPT_STATUS === InviteAcceptType.ACCEPTED
                     ? true
                     : user.ACCEPT_STATUS === InviteAcceptType.PENDING
-                    ? false
-                    : null
+                      ? false
+                      : null
                 }
               />
             );
