@@ -24,6 +24,12 @@ import {LoadingIndicator} from './Component';
 import {useApi} from './Hook/hook';
 import {ChallengeListModal} from './Modal/ChallengeListModal';
 import {useModal} from './Modal/ModalProvider';
+import CreateChallengeScreen from './screens/CreateChallengeScreen';
+import {DailyNoteScreen} from './screens/DailyNoteScreen';
+import EditChallengeScreen from './screens/EditChallengeScreen';
+import FriendScreen from './screens/FriendScreen';
+import ProfileSettingScreen from './screens/ProfileSettingScreen';
+import {MainTab} from './Tab/MainTab';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -308,7 +314,7 @@ function App() {
         component={LoginTab}
         options={{headerShown: false}}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="MainTab"
         component={MainTab}
         options={{headerShown: false}}
@@ -326,8 +332,8 @@ function App() {
         component={ProfileSettingScreen}
       />
       <Stack.Screen name="FriendScreen" component={FriendScreen} />
-      <Stack.Screen name="SettingScreen" component={SettingScreen} />
-      <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} /> */}
+      {/* <Stack.Screen name="SettingScreen" component={SettingScreen} /> */}
+      <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} />
     </Stack.Navigator>
   );
 }

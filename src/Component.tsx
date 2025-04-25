@@ -8,6 +8,7 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
+  ScrollViewProps,
   StyleSheet,
   Text,
   TextInput,
@@ -180,6 +181,19 @@ export const RowScrollContainer: React.FC<{
   </ScrollView>
 );
 
+export const ScrollContainer = React.forwardRef<ScrollView, ScrollViewProps>(
+  ({style, children, ...rest}, ref) => (
+    <ScrollView
+      ref={ref}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, style]}
+      {...rest}>
+      {children}
+    </ScrollView>
+  ),
+);
+
 /* ---------- Button ------------------------------------------------------- */
 export interface ButtonProps {
   children: React.ReactNode;
@@ -312,4 +326,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingCenter: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  container: {flex: 1},
 });

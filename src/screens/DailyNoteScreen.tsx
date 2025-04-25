@@ -1,9 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  ImageProps,
+  TouchableOpacity,
+  View,
+  ViewProps,
+} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import styled, {useTheme} from 'styled-components/native';
 
 import {useNavigation} from '@react-navigation/native';
+import {StyleSheet} from 'react-native';
 import {useMutation, useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 import EmojiPicker from 'rn-emoji-keyboard';
@@ -11,7 +17,6 @@ import {groupImage} from '../../store/data';
 import {RootState} from '../../store/RootReducer';
 import {DailyNoteRouteType} from '../App';
 import {
-  GetImage,
   HomeContainer,
   InnerContainer,
   LoadingIndicator,
@@ -19,11 +24,11 @@ import {
   RowContainer,
   ScrollContainer,
   TossFace,
-  timeSince,
-  useApi,
 } from '../Component';
+import {GetImage, timeSince, useApi} from '../Hook/hook';
 import {useModal} from '../Modal/ModalProvider';
 import {ImageZoomModal} from '../Modal/Modals';
+import {useTheme} from '../theme/ThemeProvider';
 
 interface goal {
   PERSON_NM: string;
@@ -68,7 +73,7 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
 
   return (
     <HomeContainer>
-      <InnerContainer seperate>
+      <InnerContainer separate>
         <ScrollContainer>
           <View style={{gap: 24}}>
             <RowContainer>
@@ -200,17 +205,36 @@ const FaceBtn = ({daily_no}: {daily_no: number}) => {
   );
 };
 
-const BtnAlign = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${props => props.theme.gray7};
-  border-radius: 100px;
-  padding: 0 24px;
-`;
+/** ─── BtnAlign (styled.View → StyleSheet + useTheme) ───────────────── */
+export const BtnAlign: React.FC<ViewProps> = ({style, children, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[styles.btnAlign, {backgroundColor: theme.gray7}, style]}>
+      {children}
+    </View>
+  );
+};
 
-export const ImageContainer = styled.Image`
-  width: 100%;
-  height: 222px;
-  border-radius: 10px;
-`;
+/** ─── ImageContainer (styled.Image → StyleSheet) ────────────────────── */
+export const ImageContainer: React.FC<ImageProps> = ({style, ...rest}) => (
+  <Image {...rest} style={[styles.imageContainer, style]} />
+);
+
+/** ─── StyleSheet 정의 ───────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  btnAlign: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 100,
+    paddingVertical: 0,
+    paddingHorizontal: 24,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 222,
+    borderRadius: 10,
+  },
+});

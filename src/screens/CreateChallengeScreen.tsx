@@ -11,9 +11,13 @@ import {
   Animated,
   Modal,
   Pressable,
+  PressableProps,
   ScrollView,
+  StyleSheet,
   TouchableOpacity,
+  TouchableOpacityProps,
   View,
+  ViewStyle,
 } from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import {Direction} from 'react-native-calendars/src/types';
@@ -24,7 +28,6 @@ import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {useMutation, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
 import EmojiPicker from 'rn-emoji-keyboard';
-import {styled, useTheme} from 'styled-components/native';
 import {InviteAcceptType, challengeDescription} from '../../store/data';
 import {RootState} from '../../store/Store';
 import {
@@ -36,19 +39,14 @@ import {
   RowContainer,
   ScrollContainer,
   TossFace,
+} from '../Component';
+import {
   convertKoKRToUTC,
   formatDateToYYYYMM,
   getDayOfWeek,
   useApi,
-} from '../Component';
-
-export const DatePicker = styled.TouchableOpacity`
-  border: 1px solid ${props => props.theme.gray5};
-  padding: 8px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-`;
+} from '../Hook/hook';
+import {useTheme} from '../theme/ThemeProvider';
 
 interface EmojiType {
   emoji: string;
@@ -81,31 +79,6 @@ export const formatDate = (date: Date): string => {
   const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
-
-const CalendarView = styled.TouchableOpacity`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  justify-content: flex-end;
-  padding: 16px;
-  background-color: rgba(0, 0, 0, 0.3);
-`;
-
-const CalendarModalContainer = styled.Pressable`
-  padding-top: 10px;
-  margin-bottom: 24px;
-  background-color: #fff;
-  border-radius: 12px;
-  z-index: 2;
-`;
-
-const CalendarRowContainer = styled(RowContainer)`
-  justify-content: flex-end;
-  border-top-width: 1px;
-  padding: 8px;
-  border-color: ${props => props.theme.primary1};
-`;
 
 export const CalendarContainer = ({
   setCalendarOpen,
@@ -599,3 +572,88 @@ const CreateChallengeScreen = () => {
   );
 };
 export default CreateChallengeScreen;
+
+/** ─── DatePicker ─────────────────────────────────────────────────────── */
+export const DatePicker: React.FC<TouchableOpacityProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <TouchableOpacity
+      {...rest}
+      style={[styles.datePicker, {borderColor: theme.gray5}, style]}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+/** ─── CalendarView (전체 화면 오버레이) ───────────────────────────────── */
+export const CalendarView: React.FC<TouchableOpacityProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <TouchableOpacity
+    {...rest}
+    style={[styles.calendarView, style]}
+    activeOpacity={1}>
+    {children}
+  </TouchableOpacity>
+);
+
+/** ─── CalendarModalContainer ────────────────────────────────────────── */
+export const CalendarModalContainer: React.FC<PressableProps> = ({
+  children,
+  ...rest
+}) => (
+  <Pressable {...rest} style={[styles.calendarModalContainer]}>
+    {children}
+  </Pressable>
+);
+
+/** ─── CalendarRowContainer ───────────────────────────────────────────── */
+export const CalendarRowContainer: React.FC<
+  React.ComponentProps<typeof RowContainer>
+> = ({style, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <RowContainer
+      {...rest}
+      style={[styles.calendarRow, {borderColor: theme.primary1}, style]}
+    />
+  );
+};
+
+/** ─── StyleSheet 정의 ───────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  datePicker: {
+    borderWidth: 1,
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  } as ViewStyle,
+  calendarView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    justifyContent: 'flex-end',
+    padding: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  } as ViewStyle,
+  calendarModalContainer: {
+    paddingTop: 10,
+    marginBottom: 24,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    zIndex: 2,
+  } as ViewStyle,
+  calendarRow: {
+    justifyContent: 'flex-end',
+    borderTopWidth: 1,
+    padding: 8,
+  } as ViewStyle,
+});

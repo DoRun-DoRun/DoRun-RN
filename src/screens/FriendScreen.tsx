@@ -4,7 +4,6 @@ import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
-import {styled, useTheme} from 'styled-components/native';
 import {InviteAcceptType} from '../../store/data';
 import {RootState} from '../../store/RootReducer';
 import {
@@ -16,8 +15,10 @@ import {
   NotoSansKR,
   RowContainer,
   ScrollContainer,
-  useApi,
 } from '../Component';
+import {useApi} from '../Hook/hook';
+import {ExpandedContainer, SearchContainer} from '../Modal/SearchBoxModal';
+import {useTheme} from '../theme/ThemeProvider';
 // import KakaoShareLink from 'react-native-kakao-share-link';
 
 // const FrinedCharacter = styled.View`
@@ -110,23 +111,6 @@ const Friend = ({accessToken, name, friendNo, invited}: FriendType) => {
     </RowContainer>
   );
 };
-
-const SearchContainer = styled.View`
-  flex: 1;
-  background-color: #fff;
-  border: 1px solid ${props => props.theme.gray6};
-  padding: 8px;
-  border-radius: 10px;
-  gap: 16px;
-  z-index: 10;
-`;
-
-const ExpandedContainer = styled.View`
-  background-color: #fff;
-  padding: 0 8px;
-  gap: 8px;
-  padding-bottom: 8px;
-`;
 
 interface InviteFriendType {
   name: string;
@@ -304,7 +288,7 @@ const FriendScreen = () => {
 
   return (
     <HomeContainer>
-      <InnerContainer seperate>
+      <InnerContainer separate>
         <ScrollContainer style={{flex: 1}}>
           <View style={{gap: 24}}>
             <NotoSansKR size={20}>친구 목록</NotoSansKR>

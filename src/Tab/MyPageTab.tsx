@@ -1,16 +1,24 @@
 import React, {useState} from 'react';
-import {Dimensions, Image, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  ImageProps,
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewProps,
+} from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
 import {Direction} from 'react-native-calendars/src/types';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
-import styled, {useTheme} from 'styled-components/native';
 import {profileImage} from '../../store/data';
 import {RootState} from '../../store/RootReducer';
 import {
-  GetImage,
   HomeContainer,
   InnerContainer,
   LoadingIndicator,
@@ -18,141 +26,15 @@ import {
   RowContainer,
   ScrollContainer,
   TossFace,
+} from '../Component';
+import {
   convertKoKRToUTC,
   formatDate,
   formatDateToYYYYMM,
+  GetImage,
   useApi,
-} from '../Component';
-
-const ProfileContainer = styled(RowContainer)`
-  border: 1px solid ${props => props.theme.primary1};
-  padding: 16px;
-  padding-right: 36px;
-  border-radius: 10px;
-`;
-
-const UserIcon = styled.View`
-  width: 80px;
-  height: 80px;
-  border: 3px solid ${props => props.theme.primary1};
-  border-radius: 40px;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-`;
-
-const UserStatsCount = styled.View`
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 40px;
-  background-color: ${props => props.theme.primary2};
-`;
-
-const UserStatsBox = styled.View`
-  gap: 3px;
-  align-items: center;
-`;
-
-const UserStats = ({
-  status,
-  count,
-}: {
-  status: '완료' | '진행중' | '시작 전';
-  count: number;
-}) => {
-  return (
-    <UserStatsBox>
-      <UserStatsCount>
-        <NotoSansKR size={16} color="primary1">
-          {count}
-        </NotoSansKR>
-      </UserStatsCount>
-      <NotoSansKR size={12} color="gray4" weight="Medium">
-        {status}
-      </NotoSansKR>
-    </UserStatsBox>
-  );
-};
-
-const Divider = styled.View`
-  height: 56px;
-  border: 1px solid ${props => props.theme.gray6};
-`;
-
-const UserName = styled(NotoSansKR)`
-  padding: 0 8px 8px 8px;
-`;
-
-const HistoryContainer = styled.View`
-  flex: 1;
-  margin: 0 -16px;
-  padding: 0 16px;
-  margin-bottom: -16px;
-  background-color: ${props => props.theme.primary2};
-`;
-
-const CategoryContainer = styled(RowContainer)`
-  margin: 0 -16px;
-  justify-content: flex-end;
-  background-color: ${props => props.theme.white};
-`;
-
-const CategoryTab = styled(RowContainer)`
-  border-radius: 5px 5px 0 0;
-  background-color: ${props => props.theme.gray7};
-`;
-
-const Tab = styled.Pressable<{selected?: boolean}>`
-  padding: 4px 24px;
-  border-radius: 5px 5px 0 0;
-  background-color: ${props =>
-    props.selected ? props.theme.primary2 : props.theme.gray7};
-`;
-
-const HistoryDetailContainer = styled.View`
-  gap: 32px;
-  padding: 16px 0;
-`;
-
-const DailyPicContiner = styled.View`
-  align-items: center;
-`;
-
-const DailyPic = styled.Image`
-  width: 100%;
-  height: 300px;
-  border-radius: 10px;
-  background-color: ${props => props.theme.gray7};
-`;
-
-const DailyTextContiner = styled.View`
-  width: 200px;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
-
-const DailyDiary = styled(LinearGradient).attrs({
-  start: {x: 1.27, y: 4.29},
-  end: {x: -0.19, y: -2.08},
-})`
-  border-radius: 10px;
-  padding: 16px;
-`;
-
-const DailyTodo = styled(LinearGradient).attrs({
-  start: {x: 0.05, y: 0},
-  end: {x: 1.07, y: 1},
-})`
-  gap: 8px;
-  border-radius: 10px;
-  padding: 8px 16px;
-`;
-
-const DailyTodoList = styled(RowContainer)`
-  padding: 4px 0;
-`;
+} from '../Hook/hook';
+import {useTheme} from '../theme/ThemeProvider';
 
 interface PersonGoal {
   PERSON_NO: number;
@@ -393,7 +275,7 @@ const MyPageTab = () => {
           {isLoading ? (
             <LoadingIndicator />
           ) : (
-            <ProfileContainer gap={24}>
+            <ProfileContainer>
               <UserIcon>
                 <Image
                   source={profileImage[data.USER_CHARACTER_NO - 1]}
@@ -407,7 +289,7 @@ const MyPageTab = () => {
 
               <View style={{flex: 1}}>
                 <UserName size={16}>{userName}</UserName>
-                <RowContainer gap={16} seperate>
+                <RowContainer gap={16}>
                   <UserStats status="완료" count={data.COMPLETE} />
                   <Divider />
                   <UserStats status="진행중" count={data.PROGRESS} />
@@ -463,3 +345,325 @@ const MyPageTab = () => {
 };
 
 export default MyPageTab;
+
+const UserStats = ({
+  status,
+  count,
+}: {
+  status: '완료' | '진행중' | '시작 전';
+  count: number;
+}) => {
+  return (
+    <UserStatsBox>
+      <UserStatsCount>
+        <NotoSansKR size={16} color="primary1">
+          {count}
+        </NotoSansKR>
+      </UserStatsCount>
+      <NotoSansKR size={12} color="gray4" weight="Medium">
+        {status}
+      </NotoSansKR>
+    </UserStatsBox>
+  );
+};
+
+/** ─── ProfileContainer ───────────────────────────────────────────────── */
+export const ProfileContainer: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <RowContainer
+      {...rest}
+      style={[styles.profileContainer, {borderColor: theme.primary1}, style]}>
+      {children}
+    </RowContainer>
+  );
+};
+
+/** ─── UserIcon ───────────────────────────────────────────────────────── */
+export const UserIcon: React.FC<ViewProps> = ({style, children, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[styles.userIcon, {borderColor: theme.primary1}, style]}>
+      {children}
+    </View>
+  );
+};
+
+/** ─── UserStatsCount & UserStatsBox ─────────────────────────────────── */
+export const UserStatsCount: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[styles.userStatsCount, {backgroundColor: theme.primary2}, style]}>
+      {children}
+    </View>
+  );
+};
+
+export const UserStatsBox: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <View {...rest} style={[styles.userStatsBox, style]}>
+    {children}
+  </View>
+);
+
+/** ─── Divider ────────────────────────────────────────────────────────── */
+export const Divider: React.FC<ViewProps> = ({style, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[styles.divider, {borderColor: theme.gray6}, style]}
+    />
+  );
+};
+
+/** ─── UserName ───────────────────────────────────────────────────────── */
+export const UserName: React.FC<React.ComponentProps<typeof NotoSansKR>> = ({
+  style,
+  ...rest
+}) => <NotoSansKR {...rest} style={[styles.userName, style]} />;
+
+/** ─── HistoryContainer ───────────────────────────────────────────────── */
+export const HistoryContainer: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[
+        styles.historyContainer,
+        {backgroundColor: theme.primary2},
+        style,
+      ]}>
+      {children}
+    </View>
+  );
+};
+
+/** ─── CategoryContainer & CategoryTab ───────────────────────────────── */
+export const CategoryContainer: React.FC<
+  React.ComponentProps<typeof RowContainer>
+> = ({style, children, ...rest}) => (
+  <RowContainer {...rest} style={[styles.categoryContainer, style]}>
+    {children}
+  </RowContainer>
+);
+
+export const CategoryTab: React.FC<
+  React.ComponentProps<typeof RowContainer>
+> = ({style, children, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <RowContainer
+      {...rest}
+      style={[styles.categoryTab, {backgroundColor: theme.gray7}, style]}>
+      {children}
+    </RowContainer>
+  );
+};
+
+/** ─── Tab ─────────────────────────────────────────────────────────────── */
+export const Tab: React.FC<{selected?: boolean} & PressableProps> = ({
+  selected,
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <Pressable
+      {...rest}
+      style={({pressed}) => [
+        styles.tab,
+        {
+          backgroundColor: selected ? theme.primary2 : theme.gray7,
+          opacity: pressed ? 0.8 : 1,
+        },
+        // If style is a function, call it with { pressed }, else just use it
+        typeof style === 'function' ? style({pressed}) : style,
+      ]}>
+      {children}
+    </Pressable>
+  );
+};
+
+/** ─── HistoryDetailContainer ─────────────────────────────────────────── */
+export const HistoryDetailContainer: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <View {...rest} style={[styles.historyDetailContainer, style]}>
+    {children}
+  </View>
+);
+
+/** ─── DailyPicContiner & DailyPic ───────────────────────────────────── */
+export const DailyPicContiner: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <View {...rest} style={[styles.dailyPicContainer, style]}>
+    {children}
+  </View>
+);
+
+export const DailyPic: React.FC<ImageProps> = ({style, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <Image
+      {...rest}
+      style={[styles.dailyPic, {backgroundColor: theme.gray7}, style]}
+    />
+  );
+};
+
+/** ─── DailyTextContiner ──────────────────────────────────────────────── */
+export const DailyTextContiner: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <View {...rest} style={[styles.dailyTextContainer, style]}>
+    {children}
+  </View>
+);
+
+/** ─── DailyDiary & DailyTodo ─────────────────────────────────────────── */
+export const DailyDiary: React.FC<
+  React.ComponentProps<typeof LinearGradient>
+> = ({style, ...rest}) => (
+  <LinearGradient
+    {...rest}
+    start={{x: 1.27, y: 4.29}}
+    end={{x: -0.19, y: -2.08}}
+    style={[styles.dailyDiary, style]}
+  />
+);
+
+export const DailyTodo: React.FC<
+  React.ComponentProps<typeof LinearGradient>
+> = ({style, ...rest}) => (
+  <LinearGradient
+    {...rest}
+    start={{x: 0.05, y: 0}}
+    end={{x: 1.07, y: 1}}
+    style={[styles.dailyTodo, style]}
+  />
+);
+
+/** ─── DailyTodoList ─────────────────────────────────────────────────── */
+export const DailyTodoList: React.FC<
+  React.ComponentProps<typeof RowContainer>
+> = ({style, ...rest}) => (
+  <RowContainer {...rest} style={[styles.dailyTodoList, style]} />
+);
+
+/** ─── Stylesheet ─────────────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  profileContainer: {
+    borderWidth: 1,
+    padding: 16,
+    paddingRight: 36,
+    borderRadius: 10,
+  },
+  userIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  userStatsCount: {
+    width: 40,
+    height: 40,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userStatsBox: {
+    alignItems: 'center',
+    // gap: 3, // RN core doesn't support gap; add margins manually if needed
+  },
+  divider: {
+    height: 56,
+    borderWidth: 1,
+    marginHorizontal: 0,
+  },
+  userName: {
+    paddingHorizontal: 8,
+    paddingBottom: 8,
+  },
+  historyContainer: {
+    flex: 1,
+    marginHorizontal: -16,
+    paddingHorizontal: 16,
+    marginBottom: -16,
+  },
+  categoryContainer: {
+    marginHorizontal: -16,
+    justifyContent: 'flex-end',
+    backgroundColor: '#fff',
+  },
+  categoryTab: {
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+  },
+  tab: {
+    paddingVertical: 4,
+    paddingHorizontal: 24,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+  },
+  historyDetailContainer: {
+    paddingVertical: 16,
+    // gap: 32,
+  },
+  dailyPicContainer: {
+    alignItems: 'center',
+  },
+  dailyPic: {
+    width: '100%',
+    height: 300,
+    borderRadius: 10,
+  },
+  dailyTextContainer: {
+    width: 200,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  dailyDiary: {
+    borderRadius: 10,
+    padding: 16,
+  },
+  dailyTodo: {
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    // gap: 8,
+  },
+  dailyTodoList: {
+    paddingVertical: 4,
+  },
+});

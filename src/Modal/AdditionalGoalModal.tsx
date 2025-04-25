@@ -1,17 +1,20 @@
 import React from 'react';
-import {Image, Pressable, View} from 'react-native';
+import {
+  Image,
+  ImageProps,
+  Pressable,
+  StyleSheet,
+  View,
+  ViewProps,
+} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useMutation, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
-import styled, {useTheme} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
-import {
-  ButtonComponent,
-  ModalViewPhoto,
-  NotoSansKR,
-  useApi,
-} from '../Component';
+import {ButtonComponent, ModalViewPhoto, NotoSansKR} from '../Component';
+import {useApi} from '../Hook/hook';
 import useCamera from '../Hook/UseCamera';
+import {useTheme} from '../theme/ThemeProvider';
 import {ModalHeadText} from './CustomModal';
 import {useModal} from './ModalProvider';
 
@@ -95,7 +98,7 @@ export const AdditionalGoalModal = ({
               <ModalViewPhoto
                 visible={imageVisible}
                 onClose={onViewPhoto}
-                res={modalImage}
+                uri={modalImage?.uri ?? ''}
               />
             </Pressable>
             <View style={{alignItems: 'flex-end'}}>
@@ -144,16 +147,45 @@ export const AdditionalGoalModal = ({
   );
 };
 
-const PhotoUploadFrame = styled(View)`
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  width: 88px;
-  height: 96px;
-  border: 2px solid ${props => props.theme.primary1};
-`;
+/** ─────────────────────────────────────────────────────────────────────────
+ * 1) PhotoUploadFrame (styled(View) 대체)
+ */
+export const PhotoUploadFrame: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      style={[styles.uploadFrame, {borderColor: theme.primary1}, style]}
+      {...rest}>
+      {children}
+    </View>
+  );
+};
 
-const ViewPhotoFrame = styled(Image)`
-  height: 250px;
-  border-radius: 10px;
-`;
+/** ─────────────────────────────────────────────────────────────────────────
+ * 2) ViewPhotoFrame (styled(Image) 대체)
+ */
+export const ViewPhotoFrame: React.FC<ImageProps> = ({style, ...rest}) => (
+  <Image style={[styles.photoFrame, style]} {...rest} />
+);
+
+/** ─────────────────────────────────────────────────────────────────────────
+ * 3) StyleSheet 정의
+ */
+const styles = StyleSheet.create({
+  uploadFrame: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    width: 88,
+    height: 96,
+    borderWidth: 2,
+  },
+  photoFrame: {
+    height: 250,
+    borderRadius: 10,
+  },
+});

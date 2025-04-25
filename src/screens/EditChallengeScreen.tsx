@@ -18,10 +18,6 @@ import {
   RowContainer,
   ScrollContainer,
   TossFace,
-  convertKoKRToUTC,
-  convertUTCToKoKR,
-  getDayOfWeek,
-  useApi,
 } from '../Component';
 import {useModal} from '../Modal/ModalProvider';
 import {ChallengeOptionModal} from '../Modal/Modals';
@@ -35,6 +31,12 @@ import {
 import {ChallengeStatusType, InviteAcceptType} from '../../store/data';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
 import {EditChallengeRouteType} from '../App';
+import {
+  convertKoKRToUTC,
+  convertUTCToKoKR,
+  getDayOfWeek,
+  useApi,
+} from '../Hook/hook';
 
 export interface InviteList {
   UserName: string;

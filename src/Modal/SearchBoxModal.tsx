@@ -1,36 +1,20 @@
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, ViewProps} from 'react-native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {useMutation, useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
-import {styled} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
 import {
   InputNotoSansKR,
   LoadingIndicator,
   NotoSansKR,
   RowContainer,
-  useApi,
 } from '../Component';
+import {useApi} from '../Hook/hook';
 import {InviteList} from '../screens/EditChallengeScreen';
 import {ModalHeadBorder} from './CustomModal';
 import {useModal} from './ModalProvider';
-
-const SearchContainer = styled.View`
-  background-color: #fff;
-  border-radius: 10px;
-
-  /* gap: 16px; */
-  /* z-index: 10; */
-`;
-
-const ExpandedContainer = styled.View`
-  background-color: #fff;
-  padding: 8px;
-  margin-top: 8px;
-  gap: 16px;
-`;
 
 export interface InviteFriendType {
   challenge_mst_no: number;
@@ -266,3 +250,41 @@ export const ChallengeInviteFriend = ({
     </View>
   );
 };
+
+/** ─── SearchContainer (styled.View → StyleSheet) ─────────────────────── */
+export const SearchContainer: React.FC<ViewProps> = ({
+  children,
+  style,
+  ...rest
+}) => (
+  <View style={[styles.searchContainer, style]} {...rest}>
+    {children}
+  </View>
+);
+
+/** ─── ExpandedContainer (styled.View → StyleSheet) ──────────────────── */
+export const ExpandedContainer: React.FC<ViewProps> = ({
+  children,
+  style,
+  ...rest
+}) => (
+  <View style={[styles.expandedContainer, style]} {...rest}>
+    {children}
+  </View>
+);
+
+/** ─── StyleSheet 정의 ──────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  searchContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    // gap 및 zIndex 등 추가 스타일이 필요하면 여기서 다룹니다.
+  },
+  expandedContainer: {
+    backgroundColor: '#fff',
+    padding: 8,
+    marginTop: 8,
+    // gap: 16,  // React Native (core) 에서는 gap 속성을 지원하지 않습니다.
+    // 필요 시 자식 View마다 margin을 지정하세요.
+  },
+});

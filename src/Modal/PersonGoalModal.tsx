@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch, useSelector} from 'react-redux';
-import {styled, useTheme} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
 import {
   addPersonalGoal,
@@ -15,6 +14,7 @@ import {
   NotoSansKR,
   RowContainer,
 } from '../Component';
+import {useTheme} from '../theme/ThemeProvider';
 import {ModalHeadBorder} from './CustomModal';
 import {useModal} from './ModalProvider';
 
@@ -23,13 +23,6 @@ interface PersonModalType {
   challenge_mst_no: number;
   title: string;
 }
-
-const SearchContainer = styled(RowContainer)`
-  /* border: 1px solid ${props => props.theme.gray6}; */
-  background-color: ${props => props.theme.gray7};
-  padding: 12px 8px;
-  border-radius: 10px;
-`;
 
 export const PersonGoalEditModal = ({
   id,
@@ -182,3 +175,26 @@ export const PersonGoalAddModal = ({
     </View>
   );
 };
+
+export const SearchContainer: React.FC<
+  React.ComponentProps<typeof RowContainer>
+> = ({style, children, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <RowContainer
+      {...rest}
+      style={[styles.container, {backgroundColor: theme.gray7}, style]}>
+      {children}
+    </RowContainer>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    // borderWidth: 1,
+    // borderColor: theme.gray6,
+  },
+});

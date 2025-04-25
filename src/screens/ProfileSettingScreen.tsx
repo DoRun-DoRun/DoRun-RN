@@ -1,11 +1,20 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
-import {Image, Platform, View} from 'react-native';
+import {
+  Image,
+  Platform,
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+  ViewProps,
+} from 'react-native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useDispatch, useSelector} from 'react-redux';
-import {styled} from 'styled-components/native';
 import {Avatar, avatarImage} from '../../store/data';
 import {RootState} from '../../store/RootReducer';
 import {setUserName} from '../../store/slice/UserSlice';
@@ -18,77 +27,9 @@ import {
   RowContainer,
   RowScrollContainer,
   ScrollContainer,
-  adjustBrightness,
-  useApi,
 } from '../Component';
-
-const SelectedContainer = styled.View`
-  flex: 1;
-  background-color: ${props => props.theme.primary2};
-  margin: 0 -16px;
-  padding: 24px 16px;
-  align-items: center;
-`;
-
-const SelectedButton = styled.TouchableOpacity`
-  padding: 8px 16px;
-  color: ${props => props.theme.primary1};
-  background-color: #fff;
-  border-radius: 10px;
-  align-items: center;
-`;
-
-const CharecterSlot = styled.TouchableOpacity<{
-  isEquip: boolean;
-  isOwned: boolean;
-}>`
-  width: 88px;
-  height: 104px;
-  border-radius: 10px;
-  border-width: ${props => (props.isEquip ? '2px' : 0)};
-  border-color: ${props => props.theme.primary1};
-  opacity: ${props => (props.isOwned ? 1 : 0.5)};
-  background: ${props => props.theme.white};
-  justify-content: center;
-  align-items: center;
-  margin: 4px 2px;
-  ${Platform.OS === 'ios'
-    ? `
-    shadow-color: #000;
-    shadow-offset: 2px 2px;
-    shadow-opacity: 0.3;
-    shadow-radius: 2px;`
-    : 'elevation: 3'}
-`;
-
-const CharecterSlotAndroid = styled.Pressable<{
-  isEquip: boolean;
-  isOwned: boolean;
-}>`
-  width: 88px;
-  height: 104px;
-  border-radius: 10px;
-  border-width: ${props => (props.isEquip ? '2px' : 0)};
-  border-color: ${props => props.theme.primary1};
-  opacity: ${props => (props.isOwned ? 1 : 0.5)};
-  background: ${props => props.theme.white};
-  justify-content: center;
-  align-items: center;
-  ${Platform.OS === 'ios'
-    ? `
-    shadow-color: #000;
-    shadow-offset: 2px 2px;
-    shadow-opacity: 0.3;
-    shadow-radius: 2px;`
-    : 'elevation: 3'}
-`;
-
-const PencilIcon = styled.TouchableOpacity`
-  position: absolute;
-  right: 0;
-  padding: 0 8px;
-  padding-left: 24px;
-`;
+import {adjustBrightness, useApi} from '../Hook/hook';
+import {useTheme} from '../theme/ThemeProvider';
 
 const ProfileSettingScreen = () => {
   const CallApi = useApi();
@@ -356,3 +297,185 @@ const ProfileSettingScreen = () => {
 };
 
 export default ProfileSettingScreen;
+
+/** ─── SelectedContainer ───────────────────────────────────────────────── */
+export const SelectedContainer: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[
+        styles.selectedContainer,
+        {backgroundColor: theme.primary2},
+        style,
+      ]}>
+      {children}
+    </View>
+  );
+};
+
+/** ─── SelectedButton ─────────────────────────────────────────────────── */
+export const SelectedButton: React.FC<TouchableOpacityProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <TouchableOpacity
+      {...rest}
+      style={[styles.selectedButton, {borderColor: theme.primary1}, style]}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+/** ─── CharecterSlot ───────────────────────────────────────────────────── */
+interface CharacterSlotProps extends TouchableOpacityProps {
+  isEquip: boolean;
+  isOwned: boolean;
+}
+export const CharecterSlot: React.FC<CharacterSlotProps> = ({
+  isEquip,
+  isOwned,
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <TouchableOpacity
+      {...rest}
+      style={[
+        styles.characterSlot,
+        {
+          borderWidth: isEquip ? 2 : 0,
+          borderColor: theme.primary1,
+          opacity: isOwned ? 1 : 0.5,
+          backgroundColor: theme.white,
+        },
+        style,
+      ]}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+/** ─── CharecterSlotAndroid ────────────────────────────────────────────── */
+interface CharacterSlotAndroidProps extends PressableProps {
+  isEquip: boolean;
+  isOwned: boolean;
+}
+export const CharecterSlotAndroid: React.FC<CharacterSlotAndroidProps> = ({
+  isEquip,
+  isOwned,
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <Pressable
+      {...rest}
+      style={
+        typeof style === 'function'
+          ? ({pressed}) => [
+              styles.characterSlotAndroid,
+              {
+                borderWidth: isEquip ? 2 : 0,
+                borderColor: theme.primary1,
+                opacity: isOwned ? 1 : 0.5,
+                backgroundColor: theme.white,
+              },
+              style({pressed}),
+            ]
+          : [
+              styles.characterSlotAndroid,
+              {
+                borderWidth: isEquip ? 2 : 0,
+                borderColor: theme.primary1,
+                opacity: isOwned ? 1 : 0.5,
+                backgroundColor: theme.white,
+              },
+              style,
+            ]
+      }>
+      {children}
+    </Pressable>
+  );
+};
+
+/** ─── PencilIcon ──────────────────────────────────────────────────────── */
+export const PencilIcon: React.FC<TouchableOpacityProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <TouchableOpacity {...rest} style={[styles.pencilIcon, style]}>
+    {children}
+  </TouchableOpacity>
+);
+
+/** ─── StyleSheet 定義 ────────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  selectedContainer: {
+    flex: 1,
+    marginHorizontal: -16,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  selectedButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  characterSlot: {
+    width: 88,
+    height: 104,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 4,
+    marginHorizontal: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 2, height: 2},
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
+      android: {elevation: 3},
+    }),
+  },
+  characterSlotAndroid: {
+    width: 88,
+    height: 104,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 2, height: 2},
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
+      android: {elevation: 3},
+    }),
+  },
+  pencilIcon: {
+    position: 'absolute',
+    right: 0,
+    paddingVertical: 0,
+    paddingHorizontal: 8,
+    paddingLeft: 24,
+  },
+});

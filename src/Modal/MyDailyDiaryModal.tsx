@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
-import {Image, Pressable, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useMutation, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
-import styled, {useTheme} from 'styled-components/native';
 import {goalType} from '../../store/async/asyncStore';
 import {RootState} from '../../store/RootReducer';
 import {
@@ -12,9 +11,11 @@ import {
   ModalViewPhoto,
   NotoSansKR,
   RowContainer,
-  useApi,
 } from '../Component';
+import {useApi} from '../Hook/hook';
 import useCamera from '../Hook/UseCamera';
+import {useTheme} from '../theme/ThemeProvider';
+import {PhotoUploadFrame, ViewPhotoFrame} from './AdditionalGoalModal';
 import {ModalHeadText} from './CustomModal';
 import {useModal} from './ModalProvider';
 import {DailyModal} from './Modals';
@@ -131,7 +132,7 @@ export const MyDailyDrayModal = ({
               <ModalViewPhoto
                 visible={imageVisible}
                 onClose={onViewPhoto}
-                res={modalImage}
+                uri={modalImage?.uri ?? ''}
               />
             </Pressable>
             <View style={{alignItems: 'flex-end'}}>
@@ -206,17 +207,3 @@ export const MyDailyDrayModal = ({
     </View>
   );
 };
-
-const PhotoUploadFrame = styled(View)`
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  width: 88px;
-  height: 96px;
-  border: 2px solid ${props => props.theme.primary1};
-`;
-
-const ViewPhotoFrame = styled(Image)`
-  height: 250px;
-  border-radius: 10px;
-`;

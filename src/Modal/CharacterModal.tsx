@@ -1,55 +1,25 @@
 import {Slider} from '@miblanchard/react-native-slider';
 import React, {useMemo} from 'react';
-import {Image, View} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+  ViewProps,
+} from 'react-native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {shallowEqual, useSelector} from 'react-redux';
-import styled, {useTheme} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
 import {UserStatusType, profileImage} from '../../store/data';
-import {
-  LoadingIndicator,
-  NotoSansKR,
-  RowContainer,
-  isWithin24Hours,
-  useApi,
-} from '../Component';
+import {LoadingIndicator, NotoSansKR, RowContainer} from '../Component';
+import {isWithin24Hours, useApi} from '../Hook/hook';
 import {ChallengeUserType} from '../Tab/RaceTab';
+import {useTheme} from '../theme/ThemeProvider';
 import {useModal} from './ModalProvider';
 import {UsedItemModal} from './Modals';
-
-const ButtonContainer = styled.TouchableOpacity<{
-  color: 'primary1' | 'secondary1';
-}>`
-  background-color: ${props =>
-    props.disabled ? props.theme.gray4 : props.theme[props.color]};
-  padding: 8px;
-  width: 100%;
-  align-items: center;
-  border-radius: 10px;
-`;
-
-const UserProfile = styled.View<{IS_ME: boolean}>`
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
-  border: 3px solid
-    ${props => (props.IS_ME ? props.theme.primary1 : props.theme.secondary1)};
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-`;
-const UserStatues = styled.View<{IS_ME: boolean}>`
-  display: flex;
-  padding: 2px 4px;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  gap: 4px;
-  background-color: ${props =>
-    props.IS_ME ? props.theme.primary2 : props.theme.secondary2};
-`;
 
 export const CharacterModal = ({
   data,
@@ -252,3 +222,78 @@ export const CharacterModal = ({
     </View>
   );
 };
+
+/** ─── ButtonContainer ───────────────────────────────────────────────────── */
+export const ButtonContainer: React.FC<
+  {color: 'primary1' | 'secondary1'} & TouchableOpacityProps
+> = ({color, disabled, style, children, ...rest}) => {
+  const {theme} = useTheme();
+  const backgroundColor = disabled ? theme.gray4 : theme[color];
+  return (
+    <TouchableOpacity
+      {...rest}
+      disabled={disabled}
+      style={[styles.buttonContainer, {backgroundColor}, style]}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+/** ─── UserProfile ───────────────────────────────────────────────────────── */
+export const UserProfile: React.FC<{IS_ME: boolean} & ViewProps> = ({
+  IS_ME,
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  const borderColor = IS_ME ? theme.primary1 : theme.secondary1;
+  return (
+    <View {...rest} style={[styles.userProfile, {borderColor}, style]}>
+      {children}
+    </View>
+  );
+};
+
+/** ─── UserStatues ───────────────────────────────────────────────────────── */
+export const UserStatues: React.FC<{IS_ME: boolean} & ViewProps> = ({
+  IS_ME,
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  const backgroundColor = IS_ME ? theme.primary2 : theme.secondary2;
+  return (
+    <View {...rest} style={[styles.userStatues, {backgroundColor}, style]}>
+      {children}
+    </View>
+  );
+};
+
+/** ─── StyleSheet 정의 ──────────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  buttonContainer: {
+    padding: 8,
+    width: '100%',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  userProfile: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  userStatues: {
+    flexDirection: 'row',
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+  },
+});

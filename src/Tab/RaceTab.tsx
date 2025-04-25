@@ -5,18 +5,23 @@ import {
   Animated,
   Dimensions,
   Image,
+  ImageBackground,
+  ImageBackgroundProps,
+  ImageSourcePropType,
   PanResponder,
   Platform,
   Pressable,
   RefreshControl,
+  StyleSheet,
   TouchableOpacity,
+  TouchableOpacityProps,
   View,
+  ViewProps,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {useQuery} from 'react-query';
 import {useDispatch, useSelector} from 'react-redux';
-import styled from 'styled-components/native';
 import {
   BackgroundImage,
   Dudus,
@@ -34,10 +39,11 @@ import {
   LoadingIndicator,
   NotoSansKR,
   ScrollContainer,
-  useApi,
 } from '../Component';
+import {useApi} from '../Hook/hook';
 import {CharacterModal} from '../Modal/CharacterModal';
 import {useModal} from '../Modal/ModalProvider';
+import {useTheme} from '../theme/ThemeProvider';
 
 // interface ChallengeUserListType {
 //   CHALLENGE_MST_NO: number;
@@ -50,27 +56,6 @@ import {useModal} from '../Modal/ModalProvider';
 interface DiaryType {
   DAILY_COMPLETE_NO: number;
 }
-
-const ChallengeCreateButton = styled.TouchableOpacity`
-  position: absolute;
-  background-color: ${props => props.theme.white};
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  width: 205px;
-  height: 56px;
-  top: 50%;
-  left: 50%;
-  z-index: 5;
-  transform: translateX(-102.5px) translateY(-56px);
-  ${Platform.OS === 'ios'
-    ? `
-    shadow-color: #000;
-    shadow-offset: 2px 2px;
-    shadow-opacity: 0.3;
-    shadow-radius: 2px;`
-    : 'elevation: 3;'}
-`;
 
 export interface ChallengeUserType {
   CHALLENGE_USER_NO: number;
@@ -454,36 +439,6 @@ const BGComponent = ({
   );
 };
 
-const BGImage = styled.ImageBackground<{height?: number}>`
-  height: ${props => props.height}px;
-  width: 100%;
-`;
-
-const NavigationButton = styled(View)`
-  width: 40px;
-  height: 40px;
-  background-color: ${props => props.theme.white};
-  ${Platform.OS === 'ios'
-    ? `shadow-color: rgba(0, 0, 0, 0.3);
-  shadow-offset: 1px 2px;
-  shadow-opacity: 0.3;
-  shadow-radius: 1.5px;`
-    : 'elevation: 3;'}
-
-  border-radius: 20px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const NavigationContainer = styled(View)`
-  position: absolute;
-  top: 80px;
-  right: 16px;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10;
-`;
-
 const Navigation = () => {
   const navigation = useNavigation();
 
@@ -508,3 +463,124 @@ const Navigation = () => {
   );
 };
 export default RaceTab;
+
+/** ─── ChallengeCreateButton ───────────────────────────────────────────── */
+export const ChallengeCreateButton: React.FC<TouchableOpacityProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <TouchableOpacity
+      {...rest}
+      style={[
+        styles.createButton,
+        {backgroundColor: theme.white},
+        ...(Platform.select({
+          ios: [styles.createButtonShadow],
+          android: [styles.createButtonElevation],
+        }) || []),
+        style,
+      ]}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+/** ─── BGImage ─────────────────────────────────────────────────────────── */
+export const BGImage: React.FC<
+  {height?: number; source: ImageSourcePropType} & Omit<
+    ImageBackgroundProps,
+    'source'
+  >
+> = ({height = 0, style, ...rest}) => (
+  <ImageBackground
+    {...rest}
+    source={rest.source}
+    style={[{width: '100%', height}, style]}
+  />
+);
+
+/** ─── NavigationButton ───────────────────────────────────────────────── */
+export const NavigationButton: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      {...rest}
+      style={[
+        styles.navButton,
+        {backgroundColor: theme.white},
+        ...(Platform.select({
+          ios: [styles.createButtonShadow],
+          android: [styles.createButtonElevation],
+        }) || []),
+        style,
+      ]}>
+      {children}
+    </View>
+  );
+};
+
+/** ─── NavigationContainer ────────────────────────────────────────────── */
+export const NavigationContainer: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <View {...rest} style={[styles.navContainer, style]}>
+    {children}
+  </View>
+);
+
+/** ─── StyleSheet 定義 ────────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  createButton: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    width: 205,
+    height: 56,
+    top: '50%',
+    left: '50%',
+    zIndex: 5,
+    transform: [{translateX: -102.5}, {translateY: -56}],
+  },
+  createButtonShadow: {
+    shadowColor: '#000',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  createButtonElevation: {
+    elevation: 3,
+  },
+  navButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  navButtonShadow: {
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    shadowOffset: {width: 1, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 1.5,
+  },
+  navButtonElevation: {
+    elevation: 3,
+  },
+  navContainer: {
+    position: 'absolute',
+    top: 80,
+    right: 16,
+    flexDirection: 'column',
+    // gap not supported in core RN; add spacing via child styles or.Wrap children with margin.
+  },
+});
