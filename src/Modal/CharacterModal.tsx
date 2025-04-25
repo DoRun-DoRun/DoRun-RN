@@ -9,7 +9,7 @@ import styled, {useTheme} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
 import {UserStatusType, profileImage} from '../../store/data';
 import {
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   isWithin24Hours,
@@ -59,7 +59,7 @@ export const CharacterModal = ({
   CHALLENGE_MST_NO: number;
 }) => {
   const CallApi = useApi();
-  const theme = useTheme();
+  const {theme} = useTheme();
   const {showModal} = useModal();
   const {accessToken, SIGN_TYPE} = useSelector(
     (state: RootState) => state.user,
@@ -117,7 +117,7 @@ export const CharacterModal = ({
   });
 
   if (isLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
 
   if (!user) {

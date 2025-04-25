@@ -119,7 +119,7 @@ export const CalendarContainer = ({
   const [markedDates, setMarkedDates] = useState<MarkedDataType>({});
   const [disabledLeft, setDisabledLeft] = useState(true);
 
-  const theme = useTheme();
+  const {theme} = useTheme();
   const currentDate = new Date();
 
   useEffect(() => {
@@ -492,7 +492,7 @@ const CreateChallengeScreen = () => {
               onPress={() => {
                 setDescription(prev => !prev);
               }}>
-              <RowContainer seperate>
+              <RowContainer separate>
                 <NotoSansKR size={18}>챌린지는 어떻게 진행되나요?</NotoSansKR>
                 <MaterialCommunityIcons
                   name={description ? 'chevron-down' : 'chevron-up'}

@@ -13,7 +13,7 @@ import {
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
@@ -189,7 +189,7 @@ const ProfileSettingScreen = () => {
   });
 
   if (isLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
 
   return (

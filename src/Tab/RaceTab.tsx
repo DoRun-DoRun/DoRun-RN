@@ -31,7 +31,7 @@ import {RootState} from '../../store/RootReducer';
 import {NavigationType} from '../App';
 import {
   HomeContainer,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   ScrollContainer,
   useApi,
@@ -195,7 +195,7 @@ const RaceTab = () => {
     });
   }, [refetch]);
   if (isLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
   return (
     <HomeContainer color="background">

@@ -40,7 +40,7 @@ export const PersonGoalEditModal = ({
 
   const {hideModal} = useModal();
   const dispatch = useDispatch();
-  const theme = useTheme();
+  const {theme} = useTheme();
   const [isError, setIsError] = useState(false);
   const [inputText, setInputText] = useState(title);
 
@@ -118,7 +118,7 @@ export const PersonGoalAddModal = ({
   const {SIGN_TYPE} = useSelector((state: RootState) => state.user);
   const {hideModal} = useModal();
   const dispatch = useDispatch();
-  const theme = useTheme();
+  const {theme} = useTheme();
   const [isError, setIsError] = useState(false);
 
   const [inputText, setInputText] = useState('');

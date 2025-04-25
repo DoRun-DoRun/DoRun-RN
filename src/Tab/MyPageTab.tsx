@@ -13,7 +13,7 @@ import {
   GetImage,
   HomeContainer,
   InnerContainer,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -178,7 +178,7 @@ const History = () => {
     .replace(/\. /g, '-')
     .replace('.', '');
 
-  const theme = useTheme();
+  const {theme} = useTheme();
   const [date, setDate] = useState(formattedDate);
   const [index, setIndex] = useState(1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -247,10 +247,10 @@ const History = () => {
       </CalendarProvider>
 
       {isLoading ? (
-        <LoadingIndicatior />
+        <LoadingIndicator />
       ) : data.total_size > 0 ? (
         <>
-          <RowContainer seperate>
+          <RowContainer separate>
             {index !== 1 ? (
               <TouchableOpacity onPress={() => setIndex(prev => prev - 1)}>
                 <MaterialIcons name="chevron-left" size={24} />
@@ -391,7 +391,7 @@ const MyPageTab = () => {
       <ScrollContainer contentContainerStyle={{flexGrow: 1}}>
         <InnerContainer gap={24}>
           {isLoading ? (
-            <LoadingIndicatior />
+            <LoadingIndicator />
           ) : (
             <ProfileContainer gap={24}>
               <UserIcon>

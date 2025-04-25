@@ -6,24 +6,21 @@ import Toast from 'react-native-toast-message';
 import {useMutation} from 'react-query';
 import {useSelector} from 'react-redux';
 import {
-  ItemName,
   // adReward,
   completeText,
   defaultData,
   groupImage,
+  ItemName,
   usedItemImage,
 } from '../../store/data';
 import {RootState} from '../../store/RootReducer';
 import {
   ButtonComponent,
   ContentSave,
-  GetImage,
   NotoSansKR,
   RowContainer,
-  convertUTCToKoKRDay,
-  timeSince,
-  useApi,
 } from '../Component';
+import {convertUTCToKoKRDay, GetImage, timeSince, useApi} from '../Hook/hook';
 import {ModalHeadBorder, ModalHeadText} from './CustomModal';
 import {useModal} from './ModalProvider';
 
@@ -84,7 +81,7 @@ const ShareModalComponent = ({
         <View style={{gap: 4}}>
           {response.participants.map((user: ParticipantsType, key) => {
             return (
-              <RowContainer seperate key={key}>
+              <RowContainer separate key={key}>
                 <NotoSansKR size={16} weight="Medium">
                   {user.USER_NM}
                 </NotoSansKR>
@@ -124,7 +121,7 @@ const ShareModalComponent = ({
 export const ShareModal = ({response}: {response: ChallengeLogType}) => {
   return (
     <View style={{margin: -24}}>
-      <ContentSave file_name={`dorun_${response.CHALLENGE_MST_NO}`}>
+      <ContentSave fileName={`dorun_${response.CHALLENGE_MST_NO}`}>
         <ShareModalComponent response={response} />
       </ContentSave>
     </View>

@@ -8,7 +8,7 @@ import {styled} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
 import {
   InputNotoSansKR,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   useApi,
@@ -78,7 +78,7 @@ export const InviteFriend = ({
   });
 
   return (
-    <RowContainer seperate>
+    <RowContainer separate>
       <NotoSansKR size={14} weight="Regular">
         {name}
       </NotoSansKR>
@@ -204,7 +204,7 @@ export const SearchBox = ({
           {uidInput === '' ? '친구 목록' : '검색 결과'}
         </NotoSansKR>
 
-        {(searchLoading || friendLoading) && <LoadingIndicatior />}
+        {(searchLoading || friendLoading) && <LoadingIndicator />}
 
         {uidInput === '' ? (
           friendData?.accepted.length > 0 ? (

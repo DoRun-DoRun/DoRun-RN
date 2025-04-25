@@ -13,7 +13,7 @@ import {
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -76,7 +76,7 @@ const InviteList = ({
   });
 
   return (
-    <RowContainer seperate>
+    <RowContainer separate>
       <NotoSansKR size={16} weight="Medium">
         {UserName}
       </NotoSansKR>
@@ -371,7 +371,7 @@ const EditChallengeScreen = ({route}: {route: EditChallengeRouteType}) => {
   ]);
 
   if (loadingChallenge) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
 
   return (

@@ -12,7 +12,7 @@ import {
   HomeContainer,
   InnerContainer,
   InputNotoSansKR,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -35,7 +35,7 @@ interface FriendType {
 }
 
 const Friend = ({accessToken, name, friendNo, invited}: FriendType) => {
-  const theme = useTheme();
+  const {theme} = useTheme();
   const CallApi = useApi();
   const queryClient = useQueryClient();
 
@@ -159,7 +159,7 @@ const InviteFriend = ({name, UID, setUidInput}: InviteFriendType) => {
   });
 
   return (
-    <RowContainer seperate>
+    <RowContainer separate>
       <NotoSansKR size={14} weight="Regular">
         {name}
       </NotoSansKR>
@@ -219,7 +219,7 @@ const SearchBox = ({UID}: {UID: number}) => {
           <ExpandedContainer>
             <NotoSansKR size={14}>검색 결과</NotoSansKR>
             {isLoading ? (
-              <LoadingIndicatior />
+              <LoadingIndicator />
             ) : data?.USER_NM ? (
               <InviteFriend
                 name={data?.USER_NM}
@@ -299,7 +299,7 @@ const FriendScreen = () => {
   // };
 
   if (friendLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
 
   return (

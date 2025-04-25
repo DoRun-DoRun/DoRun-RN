@@ -1,6 +1,5 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
-import CreateChallengeScreen from './screens/CreateChallengeScreen';
 
 import {
   NavigationProp,
@@ -11,12 +10,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from 'react-redux';
 import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
 import {restoreGoal} from '../store/slice/GoalSlice';
-import {playMusic, setVolume, stopMusic} from '../store/slice/SettingSlice';
-import {DailyNoteScreen} from './screens/DailyNoteScreen';
-import EditChallengeScreen from './screens/EditChallengeScreen';
-import FriendScreen from './screens/FriendScreen';
-import ProfileSettingScreen from './screens/ProfileSettingScreen';
-import SettingScreen from './screens/SettingScreen';
+
 import LoginTab from './Tab/LoginTab';
 
 import {AppState, AppStateStatus, Linking, Platform} from 'react-native';
@@ -26,10 +20,10 @@ import {useMutation, useQueryClient} from 'react-query';
 import {InviteAcceptType, SignType} from '../store/data';
 import {RootState} from '../store/RootReducer';
 import {setAccessToken, setUser} from '../store/slice/UserSlice';
-import {LoadingIndicatior, useApi} from './Component';
+import {LoadingIndicator} from './Component';
+import {useApi} from './Hook/hook';
 import {ChallengeListModal} from './Modal/ChallengeListModal';
 import {useModal} from './Modal/ModalProvider';
-import {MainTab} from './Tab/MainTab';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -199,7 +193,7 @@ function App() {
 
       const settingData = await loadSetting();
       if (settingData) {
-        dispatch(setVolume(settingData));
+        // dispatch(setVolume(settingData));
       }
       setIsLoading(false);
     };
@@ -227,11 +221,11 @@ function App() {
         getPermission();
       }
 
-      if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        dispatch(playMusic());
-      } else {
-        dispatch(stopMusic());
-      }
+      // if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      //   dispatch(playMusic());
+      // } else {
+      //   dispatch(stopMusic());
+      // }
       setAppState(nextAppState);
     };
 
@@ -290,7 +284,7 @@ function App() {
   }, [isLoggedIn, deepLinkUrl, UID, InviteFriend, InviteChallenge]);
 
   if (isLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
 
   return (
@@ -299,7 +293,6 @@ function App() {
       screenOptions={{
         headerShadowVisible: false,
         headerTitle: '',
-        // eslint-disable-next-line react/no-unstable-nested-components
         headerLeft: () => (
           <MaterialIcons
             name="arrow-back"
@@ -315,7 +308,7 @@ function App() {
         component={LoginTab}
         options={{headerShown: false}}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="MainTab"
         component={MainTab}
         options={{headerShown: false}}
@@ -334,7 +327,7 @@ function App() {
       />
       <Stack.Screen name="FriendScreen" component={FriendScreen} />
       <Stack.Screen name="SettingScreen" component={SettingScreen} />
-      <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} />
+      <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} /> */}
     </Stack.Navigator>
   );
 }

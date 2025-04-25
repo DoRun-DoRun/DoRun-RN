@@ -11,14 +11,14 @@ import RaceTab from './RaceTab';
 import {useNavigation} from '@react-navigation/native';
 import {useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
-import {useTheme} from 'styled-components/native';
 import {RootState} from '../../store/RootReducer';
 import {NavigationType} from '../App';
+import {useTheme} from '../theme/ThemeProvider';
 
 const Tab = createBottomTabNavigator();
 
 export const MainTab = () => {
-  const theme = useTheme();
+  const {theme} = useTheme();
   const navigation = useNavigation<NavigationType>();
   const {selectedChallengeMstNo} = useSelector(
     (state: RootState) => state.challenge,

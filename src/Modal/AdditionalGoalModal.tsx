@@ -22,7 +22,7 @@ export const AdditionalGoalModal = ({
   additional_goal_no: number;
   additional_goal_nm: string;
 }) => {
-  const theme = useTheme();
+  const {theme} = useTheme();
   const CallApi = useApi();
   const {onLaunchCamera, onViewPhoto, deletePhoto, modalImage, imageVisible} =
     useCamera();

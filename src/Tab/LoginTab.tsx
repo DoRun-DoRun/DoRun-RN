@@ -1,25 +1,37 @@
 import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {Animated, Platform, TouchableOpacity, View} from 'react-native';
+import {
+  Animated,
+  Image,
+  ImageBackground,
+  ImageBackgroundProps,
+  ImageProps,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+  ViewProps,
+} from 'react-native';
 import {useMutation} from 'react-query';
 import {useDispatch, useSelector} from 'react-redux';
-import {styled} from 'styled-components/native';
 import {userDataType} from '../../store/async/asyncStore';
 import {
   setAccessToken,
   setIsLoggedIn,
   setUser,
 } from '../../store/slice/UserSlice';
-import {NotoSansKR, RowContainer, useApi} from '../Component';
+import {NotoSansKR, RowContainer} from '../Component';
 
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {SignType} from '../../store/data';
 
-import {jwtDecode} from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {RootState} from '../../store/RootReducer';
 import {setSelectedChallengeMstNo} from '../../store/slice/ChallengeSlice';
+import {useApi} from '../Hook/hook';
 
 interface AppleJwtToken {
   iss: string;
@@ -342,48 +354,89 @@ const LoginTab = () => {
   );
 };
 
-const BackgroundImage = styled.ImageBackground`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  resize: contian;
-  flex: 1;
-  bottom: 0;
-`;
-
-const LoginContainer = styled.View`
-  position: absolute;
-  width: 55%;
-  min-width: 210px;
-  align-self: center;
-  bottom: 10%;
-`;
-
-// const Title = styled.Image`
-//   margin-bottom: 44px;
-// `;
-
-const IconImage = styled.Image<{size: number}>`
-  width: ${({size}) => `${size}px`};
-  height: ${({size}) => `${size}px`};
-`;
-
-const LoginButton = styled.TouchableOpacity<{kakao?: boolean}>`
-  height: 40px;
-  margin-top: 6px;
-  /* background-color: ${props => props.theme.secondary1}; */
-  background-color: ${({kakao}) => (kakao ? '#fddc3f' : '#fff')};
-  padding: 8px 16px 8px 12px;
-  /* padding: 12px 24px; */
-  border-radius: 5px;
-  ${Platform.OS === 'ios'
-    ? `
-    shadow-color: #000;
-    shadow-offset: 2px 2px;
-    shadow-opacity: 0.3;
-    shadow-radius: 2px;
-  `
-    : 'elevation: 3;'}
-`;
-
 export default LoginTab;
+
+const BackgroundImage: React.FC<ImageBackgroundProps> = ({style, ...rest}) => (
+  <ImageBackground
+    {...rest}
+    style={[styles.bgImage, style]}
+    resizeMode="contain"
+  />
+);
+
+/* ------------------------------------------------------------------ */
+/* 2) LoginContainer ------------------------------------------------- */
+const LoginContainer: React.FC<ViewProps> = ({style, ...rest}) => (
+  <View style={[styles.loginContainer, style]} {...rest} />
+);
+
+/* ------------------------------------------------------------------ */
+/* 3) IconImage (size prop 유지) ------------------------------------- */
+const IconImage: React.FC<
+  {size: number; style?: ImageProps['style']} & Omit<ImageProps, 'style'>
+> = ({size, style, ...rest}) => (
+  <Image
+    {...rest}
+    style={[{width: size, height: size}, style]}
+    resizeMode="contain"
+  />
+);
+
+/* ------------------------------------------------------------------ */
+/* 4) LoginButton (kakao prop 유지) ---------------------------------- */
+const LoginButton: React.FC<{kakao?: boolean} & TouchableOpacityProps> = ({
+  kakao,
+  style,
+  children,
+  ...rest
+}) => {
+  const backgroundColor = kakao ? '#fddc3f' : '#fff';
+  return (
+    <TouchableOpacity
+      activeOpacity={0.9}
+      style={[
+        styles.loginButton,
+        {backgroundColor},
+        Platform.OS === 'ios' ? styles.iosShadow : styles.androidElevation,
+        style,
+      ]}
+      {...rest}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* 5) StyleSheet 객체 ------------------------------------------------ */
+const styles = StyleSheet.create({
+  bgImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    bottom: 0,
+    flex: 1,
+  },
+  loginContainer: {
+    position: 'absolute',
+    width: '55%',
+    minWidth: 210,
+    alignSelf: 'center',
+    bottom: '10%',
+  },
+  loginButton: {
+    height: 40,
+    marginTop: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 5,
+  },
+  iosShadow: {
+    shadowColor: '#000',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  androidElevation: {
+    elevation: 3,
+  },
+});

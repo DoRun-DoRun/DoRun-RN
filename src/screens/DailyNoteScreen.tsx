@@ -14,7 +14,7 @@ import {
   GetImage,
   HomeContainer,
   InnerContainer,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   ScrollContainer,
@@ -32,7 +32,7 @@ interface goal {
 // DailyNoteScreen 컴포넌트
 export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   const {daily_no} = route.params;
-  const theme = useTheme();
+  const {theme} = useTheme();
   const CallApi = useApi();
   const {showModal} = useModal();
 
@@ -60,7 +60,7 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
   const {data, isLoading} = useQuery('getDiary', getDiary);
 
   if (isLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
   if (!data || data.dairy!) {
     return <NotoSansKR size={16}>에러</NotoSansKR>;
@@ -145,7 +145,7 @@ export const DailyNoteScreen = ({route}: {route: DailyNoteRouteType}) => {
 };
 
 const FaceBtn = ({daily_no}: {daily_no: number}) => {
-  const theme = useTheme();
+  const {theme} = useTheme();
   const {accessToken} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
 

@@ -1,8 +1,8 @@
+// styled.d.ts
 import 'styled-components/native';
-import {ThemeType} from './theme';
 
 declare module 'styled-components/native' {
-  export interface DefaultTheme extends ThemeType {
+  export interface DefaultTheme {
     black: string;
     white: string;
     gray1: string;
@@ -20,6 +20,5 @@ declare module 'styled-components/native' {
     red: string;
     yellow: string;
     background: string;
-    undefined: null;
   }
 }

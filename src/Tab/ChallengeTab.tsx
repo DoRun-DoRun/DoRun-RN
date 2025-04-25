@@ -6,8 +6,11 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
+  StyleSheet,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,7 +18,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OcticonIcons from 'react-native-vector-icons/Octicons';
 import {useMutation, useQuery} from 'react-query';
 import {useDispatch, useSelector} from 'react-redux';
-import styled, {useTheme} from 'styled-components/native';
 import {challengeData, goalType} from '../../store/async/asyncStore';
 import {ChallengeStatusType} from '../../store/data';
 import {RootState} from '../../store/RootReducer';
@@ -29,15 +31,13 @@ import {NavigationType} from '../App';
 import {
   ButtonComponent,
   HomeContainer,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   RowScrollContainer,
   TossFace,
-  calculateDaysUntil,
-  calculateRemainTime,
-  useApi,
 } from '../Component';
+import {calculateDaysUntil, calculateRemainTime, useApi} from '../Hook/hook';
 import {AdditionalGoalModal} from '../Modal/AdditionalGoalModal';
 import {ChallengeListModal} from '../Modal/ChallengeListModal';
 import {useModal} from '../Modal/ModalProvider';
@@ -54,15 +54,12 @@ import {
   PersonGoalAddModal,
   PersonGoalEditModal,
 } from '../Modal/PersonGoalModal';
+import {useTheme} from '../theme/ThemeProvider';
 
-const Profile = styled.View`
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  background-color: ${props => props.theme.secondary2};
-  justify-content: center;
-  align-items: center;
-`;
+interface GoalBoxProps {
+  goal: goalType;
+  challenge_mst_no: number;
+}
 
 interface ChallengeInfoType {
   mainText: string;
@@ -71,110 +68,9 @@ interface ChallengeInfoType {
   isSelected?: boolean;
 }
 
-const ChallengeInfo = ({
-  mainText,
-  subText,
-  headerEmoji,
-  isSelected,
-}: ChallengeInfoType) => {
-  const TextContainer = styled.View`
-    width: 122px;
-    height: 154px;
-
-    border-radius: 10px;
-    padding: 12px 8px;
-    background-color: white;
-    border-width: 2px;
-    border-color: ${props =>
-      isSelected ? props.theme.primary1 : props.theme.white};
-    box-sizing: border-box;
-    margin: 8px 0;
-    justify-content: space-between;
-    ${Platform.OS === 'ios'
-      ? `
-      shadow-color: #000;
-      shadow-offset: 2px 2px;
-      shadow-opacity: 0.3;
-      shadow-radius: 2px;`
-      : 'elevation: 3;'}
-  `;
-
-  return (
-    <TextContainer>
-      <Profile>
-        <TossFace size={22}>{headerEmoji}</TossFace>
-      </Profile>
-      <View style={{gap: 8}}>
-        <NotoSansKR size={14}>{mainText}</NotoSansKR>
-        <NotoSansKR size={11} color="gray5">
-          {subText}
-        </NotoSansKR>
-      </View>
-    </TextContainer>
-  );
-};
-
-const ChallengeSubInfo = ({
-  mainText,
-  subText,
-  headerEmoji,
-}: ChallengeInfoType) => {
-  const TextSubContainer = styled.View`
-    width: 108px;
-    height: 144px;
-
-    border-radius: 10px;
-    padding: 12px 8px;
-    background-color: white;
-    gap: 20px;
-    margin: 8px 0;
-
-    ${Platform.OS === 'ios'
-      ? `
-      shadow-color: #000;
-      shadow-offset: 2px 2px;
-      shadow-opacity: 0.3;
-      shadow-radius: 2px;`
-      : 'elevation: 3;'}
-  `;
-
-  return (
-    <TextSubContainer>
-      <Profile>
-        <TossFace size={20}>{headerEmoji}</TossFace>
-      </Profile>
-      <View style={{gap: 4}}>
-        <NotoSansKR size={14}>{mainText}</NotoSansKR>
-        <NotoSansKR size={10} color="gray5">
-          {subText}
-        </NotoSansKR>
-      </View>
-    </TextSubContainer>
-  );
-};
-
-interface GoalBoxProps {
-  goal: goalType;
-  challenge_mst_no: number;
-}
-
-const TodoTitle = styled(NotoSansKR)<{isComplete?: Boolean}>`
-  text-decoration: line-through;
-  color: ${props => props.theme.gray4};
-  background-color: ${props => props.theme.gray7};
-`;
-
-const GoalContainer = styled.TouchableOpacity<{bc: string; border: string}>`
-  background-color: ${props => props.bc};
-  border-radius: 10px;
-  border-color: ${props => props.border};
-  border-width: 2px;
-  padding: 12px;
-`;
-
 const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
   const {SIGN_TYPE} = useSelector((state: RootState) => state.user);
-  const theme = useTheme();
+  const {theme} = useTheme();
   const dispatch = useDispatch();
   const {showModal} = useModal();
 
@@ -205,7 +101,7 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
       }
       bc={backgroundColor}
       border={borderColor}>
-      <RowContainer seperate>
+      <RowContainer>
         <RowContainer gap={8}>
           <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
           {goal.isComplete ? (
@@ -234,7 +130,7 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
 };
 
 const PlusContainers = ({title}: {title: String}) => {
-  const theme = useTheme();
+  const {theme} = useTheme();
 
   return (
     <RowContainer gap={4} style={{justifyContent: 'flex-end'}}>
@@ -247,11 +143,6 @@ const PlusContainers = ({title}: {title: String}) => {
 };
 
 const ListItem = ({data}: {data: AdditionalInfo}) => {
-  const SomeTargetContainer = styled(RowContainer)`
-    border-bottom-color: white;
-    border-bottom-width: 1px;
-    padding: 6px 0;
-  `;
   const {showModal} = useModal();
 
   const truncateText = (text: string, maxLength: number) => {
@@ -263,7 +154,7 @@ const ListItem = ({data}: {data: AdditionalInfo}) => {
   };
 
   return (
-    <SomeTargetContainer seperate>
+    <RowContainer separate>
       <RowContainer gap={32}>
         <NotoSansKR size={14} weight="Regular" color="white">
           {data.CHALLENGE_USER_NN}
@@ -301,39 +192,9 @@ const ListItem = ({data}: {data: AdditionalInfo}) => {
           </TouchableOpacity>
         )}
       </RowContainer>
-    </SomeTargetContainer>
+    </RowContainer>
   );
 };
-
-const TopContainer = styled.View`
-  gap: 8px;
-  background-color: ${props => props.theme.primary2};
-  padding: 16px;
-`;
-
-const CenterContainer = styled.View`
-  padding: 0 16px;
-  gap: 16px;
-`;
-
-const FootContainer = styled.View<{disalbed?: boolean}>`
-  gap: 16px;
-  /* background-color: #2c2c2c; */
-  background-color: ${props =>
-    props.disalbed ? props.theme.gray5 : props.theme.gray1};
-  padding: 16px;
-  text-align: left;
-`;
-
-interface ChallengeInfo {
-  CHALLENGE_MST_NO: number;
-  CHALLENGE_MST_NM: string;
-  START_DT: string;
-  END_DT: string;
-  HEADER_EMOJI: string;
-  CHALLENGE_STATUS: ChallengeStatusType;
-  PROGRESS: number;
-}
 
 interface AdditionalInfo {
   ADDITIONAL_NO: number;
@@ -578,7 +439,7 @@ const ChallengeTab = () => {
   ]);
 
   if (listLoading || detailLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
 
   if (listData.progress_challenges?.length === 0) {
@@ -631,33 +492,31 @@ const ChallengeTab = () => {
               </View>
             ) : (
               <RowScrollContainer gap={8}>
-                {listData.invited_challenges?.map(
-                  (challenge: ChallengeInfo) => {
-                    const leftDay = calculateDaysUntil(challenge.START_DT);
-                    return (
-                      <Pressable
-                        key={challenge.CHALLENGE_MST_NO}
-                        onPress={() =>
-                          showModal(
-                            <ChallengeListModal
-                              count_challenge={
-                                listData.progress_challenges?.length
-                              }
-                              challenge_mst_no={challenge.CHALLENGE_MST_NO}
-                            />,
-                          )
-                        }>
-                        <ChallengeSubInfo
-                          headerEmoji={challenge.HEADER_EMOJI}
-                          mainText={challenge.CHALLENGE_MST_NM}
-                          subText={
-                            leftDay === 0 ? '내일시작' : `${leftDay}일 뒤 시작`
-                          }
-                        />
-                      </Pressable>
-                    );
-                  },
-                )}
+                {listData.invited_challenges?.map((challenge: any) => {
+                  const leftDay = calculateDaysUntil(challenge.START_DT);
+                  return (
+                    <Pressable
+                      key={challenge.CHALLENGE_MST_NO}
+                      onPress={() =>
+                        showModal(
+                          <ChallengeListModal
+                            count_challenge={
+                              listData.progress_challenges?.length
+                            }
+                            challenge_mst_no={challenge.CHALLENGE_MST_NO}
+                          />,
+                        )
+                      }>
+                      <ChallengeSubInfo
+                        headerEmoji={challenge.HEADER_EMOJI}
+                        mainText={challenge.CHALLENGE_MST_NM}
+                        subText={
+                          leftDay === 0 ? '내일시작' : `${leftDay}일 뒤 시작`
+                        }
+                      />
+                    </Pressable>
+                  );
+                })}
               </RowScrollContainer>
             )}
 
@@ -692,7 +551,7 @@ const ChallengeTab = () => {
         <TopContainer>
           <NotoSansKR size={16}>진행중인 챌린지</NotoSansKR>
           <RowScrollContainer gap={8}>
-            {listData.progress_challenges?.map((challenge: ChallengeInfo) => (
+            {listData.progress_challenges?.map((challenge: any) => (
               <Pressable
                 key={challenge.CHALLENGE_MST_NO}
                 onLongPress={() => {
@@ -726,7 +585,7 @@ const ChallengeTab = () => {
 
           <NotoSansKR size={16}>초대된 챌린지</NotoSansKR>
           <RowScrollContainer gap={8}>
-            {listData.invited_challenges?.map((challenge: ChallengeInfo) => {
+            {listData.invited_challenges?.map((challenge: any) => {
               const leftDay = calculateDaysUntil(challenge.START_DT);
               return (
                 <Pressable
@@ -775,7 +634,7 @@ const ChallengeTab = () => {
         {detailData?.CHALLENGE_STATUS === ChallengeStatusType.PROGRESS ? (
           <>
             <CenterContainer style={{flexGrow: 1}}>
-              <RowContainer seperate>
+              <RowContainer>
                 <NotoSansKR size={18}>오늘 할 일 목록</NotoSansKR>
                 <MaterialIcons
                   name="restore"
@@ -837,7 +696,7 @@ const ChallengeTab = () => {
             </CenterContainer>
             {detailData?.additionalGoal.length !== 0 ? (
               <FootContainer>
-                <RowContainer seperate>
+                <RowContainer separate>
                   <NotoSansKR size={18} color="white">
                     개인 미션
                   </NotoSansKR>
@@ -855,7 +714,7 @@ const ChallengeTab = () => {
               </FootContainer>
             ) : (
               <FootContainer disalbed>
-                <RowContainer seperate>
+                <RowContainer separate>
                   <NotoSansKR size={18} color="white">
                     개인 미션
                   </NotoSansKR>
@@ -894,3 +753,213 @@ const ChallengeTab = () => {
 };
 
 export default ChallengeTab;
+
+/* ---------- Profile 원본: styled.View ------------------------------------ */
+const profileStyle = StyleSheet.create({
+  box: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+const Profile: React.FC<React.PropsWithChildren<{style?: ViewStyle}>> = ({
+  children,
+  style,
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      style={[profileStyle.box, {backgroundColor: theme.secondary2}, style]}>
+      {children}
+    </View>
+  );
+};
+
+/* ---------- TodoTitle 원본: styled(NotoSansKR) --------------------------- */
+const TodoTitle: React.FC<
+  React.ComponentProps<typeof NotoSansKR> & {style?: TextStyle}
+> = ({children, style, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <NotoSansKR
+      {...rest}
+      style={[
+        {
+          textDecorationLine: 'line-through',
+          color: theme.gray4,
+          backgroundColor: theme.gray7,
+        },
+        style,
+      ]}>
+      {children}
+    </NotoSansKR>
+  );
+};
+
+/* ---------- GoalContainer 원본: styled.TouchableOpacity ------------------ */
+interface GoalContainerProps
+  extends React.ComponentProps<typeof TouchableOpacity> {
+  bc: string;
+  border: string;
+}
+const goalContainerStyle = StyleSheet.create({
+  base: {borderRadius: 10, borderWidth: 2, padding: 12},
+});
+const GoalContainer: React.FC<GoalContainerProps> = ({
+  bc,
+  border,
+  style,
+  children,
+  ...rest
+}) => (
+  <TouchableOpacity
+    style={[
+      goalContainerStyle.base,
+      {backgroundColor: bc, borderColor: border},
+      style,
+    ]}
+    {...rest}>
+    {children}
+  </TouchableOpacity>
+);
+
+/* ---------- ChallengeInfo / ChallengeSubInfo ---------------------------- */
+interface ChallengeInfoType {
+  mainText: string;
+  subText: string;
+  headerEmoji: string;
+  isSelected?: boolean;
+}
+const infoStyle = StyleSheet.create({
+  big: {
+    width: 122,
+    height: 154,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: 'white',
+    marginVertical: 8,
+    justifyContent: 'space-between',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 2, height: 2},
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
+      android: {elevation: 3},
+    }),
+  },
+  small: {
+    width: 108,
+    height: 144,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: 'white',
+    marginVertical: 8,
+    gap: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 2, height: 2},
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
+      android: {elevation: 3},
+    }),
+  },
+});
+const ChallengeInfo: React.FC<ChallengeInfoType> = ({
+  mainText,
+  subText,
+  headerEmoji,
+  isSelected,
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      style={[
+        infoStyle.big,
+        {
+          borderWidth: 2,
+          borderColor: isSelected ? theme.primary1 : theme.white,
+        },
+      ]}>
+      <Profile>
+        <TossFace size={22}>{headerEmoji}</TossFace>
+      </Profile>
+      <View style={{gap: 8}}>
+        <NotoSansKR size={14}>{mainText}</NotoSansKR>
+        <NotoSansKR size={11} color="gray5">
+          {subText}
+        </NotoSansKR>
+      </View>
+    </View>
+  );
+};
+const ChallengeSubInfo: React.FC<ChallengeInfoType> = ({
+  mainText,
+  subText,
+  headerEmoji,
+}) => (
+  <View style={infoStyle.small}>
+    <Profile>
+      <TossFace size={20}>{headerEmoji}</TossFace>
+    </Profile>
+    <View style={{gap: 4}}>
+      <NotoSansKR size={14}>{mainText}</NotoSansKR>
+      <NotoSansKR size={10} color="gray5">
+        {subText}
+      </NotoSansKR>
+    </View>
+  </View>
+);
+
+/* ---------- Top / Center / Foot Container ------------------------------ */
+const layoutStyle = StyleSheet.create({
+  top: {gap: 8, padding: 16},
+  center: {paddingHorizontal: 16, gap: 16},
+  foot: {gap: 16, padding: 16},
+});
+const TopContainer: React.FC<React.ComponentProps<typeof View>> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      style={[layoutStyle.top, {backgroundColor: theme.primary2}, style]}
+      {...rest}>
+      {children}
+    </View>
+  );
+};
+const CenterContainer: React.FC<React.ComponentProps<typeof View>> = ({
+  style,
+  children,
+  ...rest
+}) => (
+  <View style={[layoutStyle.center, style]} {...rest}>
+    {children}
+  </View>
+);
+const FootContainer: React.FC<
+  React.ComponentProps<typeof View> & {disalbed?: boolean}
+> = ({disalbed, style, children, ...rest}) => {
+  const {theme} = useTheme();
+  return (
+    <View
+      style={[
+        layoutStyle.foot,
+        {backgroundColor: disalbed ? theme.gray5 : theme.gray1},
+        style,
+      ]}
+      {...rest}>
+      {children}
+    </View>
+  );
+};

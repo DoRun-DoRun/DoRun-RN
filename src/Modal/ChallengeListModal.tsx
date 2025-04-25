@@ -1,30 +1,22 @@
 import React from 'react';
-import {View} from 'react-native';
+import {StyleSheet, View, ViewProps} from 'react-native';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
-import styled from 'styled-components/native';
 import {InviteAcceptType} from '../../store/data';
 import {RootState} from '../../store/RootReducer';
 import {
   ButtonComponent,
-  LoadingIndicatior,
+  LoadingIndicator,
   NotoSansKR,
   RowContainer,
   TossFace,
-  convertUTCToKoKRDay,
-  useApi,
 } from '../Component';
+import {convertUTCToKoKRDay, useApi} from '../Hook/hook';
+import {useTheme} from '../theme/ThemeProvider';
 import {ModalHeadText} from './CustomModal';
 import {useModal} from './ModalProvider';
 
-const ChallengeTimeBox = styled.View`
-  border-radius: 100px;
-  border: 1px solid ${props => props.theme.gray5};
-  padding: 8px;
-  align-items: center;
-  justify-content: center;
-`;
 const StatusComponent = ({
   username,
   status,
@@ -33,7 +25,7 @@ const StatusComponent = ({
   status?: Boolean | null;
 }) => {
   return (
-    <RowContainer seperate>
+    <RowContainer separate>
       <NotoSansKR size={16} weight="Medium">
         {username}
       </NotoSansKR>
@@ -112,7 +104,7 @@ export const ChallengeListModal = ({
   );
 
   if (isLoading) {
-    return <LoadingIndicatior />;
+    return <LoadingIndicator />;
   }
   return (
     <View style={{gap: 24}}>
@@ -199,3 +191,27 @@ export const ChallengeListModal = ({
 //     </HomeContainer>
 //   );
 // };
+
+export const ChallengeTimeBox: React.FC<ViewProps> = ({
+  style,
+  children,
+  ...rest
+}) => {
+  const {theme} = useTheme();
+
+  return (
+    <View style={[styles.box, {borderColor: theme.gray5}, style]} {...rest}>
+      {children}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  box: {
+    borderRadius: 100,
+    borderWidth: 1,
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

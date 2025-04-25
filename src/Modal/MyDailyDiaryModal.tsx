@@ -33,7 +33,7 @@ export const MyDailyDrayModal = ({
   challenge_user_no: number;
   personGoal: goalType[];
 }) => {
-  const theme = useTheme();
+  const {theme} = useTheme();
   const queryClient = useQueryClient();
   const CallApi = useApi();
   const {

@@ -8,13 +8,14 @@ import Toast, {
 } from 'react-native-toast-message';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {Provider as StoreProvider} from 'react-redux';
-import {ThemeProvider} from 'styled-components/native';
 import {name as appName} from './app.json';
 import App from './src/App';
 import CustomModal from './src/Modal/CustomModal';
 import {ModalProvider} from './src/Modal/ModalProvider';
-import {light} from './src/style/theme';
+import {ThemeProvider} from './src/theme/ThemeProvider';
+import {light} from './src/theme/palette';
 import {Store} from './store/Store';
+
 // import CodePush from 'react-native-code-push';
 // import 'core-js/stable/atob';
 
@@ -81,7 +82,7 @@ function Main() {
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider store={Store}>
-        <ThemeProvider theme={light}>
+        <ThemeProvider value={light}>
           <ModalProvider>
             <NavigationContainer>
               <App />
