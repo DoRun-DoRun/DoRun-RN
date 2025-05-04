@@ -2,6 +2,14 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "assets/fonts/MaterialCommunityIcons.ttf",
+      "sha1": "4c2a838b00dbb5e8bb1b368fce0de534e8eb241c"
+    },
+    {
+      "path": "assets/fonts/MaterialIcons.ttf",
+      "sha1": "7e02c3f005532ff4d24148567c84089756a7848a"
+    },
+    {
       "path": "assets/fonts/NotoSansKR-Black.ttf",
       "sha1": "2d18c106a455edbcb9dada71387511376f548b74"
     },
@@ -36,6 +44,10 @@
     {
       "path": "assets/fonts/NotoSansKR-Thin.ttf",
       "sha1": "73b8f0bf8a839f3ac8d74dbf8d69e9836b78697c"
+    },
+    {
+      "path": "assets/fonts/Octicons.ttf",
+      "sha1": "56acefc0731f35ee23b195b1c8cb5fa94a0db97b"
     },
     {
       "path": "assets/fonts/TossFaceFontMac.ttf",

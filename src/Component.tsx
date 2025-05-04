@@ -96,13 +96,18 @@ export const TossFace: React.FC<
 > = ({size, weight = 'Bold', color, border, style, ...rest}) => {
   const {theme} = useTheme();
 
+  const fontFamily = Platform.select({
+    ios: 'TossFaceFontMac',
+    android: 'Toss Face Font Mac',
+  });
+
   return (
-    <TextInput
+    <Text
       placeholderTextColor={theme.gray4}
       style={[
         {
           fontSize: size,
-          fontFamily: `TossFaceFontMac`,
+          fontFamily,
           color: '#000',
           padding: border ? 8 : 0,
           borderBottomWidth: border ? StyleSheet.hairlineWidth : 0,

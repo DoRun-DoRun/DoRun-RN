@@ -581,6 +581,7 @@ const styles = StyleSheet.create({
     top: 80,
     right: 16,
     flexDirection: 'column',
+    gap: 16,
     // gap not supported in core RN; add spacing via child styles or.Wrap children with margin.
   },
 });
