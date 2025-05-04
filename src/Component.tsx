@@ -81,8 +81,8 @@ export const InputNotoSansKR: React.FC<
           color: resolved,
           padding: border ? 8 : 0,
           borderBottomWidth: border ? StyleSheet.hairlineWidth : 0,
-          lineHeight: Platform.select({ios: 0, android: size * 1.7}),
-          ...(Platform.OS === 'android' && {includeFontPadding: false}),
+          lineHeight: size * 1.5,
+          includeFontPadding: false,
         },
         style,
       ]}
@@ -202,9 +202,11 @@ export const ScrollContainer = React.forwardRef<ScrollView, ScrollViewProps>(
 /* ---------- Button ------------------------------------------------------- */
 export interface ButtonProps {
   children: React.ReactNode;
-  type?: 'primary' | 'secondary' | 'gray' | 'black';
+  type?: 'primary' | 'secondary' | 'gray' | 'black' | 'danger';
   onPress?: () => void;
   disabled?: boolean;
+  invert?: boolean;
+  style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
 }
 
 export const ButtonComponent: React.FC<ButtonProps> = ({
@@ -212,13 +214,13 @@ export const ButtonComponent: React.FC<ButtonProps> = ({
   type = 'primary',
   onPress,
   disabled,
+  invert,
+  style,
 }) => {
   const {theme} = useTheme();
 
-  /* 색상 매핑 */
   let fg: keyof Palette | string = 'white';
   let bg = theme.primary1;
-
   if (type === 'secondary') {
     fg = 'gray4';
     bg = theme.white;
@@ -228,11 +230,26 @@ export const ButtonComponent: React.FC<ButtonProps> = ({
   } else if (type === 'black') {
     fg = 'black';
     bg = theme.white;
+  } else if (type === 'danger') {
+    fg = 'white';
+    bg = theme.red;
   }
   if (disabled) {
     fg = 'white';
     bg = theme.gray4;
   }
+
+  if (invert) {
+    [fg, bg] = [bg, fg];
+  }
+
+  const gradientColors = (() => {
+    if (type === 'primary' && !disabled) {
+      return invert ? [bg, bg] : ['#1727C3', '#6377F1', '#9EB7F6'];
+    }
+
+    return [bg, bg];
+  })();
 
   return (
     <Pressable
@@ -243,17 +260,20 @@ export const ButtonComponent: React.FC<ButtonProps> = ({
       }
       disabled={disabled}
       onPress={onPress}
-      style={{borderRadius: 10}}>
+      style={[{borderRadius: 10, overflow: 'hidden'}, style]}>
       <LinearGradient
-        colors={
-          type === 'primary' && !disabled
-            ? ['#1727C3', '#6377F1', '#9EB7F6']
-            : [bg, bg]
-        }
+        colors={gradientColors}
         start={{x: 1.27, y: 4.29}}
         end={{x: -0.19, y: -2.08}}
-        style={{padding: 8, alignItems: 'center', borderRadius: 10}}>
-        <NotoSansKR size={16} lineHeight={23} color={fg}>
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 10,
+        }}>
+        <NotoSansKR
+          size={16}
+          color={fg}
+          style={{paddingVertical: 12, paddingHorizontal: 24}}>
           {children}
         </NotoSansKR>
       </LinearGradient>

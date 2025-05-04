@@ -634,13 +634,12 @@ const ChallengeTab = () => {
         {detailData?.CHALLENGE_STATUS === ChallengeStatusType.PROGRESS ? (
           <>
             <CenterContainer style={{flexGrow: 1}}>
-              <RowContainer>
+              <RowContainer separate>
                 <NotoSansKR size={18}>오늘 할 일 목록</NotoSansKR>
                 <MaterialIcons
                   name="restore"
                   size={24}
                   color={'black'}
-                  style={{paddingLeft: 16}}
                   onPress={() => {
                     Toast.show({
                       type: 'success',

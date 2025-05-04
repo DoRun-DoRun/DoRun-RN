@@ -33,6 +33,7 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: '#648CF3',
+        top: 32,
       }}
       text1Style={{
         fontSize: 14,

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/RootReducer';
@@ -47,26 +47,46 @@ export const PersonGoalEditModal = ({
             빈 값은 입력할 수 없어요!
           </NotoSansKR>
         )}
-        <SearchContainer gap={8}>
-          <MaterialCommunityIcons
-            name="text-box-check-outline"
-            size={24}
-            color={theme.primary1}
-          />
-          <InputNotoSansKR
-            maxLength={20}
-            style={{flex: 1}}
-            size={16}
-            value={inputText}
-            placeholder="수정할 목표를 입력해주세요."
-            onChangeText={setInputText}
-          />
-        </SearchContainer>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
+          <SearchContainer gap={8}>
+            <MaterialCommunityIcons
+              name="text-box-check-outline"
+              size={24}
+              color={theme.primary1}
+            />
+            <InputNotoSansKR
+              style={{flex: 1}}
+              maxLength={20}
+              size={16}
+              value={inputText}
+              placeholder="수정할 목표를 입력해주세요."
+              onChangeText={setInputText}
+            />
+          </SearchContainer>
+        </ScrollView>
       </View>
 
-      <View style={{gap: 8}}>
+      <RowContainer gap={8} separate>
         <ButtonComponent
-          type="black"
+          style={{flex: 1}}
+          type="danger"
+          onPress={() => {
+            dispatch(
+              removeGoal({
+                type: SIGN_TYPE!,
+                goalId: id,
+                challenge_mst_no: challenge_mst_no,
+              }),
+            );
+            hideModal();
+          }}>
+          삭제하기
+        </ButtonComponent>
+        <ButtonComponent
+          style={{flex: 1}}
+          type="primary"
           onPress={() => {
             if (inputText.trim().length === 0) {
               setIsError(true);
@@ -84,21 +104,7 @@ export const PersonGoalEditModal = ({
           }}>
           수정하기
         </ButtonComponent>
-        <ButtonComponent
-          type="black"
-          onPress={() => {
-            dispatch(
-              removeGoal({
-                type: SIGN_TYPE!,
-                goalId: id,
-                challenge_mst_no: challenge_mst_no,
-              }),
-            );
-            hideModal();
-          }}>
-          삭제하기
-        </ButtonComponent>
-      </View>
+      </RowContainer>
     </View>
   );
 };
@@ -126,25 +132,36 @@ export const PersonGoalAddModal = ({
             빈 값은 입력할 수 없어요!
           </NotoSansKR>
         )}
-        <SearchContainer gap={8}>
-          <MaterialCommunityIcons
-            name="text-box-check-outline"
-            size={24}
-            color={theme.primary1}
-          />
-          <InputNotoSansKR
-            maxLength={20}
-            style={{flex: 1}}
-            size={16}
-            value={inputText}
-            placeholder="오늘 할 일은 무엇인가요?"
-            onChangeText={setInputText}
-          />
-        </SearchContainer>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
+          <SearchContainer gap={8}>
+            <MaterialCommunityIcons
+              name="text-box-check-outline"
+              size={24}
+              color={theme.primary1}
+            />
+            <InputNotoSansKR
+              style={{flex: 1}}
+              maxLength={20}
+              size={16}
+              value={inputText}
+              placeholder="오늘 할 일은 무엇인가요?"
+              onChangeText={setInputText}
+            />
+          </SearchContainer>
+        </ScrollView>
       </View>
-      <View style={{gap: 8}}>
+      <RowContainer gap={8} separate>
         <ButtonComponent
+          style={{flex: 1}}
           type="black"
+          onPress={() => hideModal()}>
+          취소하기
+        </ButtonComponent>
+        <ButtonComponent
+          style={{flex: 1}}
+          type="primary"
           onPress={() => {
             if (inputText.trim().length === 0) {
               setIsError(true);
@@ -164,14 +181,7 @@ export const PersonGoalAddModal = ({
           }}>
           생성하기
         </ButtonComponent>
-        <ButtonComponent
-          type="black"
-          onPress={() => {
-            hideModal();
-          }}>
-          취소하기
-        </ButtonComponent>
-      </View>
+      </RowContainer>
     </View>
   );
 };
