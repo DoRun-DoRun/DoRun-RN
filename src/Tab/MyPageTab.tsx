@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React, {useState} from 'react';
 import {
   Dimensions,
@@ -11,7 +12,6 @@ import {
   ViewProps,
 } from 'react-native';
 import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars';
-import {Direction} from 'react-native-calendars/src/types';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useQuery} from 'react-query';
@@ -29,7 +29,6 @@ import {
 } from '../Component';
 import {
   convertKoKRToUTC,
-  formatDate,
   formatDateToYYYYMM,
   GetImage,
   useApi,
@@ -50,18 +49,10 @@ interface EmojiDataType {
 const History = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
-  const currentDate = new Date();
-  const formattedDate = currentDate
-    .toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/\. /g, '-')
-    .replace('.', '');
+  const today = dayjs().format('YYYY-MM-DD');
+  const [date, setDate] = useState(today);
 
   const {theme} = useTheme();
-  const [date, setDate] = useState(formattedDate);
   const [index, setIndex] = useState(1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [disabledRight, setDisabledRight] = useState(false);
@@ -89,42 +80,17 @@ const History = () => {
 
   return (
     <>
-      <CalendarProvider
-        date={date}
-        // onMonthChange={e =>
-        //   e.month > currentDate.getMonth() + 1
-        //     ? setDisabledRight(false)
-        //     : setDisabledRight(true)
-        // }
-      >
+      <CalendarProvider date={date}>
         <ExpandableCalendar
           renderHeader={(dateString: string) => (
             <NotoSansKR size={16}>{formatDateToYYYYMM(dateString)}</NotoSansKR>
           )}
-          style={{borderRadius: 10, padding: 10}}
-          renderArrow={(direction: Direction) =>
-            direction === 'left' ? (
-              <MaterialIcons
-                name="arrow-back"
-                size={20}
-                color={theme.primary1}
-              />
-            ) : !disabledRight ? (
-              <MaterialIcons
-                name="arrow-forward"
-                size={20}
-                color={theme.primary1}
-              />
-            ) : (
-              <View style={{width: 20}} />
-            )
-          }
-          disableArrowRight={disabledRight}
+          style={{borderRadius: 10}}
+          calendarWidth={width - 32}
           monthFormat="yy년 MM월"
-          calendarWidth={width - 52}
           allowShadow
           onDayPress={e => setDate(e.dateString)}
-          maxDate={formatDate(new Date())}
+          maxDate={dayjs().add(1, 'day').format('YYYY-MM-DD')}
         />
       </CalendarProvider>
 
@@ -287,7 +253,7 @@ const MyPageTab = () => {
                 />
               </UserIcon>
 
-              <View style={{flex: 1}}>
+              <View>
                 <UserName size={16}>{userName}</UserName>
                 <RowContainer gap={16}>
                   <UserStats status="완료" count={data.COMPLETE} />
@@ -585,6 +551,8 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingRight: 36,
     borderRadius: 10,
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   userIcon: {
     width: 80,
