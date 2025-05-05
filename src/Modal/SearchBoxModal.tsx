@@ -276,14 +276,18 @@ export const ExpandedContainer: React.FC<ViewProps> = ({
 /** ─── StyleSheet 정의 ──────────────────────────────────────────────── */
 const styles = StyleSheet.create({
   searchContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#eeeeee',
     borderRadius: 10,
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     // gap 및 zIndex 등 추가 스타일이 필요하면 여기서 다룹니다.
   },
   expandedContainer: {
     backgroundColor: '#fff',
-    padding: 8,
-    marginTop: 8,
+    padding: 16,
+    marginTop: 12,
+    borderRadius: 10,
     // gap: 16,  // React Native (core) 에서는 gap 속성을 지원하지 않습니다.
     // 필요 시 자식 View마다 margin을 지정하세요.
   },

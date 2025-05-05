@@ -101,7 +101,7 @@ const GoalBox: React.FC<GoalBoxProps> = ({goal, challenge_mst_no}) => {
       }
       bc={backgroundColor}
       border={borderColor}>
-      <RowContainer>
+      <RowContainer separate>
         <RowContainer gap={8}>
           <OcticonIcons name="check-circle-fill" size={24} color={iconColor} />
           {goal.isComplete ? (
