@@ -14,7 +14,7 @@ import CustomModal from './src/Modal/CustomModal';
 import {ModalProvider} from './src/Modal/ModalProvider';
 import {ThemeProvider} from './src/theme/ThemeProvider';
 import {light} from './src/theme/palette';
-import {Store} from './store/Store';
+import {store} from './store/Store';
 
 // import CodePush from 'react-native-code-push';
 // import 'core-js/stable/atob';
@@ -82,7 +82,7 @@ const toastConfig = {
 function Main() {
   return (
     <QueryClientProvider client={queryClient}>
-      <StoreProvider store={Store}>
+      <StoreProvider store={store}>
         <ThemeProvider value={light}>
           <ModalProvider>
             <NavigationContainer>

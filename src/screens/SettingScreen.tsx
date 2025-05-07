@@ -1,277 +1,277 @@
-// import {Slider} from '@miblanchard/react-native-slider';
-// import {CommonActions, useNavigation} from '@react-navigation/native';
-// import React from 'react';
-// import {Alert, View} from 'react-native';
-// import {useMutation, useQuery} from 'react-query';
-// import {useDispatch, useSelector} from 'react-redux';
-// import {useTheme} from 'styled-components/native';
-// import {RootState} from '../../store/RootReducer';
-// import {setVolume} from '../../store/slice/SettingSlice';
-// import {logOut, signOut} from '../../store/slice/UserSlice';
-// import {
-//   ButtonComponent,
-//   HomeContainer,
-//   InnerContainer,
-//   LoadingIndicator,
-//   NotoSansKR,
-//   RowContainer,
-// } from '../Component';
-// import {useApi} from '../Hook/hook';
+import {Slider} from '@miblanchard/react-native-slider';
+import {CommonActions, useNavigation} from '@react-navigation/native';
+import React from 'react';
+import {Alert, View} from 'react-native';
+import {useMutation, useQuery} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../store/RootReducer';
+import {setVolume} from '../../store/slice/SettingSlice';
+import {logOut, signOut} from '../../store/slice/UserSlice';
+import {
+  ButtonComponent,
+  HomeContainer,
+  InnerContainer,
+  LoadingIndicator,
+  NotoSansKR,
+  RowContainer,
+} from '../Component';
+import {useApi} from '../Hook/hook';
+import {useTheme} from '../theme/ThemeProvider';
 
-// const SettingScreen = () => {
-//   // const [pushAlarm, setPushAlarm] = useState(true);
-//   // const [marketingAlarm, setMarketingAlarm] = useState(true);
-//   // const [nightAlarm, setNightAlarm] = useState(true);
-//   // const [soundEffect, setSoundEffect] = useState(100);
+const SettingScreen = () => {
+  // const [pushAlarm, setPushAlarm] = useState(true);
+  // const [marketingAlarm, setMarketingAlarm] = useState(true);
+  // const [nightAlarm, setNightAlarm] = useState(true);
+  // const [soundEffect, setSoundEffect] = useState(100);
 
-//   const {volume} = useSelector((state: RootState) => state.setting);
+  const {volume} = useSelector((state: RootState) => state.setting);
 
-//   const dispatch = useDispatch();
-//   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-//   const CallApi = useApi();
-//   const {accessToken, SIGN_TYPE} = useSelector(
-//     (state: RootState) => state.user,
-//   );
+  const CallApi = useApi();
+  const {accessToken, SIGN_TYPE} = useSelector(
+    (state: RootState) => state.user,
+  );
 
-//   const UserDataSetting = async () => {
-//     try {
-//       const response = CallApi({
-//         endpoint: 'user/setting',
-//         method: 'GET',
-//         accessToken: accessToken!,
-//       });
-//       return response;
-//     } catch (err) {
-//       console.log(err);
-//       throw err;
-//     }
-//   };
-//   const {data, isLoading} = useQuery('UserDataSetting', UserDataSetting);
+  const UserDataSetting = async () => {
+    try {
+      const response = CallApi({
+        endpoint: 'user/setting',
+        method: 'GET',
+        accessToken: accessToken!,
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+  const {data, isLoading} = useQuery('UserDataSetting', UserDataSetting);
 
-//   const deleteUser = () =>
-//     CallApi({
-//       endpoint: 'user',
-//       method: 'DELETE',
-//       accessToken: accessToken!,
-//     });
+  const deleteUser = () =>
+    CallApi({
+      endpoint: 'user',
+      method: 'DELETE',
+      accessToken: accessToken!,
+    });
 
-//   const {mutate} = useMutation(deleteUser, {
-//     onSuccess: () => {
-//       dispatch(signOut({SIGN_TYPE: SIGN_TYPE}));
-//       navigation.dispatch(
-//         CommonActions.reset({
-//           index: 0,
-//           routes: [{name: 'LoginTab'}],
-//         }),
-//       );
-//     },
-//     onError: error => {
-//       console.error('Error:', error);
-//     },
-//   });
+  const {mutate} = useMutation(deleteUser, {
+    onSuccess: () => {
+      dispatch(signOut({SIGN_TYPE: SIGN_TYPE}));
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'LoginTab'}],
+        }),
+      );
+    },
+    onError: error => {
+      console.error('Error:', error);
+    },
+  });
 
-//   if (isLoading) {
-//     return <LoadingIndicator />;
-//   }
-//   // const OnPushAlarmToggle = () => {
-//   //   setPushAlarm(!pushAlarm);
-//   // };
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
+  // const OnPushAlarmToggle = () => {
+  //   setPushAlarm(!pushAlarm);
+  // };
 
-//   // const OnMarketingAlarmToggle = () => {
-//   //   setMarketingAlarm(!marketingAlarm);
-//   // };
+  // const OnMarketingAlarmToggle = () => {
+  //   setMarketingAlarm(!marketingAlarm);
+  // };
 
-//   // const OnNightAlarmToggle = () => {
-//   //   setNightAlarm(!nightAlarm);
-//   // };
+  // const OnNightAlarmToggle = () => {
+  //   setNightAlarm(!nightAlarm);
+  // };
 
-//   return (
-//     <HomeContainer>
-//       <InnerContainer>
-//         <View style={{gap: 36}}>
-//           <NotoSansKR size={20}>환경 설정</NotoSansKR>
+  return (
+    <HomeContainer>
+      <InnerContainer>
+        <View style={{gap: 36}}>
+          <NotoSansKR size={20}>환경 설정</NotoSansKR>
 
-//           {/* <View style={{gap: 8}}>
-//             <ToggleComponent isOn={pushAlarm} onToggle={OnPushAlarmToggle}>
-//               푸시 알람
-//             </ToggleComponent>
-//             <ToggleComponent
-//               isOn={marketingAlarm}
-//               onToggle={OnMarketingAlarmToggle}>
-//               마케팅 푸시 알람
-//             </ToggleComponent>
-//             <ToggleComponent isOn={nightAlarm} onToggle={OnNightAlarmToggle}>
-//               23시 ~ 09시 푸시 알람
-//             </ToggleComponent>
-//           </View> */}
+          {/* <View style={{gap: 8}}>
+            <ToggleComponent isOn={pushAlarm} onToggle={OnPushAlarmToggle}>
+              푸시 알람
+            </ToggleComponent>
+            <ToggleComponent
+              isOn={marketingAlarm}
+              onToggle={OnMarketingAlarmToggle}>
+              마케팅 푸시 알람
+            </ToggleComponent>
+            <ToggleComponent isOn={nightAlarm} onToggle={OnNightAlarmToggle}>
+              23시 ~ 09시 푸시 알람
+            </ToggleComponent>
+          </View> */}
 
-//           <View style={{gap: 8}}>
-//             {/* <SliderComponent
-//               sliderValue={soundEffect}
-//               setSliderValue={setSoundEffect}>
-//               효과음
-//             </SliderComponent> */}
-//             <SliderComponent
-//               sliderValue={volume}
-//               setSliderValue={e => dispatch(setVolume({volume: e}))}>
-//               배경음악
-//             </SliderComponent>
-//           </View>
+          <View style={{gap: 8}}>
+            {/* <SliderComponent
+              sliderValue={soundEffect}
+              setSliderValue={setSoundEffect}>
+              효과음
+            </SliderComponent> */}
+            <SliderComponent
+              sliderValue={volume}
+              setSliderValue={e => dispatch(setVolume(e))}>
+              배경음악
+            </SliderComponent>
+          </View>
 
-//           <View style={{gap: 8}}>
-//             <RowContainer separate>
-//               <NotoSansKR size={16} weight="Medium">
-//                 소셜 로그인 정보
-//               </NotoSansKR>
-//               <NotoSansKR size={16} weight="Medium">
-//                 {data.SIGN_TYPE}
-//               </NotoSansKR>
-//             </RowContainer>
-//             <RowContainer separate>
-//               <NotoSansKR size={16} weight="Medium">
-//                 UID
-//               </NotoSansKR>
-//               <NotoSansKR size={16} weight="Medium">
-//                 {data.UID}
-//               </NotoSansKR>
-//             </RowContainer>
-//           </View>
-//         </View>
-//       </InnerContainer>
-//       <View style={{gap: 8, padding: 16}}>
-//         <ButtonComponent
-//           onPress={() => {
-//             dispatch(logOut());
-//             navigation.dispatch(
-//               CommonActions.reset({
-//                 index: 0,
-//                 routes: [{name: 'LoginTab'}],
-//               }),
-//             );
-//           }}>
-//           로그아웃
-//         </ButtonComponent>
-//         <ButtonComponent
-//           type="secondary"
-//           onPress={() => {
-//             Alert.alert(
-//               '계정을 삭제하시겠습니까?', // 대화상자 제목
-//               '', // 메시지
-//               [
-//                 {
-//                   text: '취소',
-//                   style: 'cancel',
-//                 },
-//                 {
-//                   text: '삭제하기',
-//                   onPress: () => {
-//                     mutate();
-//                   },
-//                   style: 'destructive',
-//                 },
-//               ],
-//             );
-//           }}>
-//           계정 삭제
-//         </ButtonComponent>
-//       </View>
-//     </HomeContainer>
-//   );
-// };
+          <View style={{gap: 8}}>
+            <RowContainer separate>
+              <NotoSansKR size={16} weight="Medium">
+                소셜 로그인 정보
+              </NotoSansKR>
+              <NotoSansKR size={16} weight="Medium">
+                {data.SIGN_TYPE}
+              </NotoSansKR>
+            </RowContainer>
+            <RowContainer separate>
+              <NotoSansKR size={16} weight="Medium">
+                UID
+              </NotoSansKR>
+              <NotoSansKR size={16} weight="Medium">
+                {data.UID}
+              </NotoSansKR>
+            </RowContainer>
+          </View>
+        </View>
+      </InnerContainer>
+      <View style={{gap: 8, padding: 16}}>
+        <ButtonComponent
+          onPress={() => {
+            dispatch(logOut());
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{name: 'LoginTab'}],
+              }),
+            );
+          }}>
+          로그아웃
+        </ButtonComponent>
+        <ButtonComponent
+          type="secondary"
+          onPress={() => {
+            Alert.alert(
+              '계정을 삭제하시겠습니까?', // 대화상자 제목
+              '', // 메시지
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                },
+                {
+                  text: '삭제하기',
+                  onPress: () => {
+                    mutate();
+                  },
+                  style: 'destructive',
+                },
+              ],
+            );
+          }}>
+          계정 삭제
+        </ButtonComponent>
+      </View>
+    </HomeContainer>
+  );
+};
 
-// // const ToggleWheel = styled(Animated.View)`
-// //   width: 20px;
-// //   height: 20px;
-// //   background-color: ${props => props.theme.white};
-// //   border-radius: 12.5px;
-// // `;
+// const ToggleWheel = styled(Animated.View)`
+//   width: 20px;
+//   height: 20px;
+//   background-color: ${props => props.theme.white};
+//   border-radius: 12.5px;
+// `;
 
-// // const Wrap = styled(View)`
-// //   flex-direction: row;
-// //   align-items: center;
-// // `;
+// const Wrap = styled(View)`
+//   flex-direction: row;
+//   align-items: center;
+// `;
 
-// // const ToggleFrame = styled(View)`
-// //   width: 48px;
-// //   height: 23px;
-// //   border-radius: 30px;
-// //   justify-content: center;
-// // `;
+// const ToggleFrame = styled(View)`
+//   width: 48px;
+//   height: 23px;
+//   border-radius: 30px;
+//   justify-content: center;
+// `;
 
-// // interface ToggleComponentType {
-// //   children: React.ReactNode;
-// //   isOn: Boolean;
-// //   onToggle: () => void;
-// // }
-
-// // const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
-// //   const {theme} = useTheme();
-
-// //   const aniValue = new Animated.Value(isOn ? 1 : 0);
-// //   const color = isOn ? theme.primary1 : theme.gray6;
-
-// //   const moveSwitchToggle = aniValue.interpolate({
-// //     inputRange: [0, 1],
-// //     outputRange: [0, 25],
-// //   });
-
-// //   Animated.timing(aniValue, {
-// //     toValue: isOn ? 1 : 0,
-// //     duration: 200,
-// //     easing: Easing.linear,
-// //     useNativeDriver: true,
-// //   }).start();
-
-// //   return (
-// //     <RowContainer separate>
-// //       <NotoSansKR size={16} weight="Medium">
-// //         {children}
-// //       </NotoSansKR>
-// //       <Wrap>
-// //         <Pressable onPress={onToggle} style={{marginVertical: 2.5}}>
-// //           <ToggleFrame style={{backgroundColor: color}}>
-// //             <ToggleWheel
-// //               style={[{transform: [{translateX: moveSwitchToggle}]}]}
-// //             />
-// //           </ToggleFrame>
-// //         </Pressable>
-// //       </Wrap>
-// //     </RowContainer>
-// //   );
-// // };
-
-// interface SliderComponentType {
+// interface ToggleComponentType {
 //   children: React.ReactNode;
-//   sliderValue: number;
-//   setSliderValue: (value: number) => void;
+//   isOn: Boolean;
+//   onToggle: () => void;
 // }
 
-// export const SliderComponent = ({
-//   children,
-//   sliderValue,
-//   setSliderValue,
-// }: SliderComponentType) => {
+// const ToggleComponent = ({children, isOn, onToggle}: ToggleComponentType) => {
 //   const {theme} = useTheme();
 
+//   const aniValue = new Animated.Value(isOn ? 1 : 0);
+//   const color = isOn ? theme.primary1 : theme.gray6;
+
+//   const moveSwitchToggle = aniValue.interpolate({
+//     inputRange: [0, 1],
+//     outputRange: [0, 25],
+//   });
+
+//   Animated.timing(aniValue, {
+//     toValue: isOn ? 1 : 0,
+//     duration: 200,
+//     easing: Easing.linear,
+//     useNativeDriver: true,
+//   }).start();
+
 //   return (
-//     <RowContainer>
-//       <View style={{width: 240}}>
-//         <NotoSansKR size={16} weight="Medium">
-//           {children}
-//         </NotoSansKR>
-//       </View>
-//       <View style={{flex: 1}}>
-//         <Slider
-//           value={sliderValue}
-//           minimumTrackTintColor={theme.primary1}
-//           maximumTrackTintColor={theme.primary2}
-//           thumbTintColor={theme.primary1}
-//           onValueChange={values => setSliderValue(values[0])}
-//         />
-//       </View>
+//     <RowContainer separate>
+//       <NotoSansKR size={16} weight="Medium">
+//         {children}
+//       </NotoSansKR>
+//       <Wrap>
+//         <Pressable onPress={onToggle} style={{marginVertical: 2.5}}>
+//           <ToggleFrame style={{backgroundColor: color}}>
+//             <ToggleWheel
+//               style={[{transform: [{translateX: moveSwitchToggle}]}]}
+//             />
+//           </ToggleFrame>
+//         </Pressable>
+//       </Wrap>
 //     </RowContainer>
 //   );
 // };
 
-// export default SettingScreen;
+interface SliderComponentType {
+  children: React.ReactNode;
+  sliderValue: number;
+  setSliderValue: (value: number) => void;
+}
+
+export const SliderComponent = ({
+  children,
+  sliderValue,
+  setSliderValue,
+}: SliderComponentType) => {
+  const {theme} = useTheme();
+
+  return (
+    <RowContainer>
+      <View style={{width: 240}}>
+        <NotoSansKR size={16} weight="Medium">
+          {children}
+        </NotoSansKR>
+      </View>
+      <View style={{flex: 1}}>
+        <Slider
+          value={sliderValue}
+          minimumTrackTintColor={theme.primary1}
+          maximumTrackTintColor={theme.primary2}
+          thumbTintColor={theme.primary1}
+          onValueChange={values => setSliderValue(values[0])}
+        />
+      </View>
+    </RowContainer>
+  );
+};
+
+export default SettingScreen;

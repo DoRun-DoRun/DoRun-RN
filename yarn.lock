@@ -324,7 +324,7 @@
     "@babel/helper-plugin-utils" "^7.18.6"
     "@babel/plugin-syntax-optional-catch-binding" "^7.8.3"
 
-"@babel/plugin-proposal-optional-chaining@^7.20.0":
+"@babel/plugin-proposal-optional-chaining@^7.20.0", "@babel/plugin-proposal-optional-chaining@^7.21.0":
   version "7.21.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.21.0.tgz#886f5c8978deb7d30f678b2e24346b287234d3ea"
   integrity sha512-p4zeefM72gpmEe2fkUr/OnOXpWEf8nAgk7ZYVqqfFiyIG7oFfVZcCrU64hWn5xp4tQ9LkV4bTIa5rD0KANpKNA==
@@ -6035,6 +6035,11 @@ react-native-toast-message@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.3.0.tgz#c25fb40d7af4388f6a798efbfca479d53916ed00"
   integrity sha512-d7LldTK1ei1Bl7RFhoOYw8hVQ4oKPQHORYI//xR9Pyz3HxSlFlvQbueE5X3KLoemRRgBrOUg3zY6DxXnxrVLRg==
+
+react-native-track-player@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-4.1.1.tgz#96f8688f270c5a01bc597b6331843b191402502b"
+  integrity sha512-E5N/eK/+HtAVJUAzXpm1cWz8ROheV9jb0TI6h2bM+333U+DWibTTnT2T1122FkCoXLXIYavtm2FR2if+5jH8cA==
 
 react-native-vector-icons@^10.2.0:
   version "10.2.0"

@@ -360,7 +360,7 @@ const BackgroundImage: React.FC<ImageBackgroundProps> = ({style, ...rest}) => (
   <ImageBackground
     {...rest}
     style={[styles.bgImage, style]}
-    resizeMode="contain"
+    resizeMode="cover"
   />
 );
 

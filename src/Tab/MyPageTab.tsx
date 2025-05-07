@@ -27,12 +27,8 @@ import {
   ScrollContainer,
   TossFace,
 } from '../Component';
-import {
-  convertKoKRToUTC,
-  formatDateToYYYYMM,
-  GetImage,
-  useApi,
-} from '../Hook/hook';
+import {convertKoKRToUTC, GetImage, useApi} from '../Hook/hook';
+import {Palette} from '../theme/palette';
 import {useTheme} from '../theme/ThemeProvider';
 
 interface PersonGoal {
@@ -46,22 +42,67 @@ interface EmojiDataType {
   EMOJI: string;
 }
 
+function HistoryCalendar({theme}: {theme: Palette}) {
+  const width = Dimensions.get('screen').width;
+  const today = dayjs();
+
+  const [selectedDate, setSelectedDate] = useState(today.format('YYYY-MM-DD'));
+  const [currentMonth, setCurrentMonth] = useState(
+    today.startOf('month').format('YYYY-MM-DD'),
+  );
+
+  const changeMonth = (offset: number) => {
+    const next = dayjs(currentMonth).add(offset, 'month');
+
+    if (next.isAfter(today, 'month')) return;
+    setCurrentMonth(next.format('YYYY-MM-DD'));
+  };
+
+  const handleDayPress = (day: {dateString: string}) => {
+    if (dayjs(day.dateString).isAfter(today, 'day')) return;
+    setSelectedDate(day.dateString);
+  };
+
+  return (
+    <CalendarProvider date={selectedDate}>
+      <ExpandableCalendar
+        renderHeader={d => (
+          <NotoSansKR size={16}>{dayjs(d).format('YY년 MM월')}</NotoSansKR>
+        )}
+        current={currentMonth}
+        onPressArrowLeft={() => changeMonth(-1)}
+        onPressArrowRight={() => changeMonth(1)}
+        disableArrowRight={dayjs(currentMonth).isSame(today, 'month')}
+        onDayPress={handleDayPress}
+        markedDates={{
+          [selectedDate]: {
+            selected: true,
+            selectedColor: theme.primary1,
+          },
+        }}
+        maxDate={today.format('YYYY-MM-DD')}
+        disableAllTouchEventsForDisabledDays={true}
+        style={{borderRadius: 10}}
+        calendarWidth={width - 32}
+        allowShadow
+      />
+    </CalendarProvider>
+  );
+}
+
 const History = () => {
   const {accessToken} = useSelector((state: RootState) => state.user);
   const CallApi = useApi();
   const today = dayjs().format('YYYY-MM-DD');
-  const [date, setDate] = useState(today);
 
   const {theme} = useTheme();
   const [index, setIndex] = useState(1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [disabledRight, setDisabledRight] = useState(false);
 
   const ChallengeHistory = async () => {
     try {
       const response = CallApi({
         endpoint: `challenge/history?current_day=${convertKoKRToUTC(
-          date,
+          today,
         ).toISOString()}&page=${index}`,
         method: 'GET',
         accessToken: accessToken!,
@@ -72,27 +113,13 @@ const History = () => {
     }
   };
   const {data, isLoading} = useQuery(
-    ['challenge_history', date, index],
+    ['challenge_history', today, index],
     ChallengeHistory,
   );
 
-  const width = Dimensions.get('screen').width;
-
   return (
     <>
-      <CalendarProvider date={date}>
-        <ExpandableCalendar
-          renderHeader={(dateString: string) => (
-            <NotoSansKR size={16}>{formatDateToYYYYMM(dateString)}</NotoSansKR>
-          )}
-          style={{borderRadius: 10}}
-          calendarWidth={width - 32}
-          monthFormat="yy년 MM월"
-          allowShadow
-          onDayPress={e => setDate(e.dateString)}
-          maxDate={dayjs().add(1, 'day').format('YYYY-MM-DD')}
-        />
-      </CalendarProvider>
+      <HistoryCalendar theme={theme} />
 
       {isLoading ? (
         <LoadingIndicator />
@@ -135,7 +162,7 @@ const History = () => {
             {data.COMMENT && (
               <DailyDiary colors={['#09277b', '#3967ef', '#9eb8f9']}>
                 <NotoSansKR color="white" size={16}>
-                  {date} 한줄일기
+                  {today} 한줄일기
                 </NotoSansKR>
                 <NotoSansKR color="white" size={14} weight="Regular">
                   {data.COMMENT}
@@ -463,7 +490,7 @@ export const Tab: React.FC<{selected?: boolean} & PressableProps> = ({
           backgroundColor: selected ? theme.primary2 : theme.gray7,
           opacity: pressed ? 0.8 : 1,
         },
-        // If style is a function, call it with { pressed }, else just use it
+
         typeof style === 'function' ? style({pressed}) : style,
       ]}>
       {children}
@@ -595,18 +622,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   categoryTab: {
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
   },
   tab: {
-    paddingVertical: 4,
+    paddingVertical: 8,
     paddingHorizontal: 24,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
   },
   historyDetailContainer: {
     paddingVertical: 16,
-    // gap: 32,
+    gap: 32,
   },
   dailyPicContainer: {
     alignItems: 'center',

@@ -43,6 +43,7 @@
     "react-native-share": "^12.0.9",
     "react-native-simple-modal": "^9.0.1",
     "react-native-toast-message": "^2.3.0",
+    "react-native-track-player": "^4.1.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-view-shot": "^4.0.3",
     "react-query": "^3.39.3",
@@ -55,6 +56,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
     "@react-native-community/cli": "18.0.0",

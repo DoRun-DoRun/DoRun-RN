@@ -1,7 +1,7 @@
 import {combineReducers} from '@reduxjs/toolkit';
 import ChallengeSlice from './slice/ChallengeSlice';
 import GoalSlice from './slice/GoalSlice';
-// import SettingSlice from './slice/SettingSlice';
+import SettingSlice from './slice/SettingSlice';
 import UserSlice from './slice/UserSlice';
 
 /**
@@ -11,7 +11,7 @@ const RootReducer = combineReducers({
   user: UserSlice,
   goal: GoalSlice,
   challenge: ChallengeSlice,
-  // setting: SettingSlice,
+  setting: SettingSlice,
 });
 
 export type RootState = ReturnType<typeof RootReducer>;

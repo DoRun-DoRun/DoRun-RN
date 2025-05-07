@@ -14,7 +14,6 @@ const challengeSlice = createSlice({
   reducers: {
     setSelectedChallengeMstNo(state, action: PayloadAction<number | null>) {
       state.selectedChallengeMstNo = action.payload;
-      console.log('변경!', state);
     },
   },
 });

@@ -1,5 +1,5 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {
   NavigationProp,
@@ -7,7 +7,7 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {loadGoals, loadSetting, loadUser} from '../store/async/asyncStore';
 import {restoreGoal} from '../store/slice/GoalSlice';
 
@@ -30,6 +30,11 @@ import EditChallengeScreen from './screens/EditChallengeScreen';
 import FriendScreen from './screens/FriendScreen';
 import ProfileSettingScreen from './screens/ProfileSettingScreen';
 import {MainTab} from './Tab/MainTab';
+
+import TrackPlayer from 'react-native-track-player';
+import {initTrackPlayer, setVolume} from '../store/slice/SettingSlice';
+import {useAppDispatch} from './Hook/reduxHooks';
+import SettingScreen from './screens/SettingScreen';
 
 export type RootStackParamList = {
   DailyNoteScreen: {
@@ -67,25 +72,28 @@ export type EditChallengeRouteType = RouteProp<
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+TrackPlayer.registerPlaybackService(
+  () => require('./theme/trackPlayerService').default,
+);
+
 function App() {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const CallApi = useApi();
+  const queryClient = useQueryClient();
+  const {showModal} = useModal();
+
   const {accessToken, UID, isLoggedIn} = useSelector(
     (state: RootState) => state.user,
   );
+
+  /* ---------- ① 스토어 / 사용자 데이터 부트스트랩 ---------- */
   const [isLoading, setIsLoading] = useState(true);
-
-  const {showModal} = useModal();
-
-  const queryClient = useQueryClient();
-  const [deepLinkUrl, setDeepLinkUrl] = useState('');
+  const pendingUrl = useRef<string | null>(null);
   const [initialRoute, setInitialRoute] =
     useState<keyof RootStackParamList>('LoginTab');
 
-  const [appState, setAppState] = useState<AppStateStatus>(
-    AppState.currentState,
-  );
+  /* ---------- ② react‑query mutations ---------- */
 
   const changeFriend = (friendNo: number) =>
     CallApi({
@@ -172,126 +180,122 @@ function App() {
     },
   });
 
+  /* ---------------------------------------------------------- */
+  /*                        useEffect ①                         */
+  /*  - 스토어 복원, 자동 로그인, 볼륨 설정 등 한 번만 실행       */
+  /* ---------------------------------------------------------- */
   useEffect(() => {
-    const bootstrapAsync = async () => {
-      const userData = await loadUser();
-      if (userData) {
-        dispatch(setUser(userData));
+    (async () => {
+      try {
+        /* user ---------------------------------------------------------------- */
+        const userData = await loadUser();
+        if (userData) {
+          dispatch(setUser(userData)); // store 에 복원
 
-        if (userData.SIGN_TYPE === SignType.KAKAO) {
-          loginMutation.mutate(userData.KAKAO);
+          const token =
+            userData.SIGN_TYPE === SignType.KAKAO
+              ? userData.KAKAO
+              : userData.SIGN_TYPE === SignType.APPLE
+                ? userData.APPLE
+                : userData.GUEST;
+
+          loginMutation.mutate(token);
           setInitialRoute('MainTab');
         }
-        if (userData.SIGN_TYPE === SignType.APPLE) {
-          loginMutation.mutate(userData.APPLE);
-          setInitialRoute('MainTab');
-        }
-        if (userData.SIGN_TYPE === SignType.GUEST) {
-          loginMutation.mutate(userData.GUEST);
-          setInitialRoute('MainTab');
-        }
-      }
 
-      const goalData = await loadGoals();
-      if (goalData) {
-        dispatch(restoreGoal(goalData));
-      }
+        /* goal ---------------------------------------------------------------- */
+        const goalData = await loadGoals();
+        goalData && dispatch(restoreGoal(goalData));
 
-      const settingData = await loadSetting();
-      if (settingData) {
-        // dispatch(setVolume(settingData));
-      }
-      setIsLoading(false);
-    };
-    bootstrapAsync();
-    // mobileAds().initialize();
-    // .then(adapterStatuses => {
-    //   console.log(adapterStatuses);
-    // });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+        /* setting ------------------------------------------------------------- */
+        const settingData = await loadSetting();
+        dispatch(initTrackPlayer());
+        settingData && dispatch(setVolume(settingData.volume));
 
+        console.log('queue', await TrackPlayer.getQueue());
+        console.log('state', await TrackPlayer.getState());
+        console.log('volume', await TrackPlayer.getVolume());
+
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+        setIsLoading(false);
+      }
+    })();
+  }, []); // ← mount only
+
+  /* ---------------------------------------------------------- */
+  /*                        useEffect ②                         */
+  /*  - AppState, 권한, 딥링크를 한 번에 관리                    */
+  /* ---------------------------------------------------------- */
   useEffect(() => {
-    const getPermission = async () => {
-      const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
-      console.log(result);
-      if (result === RESULTS.DENIED) {
+    /* ----- App Tracking Permission (iOS) -------------------- */
+    const requestATT = async () => {
+      if (Platform.OS !== 'ios') return;
+      const status = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+      if (status === RESULTS.DENIED) {
         await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
       }
     };
 
-    const appStateChange = (nextAppState: AppStateStatus) => {
-      console.log(nextAppState);
-      if (Platform.OS === 'ios' && nextAppState === 'active') {
-        console.log('getPerrmission');
-        getPermission();
+    /* ----- AppState listener -------------------------------- */
+    const onAppStateChange = (nextState: AppStateStatus) => {
+      if (Platform.OS === 'ios' && nextState === 'active') {
+        requestATT();
       }
-
-      // if (appState.match(/inactive|background/) && nextAppState === 'active') {
-      //   dispatch(playMusic());
-      // } else {
-      //   dispatch(stopMusic());
-      // }
-      setAppState(nextAppState);
     };
+    const appStateSub = AppState.addEventListener('change', onAppStateChange);
 
-    const app = AppState.addEventListener('change', appStateChange);
+    /* ----- 딥링크 처리 -------------------------------------- */
+    const parseUrl = (url: string) => {
+      const [, query] = url.split('?');
+      if (!query) return;
 
-    return () => {
-      app.remove();
-    };
-  }, [appState, dispatch]);
-
-  useEffect(() => {
-    const handleDeepLink = (event: {url: string}) => {
-      setDeepLinkUrl(event.url);
-    };
-
-    const unsubscribeLinking = Linking.addEventListener('url', handleDeepLink);
-
-    Linking.getInitialURL().then(url => {
-      if (url) {
-        setDeepLinkUrl(url);
-      }
-    });
-
-    return () => {
-      unsubscribeLinking.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    const extractParamsFromUrl = (url: string) => {
-      const queryParams = url.split('?')[1];
-      const params = queryParams ? queryParams.split('&') : [];
-      console.log(params);
-      params.map(param => {
+      query.split('&').forEach(param => {
         const [key, value] = param.split('=');
         if (key === 'SENDER_NO') {
-          if (UID! === parseInt(value, 10)) {
+          if (UID === Number(value)) {
             Toast.show({
               type: 'error',
               text1: '나 자신에게 친구요청을 할 수 없습니다.',
             });
           } else {
-            InviteFriend(parseInt(value, 10));
+            InviteFriend(Number(value));
           }
         }
         if (key === 'INVITE_CHALLENGE_NO') {
-          InviteChallenge(parseInt(value, 10));
+          InviteChallenge(Number(value));
         }
       });
     };
 
-    if (isLoggedIn && deepLinkUrl) {
-      extractParamsFromUrl(deepLinkUrl);
-      setDeepLinkUrl('');
-    }
-  }, [isLoggedIn, deepLinkUrl, UID, InviteFriend, InviteChallenge]);
+    const handleDeepLink = ({url}: {url: string}) => {
+      if (isLoggedIn) parseUrl(url);
+      else pendingUrl.current = url; // 로그인 완료 후에 처리
+    };
 
-  if (isLoading) {
-    return <LoadingIndicator />;
-  }
+    const linkSub = Linking.addEventListener('url', handleDeepLink);
+
+    // Initial URL
+    Linking.getInitialURL().then(url => url && handleDeepLink({url}));
+
+    /* ----- 로그인 완료 후 지연된 딥링크 처리 ---------------- */
+    if (isLoggedIn && pendingUrl.current) {
+      parseUrl(pendingUrl.current);
+      pendingUrl.current = null;
+    }
+
+    /* ----- cleanup ----------------------------------------- */
+    return () => {
+      appStateSub.remove();
+      linkSub.remove();
+    };
+  }, [isLoggedIn, UID]); // ← 로그인 여부가 바뀔 때만 재설정
+
+  /* ---------------------------------------------------------- */
+  /*                         Render                             */
+  /* ---------------------------------------------------------- */
+  if (isLoading) return <LoadingIndicator />;
 
   return (
     <Stack.Navigator
@@ -304,7 +308,7 @@ function App() {
             name="arrow-back"
             size={24}
             style={{paddingRight: 24}}
-            color={'#1C1B1F'}
+            color="#1C1B1F"
             onPress={() => navigation.goBack()}
           />
         ),
@@ -332,7 +336,7 @@ function App() {
         component={ProfileSettingScreen}
       />
       <Stack.Screen name="FriendScreen" component={FriendScreen} />
-      {/* <Stack.Screen name="SettingScreen" component={SettingScreen} /> */}
+      <Stack.Screen name="SettingScreen" component={SettingScreen} />
       <Stack.Screen name="DailyNoteScreen" component={DailyNoteScreen} />
     </Stack.Navigator>
   );
