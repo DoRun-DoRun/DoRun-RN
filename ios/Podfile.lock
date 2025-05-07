@@ -11,11 +11,6 @@ PODS:
   - hermes-engine (0.79.1):
     - hermes-engine/Pre-built (= 0.79.1)
   - hermes-engine/Pre-built (0.79.1)
-  - kakao-login (5.4.1):
-    - KakaoSDKAuth (= 2.22.0)
-    - KakaoSDKCommon (= 2.22.0)
-    - KakaoSDKUser (= 2.22.0)
-    - React
   - KakaoSDKAuth (2.22.0):
     - KakaoSDKCommon (= 2.22.0)
   - KakaoSDKCommon (2.22.0):
@@ -24,6 +19,18 @@ PODS:
   - KakaoSDKCommon/Common (2.22.0)
   - KakaoSDKCommon/Network (2.22.0):
     - Alamofire (~> 5.9.0)
+    - KakaoSDKCommon/Common (= 2.22.0)
+  - KakaoSDKFriend (2.22.0):
+    - KakaoSDKFriendCore (= 2.22.0)
+    - KakaoSDKUser (= 2.22.0)
+  - KakaoSDKFriendCore (2.22.0)
+  - KakaoSDKShare (2.22.0):
+    - KakaoSDKCommon (= 2.22.0)
+    - KakaoSDKTemplate (= 2.22.0)
+  - KakaoSDKTalk (2.22.0):
+    - KakaoSDKTemplate (= 2.22.0)
+    - KakaoSDKUser (= 2.22.0)
+  - KakaoSDKTemplate (2.22.0):
     - KakaoSDKCommon/Common (= 2.22.0)
   - KakaoSDKUser (2.22.0):
     - KakaoSDKAuth (= 2.22.0)
@@ -1865,6 +1872,112 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNCKakaoCore (2.4.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - KakaoSDKCommon (= 2.22.0)
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - RNCKakaoShare (2.4.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - KakaoSDKShare (= 2.22.0)
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNCKakaoCore
+    - RNCKakaoSocial
+    - Yoga
+  - RNCKakaoSocial (2.4.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - KakaoSDKFriend (= 2.22.0)
+    - KakaoSDKTalk (= 2.22.0)
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNCKakaoCore
+    - RNCKakaoUser
+    - Yoga
+  - RNCKakaoUser (2.4.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - KakaoSDKUser (= 2.22.0)
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNCKakaoCore
+    - Yoga
   - RNFastImage (8.6.3):
     - React-Core
     - SDWebImage (~> 5.11.1)
@@ -1987,7 +2100,6 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
-  - "kakao-login (from `../node_modules/@react-native-seoul/kakao-login`)"
   - lottie-react-native (from `../node_modules/lottie-react-native`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -2060,6 +2172,10 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCKakaoCore (from `../node_modules/@react-native-kakao/core`)"
+  - "RNCKakaoShare (from `../node_modules/@react-native-kakao/share`)"
+  - "RNCKakaoSocial (from `../node_modules/@react-native-kakao/social`)"
+  - "RNCKakaoUser (from `../node_modules/@react-native-kakao/user`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -2071,6 +2187,11 @@ SPEC REPOS:
     - Alamofire
     - KakaoSDKAuth
     - KakaoSDKCommon
+    - KakaoSDKFriend
+    - KakaoSDKFriendCore
+    - KakaoSDKShare
+    - KakaoSDKTalk
+    - KakaoSDKTemplate
     - KakaoSDKUser
     - libwebp
     - lottie-ios
@@ -2097,8 +2218,6 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-03-03-RNv0.79.0-bc17d964d03743424823d7dd1a9f37633459c5c5
-  kakao-login:
-    :path: "../node_modules/@react-native-seoul/kakao-login"
   lottie-react-native:
     :path: "../node_modules/lottie-react-native"
   RCT-Folly:
@@ -2239,6 +2358,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@invertase/react-native-apple-authentication"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCKakaoCore:
+    :path: "../node_modules/@react-native-kakao/core"
+  RNCKakaoShare:
+    :path: "../node_modules/@react-native-kakao/share"
+  RNCKakaoSocial:
+    :path: "../node_modules/@react-native-kakao/social"
+  RNCKakaoUser:
+    :path: "../node_modules/@react-native-kakao/user"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
   RNPermissions:
@@ -2260,9 +2387,13 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: c32f2e405098bc1ebe30630a051ddce6f21d3c2e
-  kakao-login: 39d7c13140ad97c54f9d42893d32ab4a1476420a
   KakaoSDKAuth: 569b377eda622d93d4575240b8031cd658163eef
   KakaoSDKCommon: d57127c339fc79e73aa8b236a4c77211c29924f1
+  KakaoSDKFriend: bfd6b017e31a448fa12b3254690a0dc209685d9f
+  KakaoSDKFriendCore: 15335ad820ec06940dbe5be7f920123826234d03
+  KakaoSDKShare: cbbe89685ad799709d467845dcc488c115629f5e
+  KakaoSDKTalk: cf2af6650bc7d77aa6cc8dab1bd464f4fda0618d
+  KakaoSDKTemplate: 2b518d4875fb9b3e832d39e957e4e33cb27a9d36
   KakaoSDKUser: 043bcd7e91454ebf3bf64f150c430e6f65f0a08d
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   lottie-ios: a881093fab623c467d3bce374367755c272bdd59
@@ -2336,6 +2467,10 @@ SPEC CHECKSUMS:
   ReactCommon: aa48e4fddbc6a0afa19dca39a1b6016c150b5db4
   RNAppleAuthentication: c3dddf5918126c9aae85dc2e2ce9fb87835e9e04
   RNCAsyncStorage: 39c42c1e478e1f5166d1db52b5055e090e85ad66
+  RNCKakaoCore: c4d33961a7bd2d0827d1694a7046097aa75eb495
+  RNCKakaoShare: 9a6974a96e24ea03d286247f2a78ec5cc5a6afdf
+  RNCKakaoSocial: 40d40b74cbf8c2c5f677c592d6d870551474f0ed
+  RNCKakaoUser: 81981640ce3c0ddf3d7ea461a5f8e675b4129254
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
   RNPermissions: aa1218854e3d2a896ac778da95a51a993b35971f
   RNScreens: 5621e3ad5a329fbd16de683344ac5af4192b40d3

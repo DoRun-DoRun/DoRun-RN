@@ -1,3 +1,5 @@
+import {initializeKakaoSDK} from '@react-native-kakao/core';
+
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect, useRef, useState} from 'react';
 
@@ -212,9 +214,9 @@ function App() {
         dispatch(initTrackPlayer());
         settingData && dispatch(setVolume(settingData.volume));
 
-        console.log('queue', await TrackPlayer.getQueue());
-        console.log('state', await TrackPlayer.getState());
-        console.log('volume', await TrackPlayer.getVolume());
+        // console.log('queue', await TrackPlayer.getQueue());
+        // console.log('state', await TrackPlayer.getState());
+        // console.log('volume', await TrackPlayer.getVolume());
 
         setIsLoading(false);
       } catch (e) {
@@ -229,6 +231,8 @@ function App() {
   /*  - AppState, 권한, 딥링크를 한 번에 관리                    */
   /* ---------------------------------------------------------- */
   useEffect(() => {
+    initializeKakaoSDK('97d8ca4c2736fdb3f362246fe17f316b');
+
     /* ----- App Tracking Permission (iOS) -------------------- */
     const requestATT = async () => {
       if (Platform.OS !== 'ios') return;

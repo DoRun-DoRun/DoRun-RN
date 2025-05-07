@@ -1,4 +1,4 @@
-import {KakaoOAuthToken, login} from '@react-native-seoul/kakao-login';
+import KakaoLogin, {me} from '@react-native-kakao/user';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -46,17 +46,6 @@ interface AppleJwtToken {
   is_private_email: string;
   auth_time: number;
   nonce_supported: boolean;
-}
-
-interface KakaoJwtToken {
-  aud: string;
-  sub: string;
-  auth_time: number;
-  iss: string;
-  nickname: string;
-  exp: number;
-  iat: number;
-  email: string;
 }
 
 const LoginTab = () => {
@@ -132,9 +121,13 @@ const LoginTab = () => {
 
   const signInWithKakao = async (): Promise<void> => {
     try {
-      const token: KakaoOAuthToken = await login();
-      const payload: KakaoJwtToken = jwtDecode(token.idToken);
-      SignUp({signType: SignType.KAKAO, email: payload.email});
+      const payload = await KakaoLogin.login();
+      console.log(payload);
+      const user = await me();
+      console.log(user);
+      // const token: KakaoOAuthToken = await login();
+      // const payload: KakaoJwtToken = jwtDecode(token.idToken);
+      SignUp({signType: SignType.KAKAO, email: user.email});
     } catch (err) {
       console.log(err);
     }
