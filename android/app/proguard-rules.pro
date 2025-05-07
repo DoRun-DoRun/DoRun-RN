@@ -17,8 +17,10 @@
 -dontwarn org.conscrypt.*
 -dontwarn org.openjsse.**
 
-#------------------RETROFIT---------------------
-#R8 full mode strips generic signatures from return types if not kept.
+# refrofit2 (with r8 full mode)
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 -if interface * { @retrofit2.http.* public *** *(...); }
 -keep,allowoptimization,allowshrinking,allowobfuscation class <3>
-#-------------------END--------------------------
+-keep,allowobfuscation,allowshrinking class retrofit2.Response

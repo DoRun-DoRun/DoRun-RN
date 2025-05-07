@@ -46,7 +46,7 @@
     "react-native-share": "^12.0.9",
     "react-native-simple-modal": "^9.0.1",
     "react-native-toast-message": "^2.3.0",
-    "react-native-track-player": "^4.1.1",
+    "react-native-track-player": "github:StuCodeGreen/react-native-track-player#fix/service-onBind-signature",
     "react-native-vector-icons": "^10.2.0",
     "react-native-view-shot": "^4.0.3",
     "react-query": "^3.39.3",

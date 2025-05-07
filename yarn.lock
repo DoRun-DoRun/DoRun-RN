@@ -6088,10 +6088,9 @@ react-native-toast-message@^2.3.0:
   resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.3.0.tgz#c25fb40d7af4388f6a798efbfca479d53916ed00"
   integrity sha512-d7LldTK1ei1Bl7RFhoOYw8hVQ4oKPQHORYI//xR9Pyz3HxSlFlvQbueE5X3KLoemRRgBrOUg3zY6DxXnxrVLRg==
 
-react-native-track-player@^4.1.1:
+"react-native-track-player@github:StuCodeGreen/react-native-track-player#fix/service-onBind-signature":
   version "4.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-4.1.1.tgz#96f8688f270c5a01bc597b6331843b191402502b"
-  integrity sha512-E5N/eK/+HtAVJUAzXpm1cWz8ROheV9jb0TI6h2bM+333U+DWibTTnT2T1122FkCoXLXIYavtm2FR2if+5jH8cA==
+  resolved "https://codeload.github.com/StuCodeGreen/react-native-track-player/tar.gz/4186e76edd42315c98294a1bbfea78f04fc7438b"
 
 react-native-vector-icons@^10.2.0:
   version "10.2.0"

@@ -71,6 +71,7 @@ def enableProguardInReleaseBuilds = false
  * this variant is about 6MiB larger per architecture than default.
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+def kakaoSdkVersion = "2.21.1"
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -110,6 +111,12 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+
+    implementation "com.kakao.sdk:v2-all:2.20.1" // 전체 모듈 설치, 2.11.0 버전부터 지원
+    implementation "com.kakao.sdk:v2-user:2.20.1" // 카카오 로그인 API 모듈
+    implementation "com.kakao.sdk:v2-share:2.20.1" // 카카오톡 공유 API 모듈
+    implementation "com.kakao.sdk:v2-talk:2.20.1" // 카카오톡 채널, 카카오톡 소셜, 카카오톡 메시지 API 모듈
+    implementation "com.kakao.sdk:v2-cert:2.20.1" // 카카오톡 인증 서비스 API 모듈
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
